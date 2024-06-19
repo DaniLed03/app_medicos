@@ -7,7 +7,6 @@
             <p class="mt-4 text-lg">Tu tiempo es para tus pacientes. Nosotros nos encargamos del resto.</p>
             <div class="mt-8">
                 <a href="{{ route('login') }}" class="bg-secondary text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark ml-4">Iniciar Sesión</a>
-                <a href="{{ route('register') }}" class="bg-secondary text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark ml-4">Crear cuenta ¡gratis!</a>
             </div>
         </div>
 
@@ -55,7 +54,7 @@
                 <div class="mt-8 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     <!-- Feature Card 1 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M7 2a2 2 0 0 0-2 2v1a1 1 0 0 0 0 2v1a1 1 0 0 0 0 2v1a1 1 0 1 0 0 2v1a1 1 0 1 0 0 2v1a1 1 0 1 0 0 2v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H7Zm3 8a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm-1 7a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3 1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
                             </svg>  
@@ -66,7 +65,7 @@
 
                     <!-- Feature Card 2 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M5.617 2.076a1 1 0 0 1 1.09.217L8 3.586l1.293-1.293a1 1 0 0 1 1.414 0L12 3.586l1.293-1.293a1 1 0 0 1 1.414 0L16 3.586l1.293-1.293A1 1 0 0 1 19 3v18a1 1 0 0 1-1.707.707L16 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L12 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L8 20.414l-1.293 1.293A1 1 0 0 1 5 21V3a1 1 0 0 1 .617-.924ZM9 7a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2H9Zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z" clip-rule="evenodd"/>
                             </svg>   
@@ -77,7 +76,7 @@
 
                     <!-- Feature Card 3 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z" clip-rule="evenodd"/>
                             </svg>
@@ -88,7 +87,7 @@
 
                     <!-- Feature Card 4 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 0 0-1 1H6a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2a1 1 0 0 0-1-1H9Zm1 2h4v2h1a1 1 0 1 1 0 2H9a1 1 0 0 1 0-2h1V4Zm5.707 8.707a1 1 0 0 0-1.414-1.414L11 14.586l-1.293-1.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4Z" clip-rule="evenodd"/>
                             </svg>
@@ -99,7 +98,7 @@
 
                     <!-- Feature Card 5 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M11.644 3.066a1 1 0 0 1 .712 0l7 2.666A1 1 0 0 1 20 6.68a17.694 17.694 0 0 1-2.023 7.98 17.406 17.406 0 0 1-5.402 6.158 1 1 0 0 1-1.15 0 17.405 17.405 0 0 1-5.403-6.157A17.695 17.695 0 0 1 4 6.68a1 1 0 0 1 .644-.949l7-2.666Zm4.014 7.187a1 1 0 0 0-1.316-1.506l-3.296 2.884-.839-.838a1 1 0 0 0-1.414 1.414l1.5 1.5a1 1 0 0 0 1.366.046l4-3.5Z" clip-rule="evenodd"/>
                             </svg>
@@ -110,7 +109,7 @@
 
                     <!-- Feature Card 6 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v5h18V5a2 2 0 0 0-2-2H5ZM3 14v-2h18v2a2 2 0 0 1-2 2h-6v3h2a1 1 0 1 1 0 2H9a1 1 0 1 1 0-2h2v-3H5a2 2 0 0 1-2-2Z" clip-rule="evenodd"/>
                             </svg>
@@ -121,7 +120,7 @@
 
                     <!-- Feature Card 7 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M17.133 12.632v-1.8a5.407 5.407 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.933.933 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175Zm-13.267-.8a1 1 0 0 1-1-1 9.424 9.424 0 0 1 2.517-6.391A1.001 1.001 0 1 1 6.854 5.8a7.43 7.43 0 0 0-1.988 5.037 1 1 0 0 1-1 .995Zm16.268 0a1 1 0 0 1-1-1A7.431 7.431 0 0 0 17.146 5.8a1 1 0 0 1 1.471-1.354 9.424 9.424 0 0 1 2.517 6.391 1 1 0 0 1-1 .995ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z"/>
                             </svg>
@@ -132,7 +131,7 @@
 
                     <!-- Feature Card 8 -->
                     <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <div class="bg-primary text-white rounded-full p-4 inline-block">
+                        <div class="bg-tercero text-white rounded-full p-4 inline-block">
                             <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 10 3-3m0 0-3-3m3 3H5v3m3 4-3 3m0 0 3 3m-3-3h14v-3"/>
                             </svg>
@@ -162,5 +161,8 @@
     }
     .bg-secondary-dark {
         background-color: #278A75;
+    }
+    .bg-tercero {
+        background-color: #000000;
     }
 </style>

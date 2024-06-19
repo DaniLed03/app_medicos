@@ -38,12 +38,6 @@
                     <a href="{{ route('password.request') }}" class="mb-6 text-center text-sm font-medium text-gray-600 md:text-left">¿Olvidaste tu contraseña?</a>
                     <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-center text-base font-semibold text-white shadow-md outline-none ring-blue-500 ring-offset-2 transition hover:bg-blue-700 focus:ring-2 md:w-32">Iniciar sesión</button>
                 </form>
-                <div class="py-12 text-center">
-                    <p class="text-gray-600">
-                        ¿No tienes una cuenta?
-                        <a href="{{ route('register') }}" class="whitespace-nowrap font-semibold text-gray-900 underline underline-offset-4">Regístrate gratis.</a>
-                    </p>
-                </div>
             </div>
         </div>
         <div class="relative hidden h-full w-full select-none bg-gradient-to-br from-green-600 via-blue-500 to-blue-700 md:block md:w-1/2 lg:w-2/5">

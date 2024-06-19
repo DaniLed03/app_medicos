@@ -1,85 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #06b6d4, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex w-screen h-screen">
+        <div class="flex w-full flex-col md:w-1/2 lg:w-3/5 p-10">
+            <div class="my-auto mx-auto flex flex-col justify-center px-6 pt-8 md:justify-start lg:w-[32rem]">
+                <p class="text-center text-3xl font-bold md:leading-tight md:text-left md:text-5xl">
+                    Crea tu cuenta en <br />
+                    <span class="gradient-text">LedeHealth</span>
+                </p>
+                <p class="mt-6 text-center font-medium md:text-left">Completa el formulario para registrarte.</p>
+      
+                <form method="POST" action="{{ route('register') }}" class="flex flex-col items-stretch pt-3 md:pt-8">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="text" id="nombres" name="nombres" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Nombres" required />
+                            </div>
+                        </div>
 
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="text" id="apepat" name="apepat" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Apellido Paterno" required />
+                            </div>
+                        </div>
 
-        <!-- Nombres -->
-        <div class="mt-4 col-span-2">
-            <x-input-label for="nombres" :value="__('Nombres')" />
-            <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="text" id="apemat" name="apemat" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Apellido Materno" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="date" id="fechanac" name="fechanac" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Fecha de Nacimiento" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="number" id="telefono" name="telefono" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Teléfono" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <select id="rol" name="rol" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
+                                    <option value="medico">Médico</option>
+                                    <option value="secretaria">Secretaria</option>
+                                    <option value="colaborador">Colaborador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="email" id="email" name="email" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Correo Electrónico" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="password" id="password" name="password" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Contraseña" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="password" id="password_confirmation" name="password_confirmation" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Confirmar Contraseña" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="py-12 text-center">
+                        <p class="text-gray-600">
+                            ¿Ya tienes una cuenta?
+                            <a href="{{ route('login') }}" class="whitespace-nowrap font-semibold text-gray-900 underline underline-offset-4">Inicia sesión.</a>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-center text-base font-semibold text-white shadow-md outline-none ring-blue-500 ring-offset-2 transition hover:bg-blue-700 focus:ring-2 md:w-32 mx-auto">Registrarse</button>
+                </form>
+            </div>
         </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <!-- Apellido Paterno -->
-            <div class="mt-4">
-                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-            </div>
-
-            <!-- Apellido Materno -->
-            <div class="mt-4">
-                <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-            </div>
-
-            <!-- Fecha de Nacimiento -->
-            <div class="mt-4">
-                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
-            </div>
-
-            <!-- Telefono -->
-            <div class="mt-4">
-                <x-input-label for="telefono" :value="__('Teléfono')" />
-                <x-text-input id="telefono" class="block mt-1 w-full" type="number" name="telefono" :value="old('telefono')" required autofocus autocomplete="tel" />
-                <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
-            </div>
-
-            <!-- Rol -->
-            <div class="mt-4 col-span-2">
-                <x-input-label for="rol" :value="__('Rol')" />
-                <select id="rol" name="rol" class="block mt-1 w-full" required>
-                    <option value="medico" {{ old('rol') == 'medico' ? 'selected' : '' }}>Médico</option>
-                    <option value="secretaria" {{ old('rol') == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
-                    <option value="colaborador" {{ old('rol') == 'colaborador' ? 'selected' : '' }}>Colaborador</option>
-                </select>
-                <x-input-error :messages="$errors->get('rol')" class="mt-2" />
-            </div>
-
-            <!-- Correo Electrónico -->
-            <div class="mt-4 col-span-2">
-                <x-input-label for="correo" :value="__('Correo Electrónico')" />
-                <x-text-input id="email" class="block mt-1 w-full" type="text" name="email" :value="old('email')" required autocomplete="username" />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
-            </div>
-
-            <!-- Contraseña -->
-            <div class="mt-4">
-                <x-input-label for="password" :value="__('Contraseña')" />
-                <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
-
-            <!-- Confirmar Contraseña -->
-            <div class="mt-4">
-                <x-input-label for="password_confirmation" :value="__('Confirmar Contraseña')" />
-                <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <div class="relative hidden h-full w-full select-none bg-gradient-to-br from-green-600 via-blue-500 to-blue-700 md:block md:w-1/2 lg:w-2/5">
+            <div class="py-8 px-8 text-white xl:w-[40rem] text-center">
+                <img src="{{ asset('images/Ledehealth.png') }}" alt="LedeHealth Logo" class="mx-auto h-100 mb-4">
+                <p class="mt-8 font-bold">En nuestro consultorio virtual, podrás gestionar tus citas, consultar resultados de exámenes y recibir asesoramiento médico de manera remota.</p>
             </div>
         </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ml-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+</body>
+</html>

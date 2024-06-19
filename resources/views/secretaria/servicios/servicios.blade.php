@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg"> <!-- Añadido shadow-lg para la sombra -->
                 <div class="p-6 text-gray-900">
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
                         <div class="flex my-4 mx-4 items-center justify-between">
