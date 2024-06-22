@@ -170,12 +170,29 @@ class SecretariaController extends Controller
             'usuariomedicoid' => 'required|exists:users,id'
         ]);
 
+        // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
+        $exists = Citas::where('fecha', $request->fecha)
+                    ->where('hora', $request->hora)
+                    ->where('medicoid', $request->usuariomedicoid)
+                    ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['hora' => 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.'])->withInput();
+        }
+
         // Creación de la cita
-        Citas::create($request->all());
+        Citas::create([
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'pacienteid' => $request->pacienteid,
+            'medicoid' => $request->usuariomedicoid
+        ]);
 
         // Redirecciona a la vista de citas con un mensaje de éxito
         return redirect()->route('citas')->with('status', 'Cita registrada correctamente');
     }
+
+
 
     // Muestra el formulario para agregar una nueva cita
     public function crearCita()
@@ -242,9 +259,15 @@ class SecretariaController extends Controller
     public function horasDisponibles(Request $request)
     {
         $fecha = $request->input('fecha');
-        $citas = Citas::where('fecha', $fecha)->pluck('hora')->toArray();
+        $medicoid = $request->input('medicoid');
+        $citas = Citas::where('fecha', $fecha)
+                    ->where('medicoid', $medicoid)
+                    ->pluck('hora')
+                    ->toArray();
         return response()->json($citas);
-    }
+}
+
+
 
 
     //////////////////////////////////    MEDICOS    /////////////////////////////////////////

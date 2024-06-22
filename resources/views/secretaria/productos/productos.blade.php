@@ -1,16 +1,14 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
                         <div class="flex my-4 mx-4 items-center justify-between">
                             <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Productos</h1>
-                            <a href="{{ route('productos.agregar') }}">
-                                <x-primary-button class="bg-button-color hover:bg-button-hover">
-                                    {{ __('Agregar Producto') }}
-                                </x-primary-button>
-                            </a>
+                            <button id="openModal" class="bg-button-color hover:bg-button-hover text-white py-2 px-4 rounded">
+                                Agregar Producto
+                            </button>
                         </div>
                         <!-- Table -->
                         <table class="min-w-full text-center text-sm whitespace-nowrap">
@@ -54,7 +52,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="sm:flex sm:items-center w-full">
+                            <h3 class="text-2xl leading-6 font-bold text-center text-gray-900 w-full" style="color: #316986;">
+                                Agregar Producto
+                            </h3>
+                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-2xl" id="closeModal">
+                                <span class="sr-only">Close</span>
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 mt-4"></div>
+                    <div class="mt-2">
+                        @include('secretaria.productos.agregarProducto')
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-app-layout>
+
+<script>
+    document.getElementById('openModal').addEventListener('click', function() {
+        document.getElementById('modal').classList.remove('hidden');
+    });
+
+    document.getElementById('closeModal').addEventListener('click', function() {
+        document.getElementById('modal').classList.add('hidden');
+    });
+</script>
 
 <style>
     .bg-custom-color {

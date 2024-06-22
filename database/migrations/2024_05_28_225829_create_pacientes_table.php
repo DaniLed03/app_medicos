@@ -4,26 +4,26 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// Esta clase se usa para crear y eliminar la tabla 'pacientes' en la base de datos.
 return new class extends Migration
 {
-    // Método que se ejecuta al aplicar la migración
+    // Método que se ejecuta al aplicar la migración (crear la tabla 'pacientes').
     public function up(): void
     {
-        // Crear la tabla 'pacientes'
         Schema::create('pacientes', function (Blueprint $table) {
-            $table->id(); // Columna ID auto incrementada
-            $table->string('nombres', 100); // Columna nombres con un máximo de 100 caracteres
-            $table->string('apepat', 100); // Columna apellido paterno con un máximo de 100 caracteres
-            $table->string('apemat', 100); // Columna apellido materno con un máximo de 100 caracteres
-            $table->date('fechanac'); // Columna fecha de nacimiento
-            $table->enum('activo', ['si', 'no'])->default('si'); // Columna activo con valores 'si' y 'no', por defecto 'si'
-            $table->timestamps(); // Columnas created_at y updated_at
+            $table->id(); // Columna para el ID único del paciente.
+            $table->string('nombres', 100); // Columna para los nombres del paciente.
+            $table->string('apepat', 100); // Columna para el apellido paterno.
+            $table->string('apemat', 100); // Columna para el apellido materno.
+            $table->date('fechanac'); // Columna para la fecha de nacimiento.
+            $table->enum('activo', ['si', 'no'])->default('si'); // Columna para el estado (activo o inactivo) del paciente, por defecto es 'si'.
+            $table->timestamps(); // Columnas para las marcas de tiempo (creación y actualización).
         });
     }
 
-    // Método que se ejecuta al revertir la migración
+    // Método que se ejecuta al revertir la migración (eliminar la tabla 'pacientes').
     public function down(): void
     {
-        Schema::dropIfExists('pacientes'); // Elimina la tabla 'pacientes' si existe
+        Schema::dropIfExists('pacientes'); // Elimina la tabla 'pacientes'.
     }
 };

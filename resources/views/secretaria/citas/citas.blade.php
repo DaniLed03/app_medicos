@@ -1,10 +1,9 @@
 <x-app-layout>
     <div class="py-12" x-data="{ isModalOpen: false }">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg"> <!-- Añadido shadow-lg para la sombra -->
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <!-- Calendar and Appointment Table -->
                         <div class="lg:flex lg:h-full lg:flex-col">
                             <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
                                 <h1 class="text-base font-semibold leading-6 text-gray-900">
@@ -28,7 +27,7 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                    <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
                                         {{ __('Agregar Cita') }}
                                     </button>
                                 </div>
@@ -74,34 +73,36 @@
                                 </div>
                                 <!-- Appointment Table -->
                                 <div class="lg:flex lg:flex-auto lg:flex-col lg:w-1/3 lg:ml-4">
-                                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5">
-                                        <table class="min-w-full divide-y divide-gray-300">
-                                            <thead class="bg-primary text-white font-bold">
-                                                <tr>
-                                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Fecha</th>
-                                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Hora</th>
-                                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Paciente</th>
-                                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="divide-y divide-gray-200 bg-white">
-                                                @foreach($citas as $cita)
-                                                    <tr>
-                                                        <td class="px-3 py-4 text-sm text-gray-500">{{ $cita->fecha }}</td>
-                                                        <td class="px-3 py-4 text-sm text-gray-500">{{ $cita->hora }}</td>
-                                                        <td class="px-3 py-4 text-sm text-gray-500">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</td>
-                                                        <td class="px-3 py-4 text-sm text-gray-500">
-                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                                    <div class="bg-white shadow overflow-hidden rounded-lg">
+                                        <div class="bg-primary text-white px-4 py-2 font-bold">Hoy</div>
+                                        <div class="p-4">
+                                            @foreach($citas as $cita)
+                                                @if($cita->fecha === \Carbon\Carbon::now()->format('Y-m-d'))
+                                                    <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center">
+                                                        <div class="bg-gray-200 p-2 rounded-full mr-3">
+                                                            <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 4h10M5 11h14m-7 4h.01M12 17h.01M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <a href="#" class="text-lg font-semibold text-gray-900 selectable">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
+                                                            <div class="text-sm text-gray-600">{{ $cita->fecha }} - {{ $cita->hora }}</div>
+                                                        </div>
+                                                        <div class="flex space-x-2">
+                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                                                             <form action="{{ route('citas.eliminar', $cita->id) }}" method="POST" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit" class="text-red-600 hover:text-red-900 ml-2">Eliminar</button>
                                                             </form>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                            @if($citas->where('fecha', \Carbon\Carbon::now()->format('Y-m-d'))->isEmpty())
+                                                <p class="text-center text-gray-500">No hay citas para hoy.</p>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -113,10 +114,7 @@
 
         <!-- Modal -->
         <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div @click.away="isModalOpen = false" class="bg-white p-6 rounded shadow-lg modal">
-                <h2 class="text-xl mb-4">Agregar Cita</h2>
-                @include('secretaria.citas.agregarCita', ['pacientes' => $pacientes, 'usuarios' => $usuarios])
-            </div>
+            @include('secretaria.citas.agregarCita', ['pacientes' => $pacientes, 'usuarios' => $usuarios])
         </div>
     </div>
 </x-app-layout>
@@ -150,6 +148,15 @@
     }
     .hover\:bg-button-hover:hover {
         background-color: #278A75;
+    }
+    .current-day {
+        background-color: #2D7498;
+        border-radius: 50%;
+        color: white;
+        padding: 5px;
+    }
+    .selectable {
+        user-select: text;
     }
 </style>
 
@@ -197,7 +204,8 @@
             const currentDay = new Date(currentYear, currentDate.getMonth(), i);
             const dateString = currentDay.toISOString().split('T')[0];
             let citaContent = '';
-
+            let isToday = currentDay.toDateString() === new Date().toDateString();
+            
             // Check if there are any appointments for this day
             citas.forEach(cita => {
                 if (cita.fecha === dateString) {
@@ -206,7 +214,7 @@
             });
 
             calendarGrid += `<div class="relative bg-white px-3 py-2 h-24 calendar-day">
-                                <time datetime="${dateString}">${i}</time>
+                                <time datetime="${dateString}" class="${isToday ? 'current-day' : ''}">${i}</time>
                                 ${citaContent}
                              </div>`;
         }

@@ -2,58 +2,59 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Clase User que representa a un usuario en el sistema.
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Los atributos que se pueden llenar al crear o actualizar un usuario.
      */
     protected $fillable = [
-        'nombres',
-        'apepat',
-        'apemat',
-        'fechanac',
-        'telefono',
-        'rol',
-        'activo',
-        'email',
-        'password',
+        'nombres',    // Nombres del usuario
+        'apepat',     // Apellido paterno del usuario
+        'apemat',     // Apellido materno del usuario
+        'fechanac',   // Fecha de nacimiento del usuario
+        'telefono',   // Teléfono del usuario
+        'rol',        // Rol del usuario (ej. admin, doctor, paciente)
+        'activo',     // Estado del usuario (activo o inactivo)
+        'email',      // Correo electrónico del usuario
+        'password',   // Contraseña del usuario
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Los atributos que deben ser ocultos al serializar el modelo.
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password',         // Ocultar la contraseña
+        'remember_token',   // Ocultar el token de recordar sesión
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Obtener los atributos que deben ser convertidos a otros tipos.
      */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at' => 'datetime', // Convertir a datetime
+            'password' => 'hashed',           // Guardar la contraseña como hash
         ];
     }
 
-    // Relación con el modelo Citas
+    /**
+     * Define la relación entre el modelo User y el modelo Citas.
+     * Un usuario puede tener muchas citas si es médico.
+     */
     public function citas()
     {
+        // Relación uno a muchos: Un usuario (médico) puede tener muchas citas.
         return $this->hasMany(Citas::class, 'usuariomedicoid');
     }
 }

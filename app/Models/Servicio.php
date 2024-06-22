@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Servicio extends Model
 {
     use HasFactory;
-    
-    // Los campos aqui se asignan
 
     protected $fillable = [
         'nombre',
         'precio',
-        'activo',
+        'activo'
     ];
+
+    public function consultas()
+    {
+        return $this->belongsToMany(Consultas::class, 'consulta_servicio');
+    }
 }
