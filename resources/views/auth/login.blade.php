@@ -42,7 +42,7 @@
         </div>
         <div class="relative hidden h-full w-full select-none bg-gradient-to-br from-green-600 via-blue-500 to-blue-700 md:block md:w-1/2 lg:w-2/5">
             <div class="py-8 px-8 text-white xl:w-[40rem] text-center">
-                <img src="{{ asset('images/Ledehealth.png') }}" alt="LedeHealth Logo" class="mx-auto h-100 mb-4">
+                <img src="{{ url('images/LedeHealth.png') }}" alt="LedeHealth Logo" class="mx-auto h-100 mb-4">
                 <p class="mt-8 font-bold">En nuestro consultorio virtual, podrás gestionar tus citas, consultar resultados de exámenes y recibir asesoramiento médico de manera remota.</p>
             </div>
         </div>

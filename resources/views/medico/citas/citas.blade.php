@@ -27,11 +27,12 @@
                                             </svg>
                                         </button>
                                     </div>
+                                    <button type="button" class="ml-6 hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block" onclick="goToToday()">Hoy</button>
                                     <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
                                         {{ __('Agregar Cita') }}
                                     </button>
                                 </div>
-                            </header>
+                            </header>                                                       
                             <div class="lg:flex lg:flex-auto lg:flex-row">
                                 <!-- Calendar -->
                                 <div class="shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col lg:w-2/3">
@@ -78,24 +79,21 @@
                                         <div class="p-4">
                                             @foreach($citas as $cita)
                                                 @if($cita->fecha === \Carbon\Carbon::now()->format('Y-m-d'))
-                                                    <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center">
+                                                    <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center cursor-pointer" onclick="window.location.href='{{ route('citas.editar', $cita->id) }}'">
                                                         <div class="bg-gray-200 p-2 rounded-full mr-3">
                                                             <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 4h10M5 11h14m-7 4h.01M12 17h.01M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                             </svg>
                                                         </div>
                                                         <div class="flex-1">
-                                                            <a href="#" class="text-lg font-semibold text-gray-900 selectable">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
+                                                            <a href="#" class="text-lg font-semibold text-gray-900">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
                                                             <div class="text-sm text-gray-600">{{ $cita->fecha }} - {{ $cita->hora }}</div>
                                                         </div>
-                                                        <div class="flex space-x-2">
-                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
-                                                            <form action="{{ route('citas.eliminar', $cita->id) }}" method="POST" style="display:inline;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="text-red-600 hover:text-red-900 ml-2">Eliminar</button>
-                                                            </form>
-                                                        </div>
+                                                        <form action="{{ route('citas.eliminar', $cita->id) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-red-600 hover:text-red-900 ml-2">Eliminar</button>
+                                                        </form>
                                                     </div>
                                                 @endif
                                             @endforeach
@@ -114,7 +112,69 @@
 
         <!-- Modal -->
         <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            @include('secretaria.citas.agregarCita', ['pacientes' => $pacientes, 'usuarios' => $usuarios])
+            <form method="POST" id="cita-form" action="{{ route('citas.store') }}" class="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto relative">
+                @csrf
+                <button type="button" @click="isModalOpen = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <h2 class="text-2xl font-bold text-center mb-4" style="color: #316986;">Agregar Cita</h2>
+                <hr class="mb-4">
+            
+                <!-- Fecha y Hora -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
+                        <input id="fecha" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" type="date" name="fecha" :value="old('fecha')" required autofocus min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
+                        @error('fecha')
+                            <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
+                        @enderror
+                    </div>
+            
+                    <div>
+                        <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
+                        <select id="hora" name="hora" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <!-- Options will be dynamically populated -->
+                        </select>
+                        @error('hora')
+                            <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            
+                <!-- Paciente -->
+                <div class="flex items-center mb-4">
+                    <div class="flex-grow">
+                        <label for="pacienteid" class="block text-sm font-medium text-gray-700">Paciente</label>
+                        <select id="pacienteid" name="pacienteid" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            @foreach($pacientes as $paciente)
+                                <option value="{{ $paciente->id }}" {{ old('pacienteid') == $paciente->id ? 'selected' : '' }}>
+                                    {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('pacienteid')
+                            <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            
+                <!-- Usuario Médico (Visible but Disabled Field and Hidden Field) -->
+                <div class="mb-4">
+                    <label for="usuariomedico" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
+                    <input id="usuariomedico" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" type="text" value="Daniel Ledezma Donjuan" disabled />
+                    <input type="hidden" id="usuariomedicoid" name="usuariomedicoid" value="1">
+                </div>
+            
+                <div id="error-message" class="text-red-500 text-sm mt-2" style="display: none;"></div>
+            
+                <div class="flex items-center justify-end mt-4">
+                    <button type="submit" id="registrar-cita-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Registrar Cita
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>
@@ -153,10 +213,27 @@
         background-color: #2D7498;
         border-radius: 50%;
         color: white;
-        padding: 5px;
+        padding: 0; /* Remove padding to avoid oval shape */
+        width: 30px; /* Set a fixed width */
+        height: 30px; /* Set a fixed height */
+        line-height: 30px; /* Center text vertically */
+        text-align: center; /* Center text horizontally */
+        margin: auto; /* Center the circle within its container */
     }
     .selectable {
         user-select: text;
+    }
+    .appointment {
+        background-color: #d1d5db; /* Tailwind CSS gray-300 */
+        color: #1f2937; /* Tailwind CSS gray-800 */
+        padding: 2px 4px;
+        border-radius: 4px;
+        margin-bottom: 2px;
+    }
+    .day-circle {
+        display: inline-block;
+        margin-top: 8px; /* Ajusta el valor según sea necesario */
+        margin-bottom: 8px; /* Ajusta el valor según sea necesario */
     }
 </style>
 
@@ -180,8 +257,12 @@
         updateCalendar();
     }
 
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     function updateCalendar() {
-        const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+        const currentMonth = capitalizeFirstLetter(new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(currentDate));
         const currentYear = currentDate.getFullYear();
         document.getElementById('current-month').textContent = `${currentMonth} ${currentYear}`;
         
@@ -196,7 +277,7 @@
             prevMonthDay.setDate(prevMonthDay.getDate() - i);
             calendarGrid += `<div class="relative bg-gray-50 px-3 py-2 text-gray-500">
                                 <time datetime="${prevMonthDay.toISOString().split('T')[0]}">${prevMonthDay.getDate()}</time>
-                             </div>`;
+                            </div>`;
         }
         
         // Days of the current month
@@ -209,14 +290,18 @@
             // Check if there are any appointments for this day
             citas.forEach(cita => {
                 if (cita.fecha === dateString) {
-                    citaContent += `<div class="text-xs text-blue-500">${cita.hora} - ${cita.nombres} ${cita.apepat} ${cita.apemat}</div>`;
+                    citaContent += `<div class="appointment flex items-center justify-between p-1 cursor-pointer" onclick="window.location.href='/medico/citas/editar/${cita.id}'">
+                                        <div class="flex items-center">
+                                            <div>${cita.hora} - ${cita.nombres} ${cita.apepat} ${cita.apemat}</div>
+                                        </div>
+                                    </div>`;
                 }
             });
 
             calendarGrid += `<div class="relative bg-white px-3 py-2 h-24 calendar-day">
-                                <time datetime="${dateString}" class="${isToday ? 'current-day' : ''}">${i}</time>
+                                <time datetime="${dateString}" class="day-circle ${isToday ? 'current-day' : ''}">${i}</time>
                                 ${citaContent}
-                             </div>`;
+                            </div>`;
         }
         
         // Days of the next month
@@ -226,14 +311,124 @@
             nextMonthDay.setDate(nextMonthDay.getDate() + i);
             calendarGrid += `<div class="relative bg-gray-50 px-3 py-2 text-gray-500">
                                 <time datetime="${nextMonthDay.toISOString().split('T')[0]}">${nextMonthDay.getDate()}</time>
-                             </div>`;
+                            </div>`;
         }
         
         document.getElementById('calendar-grid').innerHTML = calendarGrid;
-        
-        // Disable prev button if it's the current month
-        document.getElementById('prev-month-btn').disabled = currentDate.getMonth() === initialDate.getMonth() && currentDate.getFullYear() === initialDate.getFullYear();
+    }
+
+    function changeMonth(monthChange) {
+        currentDate.setMonth(currentDate.getMonth() + monthChange);
+        updateCalendar();
+    }
+
+    function goToToday() {
+        currentDate = new Date();
+        updateCalendar();
     }
 
     document.addEventListener('DOMContentLoaded', updateCalendar);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha').setAttribute('min', today);
+    });
+
+    document.getElementById('fecha').addEventListener('change', function() {
+        const fecha = this.value;
+        const horaSelect = document.getElementById('hora');
+
+        if (fecha) {
+            fetch('{{ route('horas.disponibles') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ fecha: fecha })
+            })
+            .then(response => response.json())
+            .then(data => {
+                horaSelect.innerHTML = '';
+                const now = new Date();
+                const selectedDate = new Date(fecha);
+                const currentHour = now.getHours();
+
+                for (let i = 10; i <= 22; i++) { // Limiting hours from 10:00 AM to 10:00 PM
+                    const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+
+                    const option = document.createElement('option');
+                    option.value = hour;
+                    option.textContent = hour;
+
+                    // Deshabilitar horas ya seleccionadas
+                    if (data.includes(hour)) {
+                        option.disabled = true;
+                    }
+
+                    horaSelect.appendChild(option);
+                }
+            });
+        }
+    });
+
+    document.getElementById('hora').addEventListener('change', function() {
+        const fecha = document.getElementById('fecha').value;
+        const hora = this.value;
+        const medicoId = document.getElementById('usuariomedicoid').value;
+        const errorMessage = document.getElementById('error-message');
+
+        if (fecha && hora && medicoId) {
+            fetch('{{ route('horas.disponibles') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ fecha: fecha, medicoid: medicoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.includes(hora)) {
+                    errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
+                    errorMessage.style.display = 'block';
+                    document.getElementById('registrar-cita-btn').disabled = true;
+                } else {
+                    errorMessage.style.display = 'none';
+                    document.getElementById('registrar-cita-btn').disabled = false;
+                }
+            });
+        }
+    });
+
+    document.getElementById('cita-form').addEventListener('submit', function(event) {
+        const fecha = document.getElementById('fecha').value;
+        const hora = document.getElementById('hora').value;
+        const medicoId = document.getElementById('usuariomedicoid').value;
+        const errorMessage = document.getElementById('error-message');
+
+        if (fecha && hora && medicoId) {
+            event.preventDefault();
+            fetch('{{ route('horas.disponibles') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ fecha: fecha, hora: hora, medicoid: medicoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.includes(hora)) {
+                    errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
+                    errorMessage.style.display = 'block';
+                    document.getElementById('registrar-cita-btn').disabled = true;
+                } else {
+                    errorMessage.style.display = 'none';
+                    document.getElementById('registrar-cita-btn').disabled = false;
+                    event.target.submit();
+                }
+            });
+        }
+    });
 </script>

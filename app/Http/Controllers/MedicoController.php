@@ -9,12 +9,12 @@ use App\Models\Citas;
 use App\Models\Servicio;
 use Illuminate\Http\Request;
 
-class SecretariaController extends Controller
+class MedicoController extends Controller
 {
-    // Muestra la vista principal del usuario secretaria
+    // Muestra la vista principal del usuario medico
     public function index()
     {
-        return view('UsuarioSecretaria');
+        return view('UsuarioMedico');
     }
 
     //////////////////////////////////    PACIENTES    /////////////////////////////////////////
@@ -28,30 +28,39 @@ class SecretariaController extends Controller
             'apepat' => 'required|string|max:255',
             'apemat' => 'required|string|max:255',
             'fechanac' => 'required|date',
+            'correo' => 'required|string|email|max:255|unique:pacientes',
+            'contraseña' => 'required|string|min:8',
         ]);
 
         // Creación del paciente
-        Paciente::create($request->all());
+        Paciente::create([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'correo' => $request->correo,
+            'contraseña' => bcrypt($request->contraseña), // Cifrado de la contraseña
+            'activo' => 'si',
+        ]);
 
-        // Redirecciona a la vista del dashboard de la secretaria con un mensaje de éxito
-        return redirect()->route('dashboardSecretaria')->with('status', 'Paciente registrado correctamente');
+        // Redirecciona a la vista del dashboard de la medico con un mensaje de éxito
+        return redirect()->route('medico.dashboard')->with('status', 'Paciente registrado correctamente');
     }
 
     // Muestra todos los pacientes activos
     public function mostrarPacientes()
     {
         $pacientes = Paciente::where('activo', 'si')->get();
-        return view('secretaria.dashboardSecretaria', compact('pacientes'));
+        return view('medico.dashboard', compact('pacientes'));
     }
 
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($id)
     {
         $paciente = Paciente::findOrFail($id);
-        return view('secretaria.pacientes.editarPaciente', compact('paciente'));
+        return view('medico.pacientes.editarPaciente', compact('paciente'));
     }
 
-    // Actualiza la información de un paciente específico
     public function updatePaciente(Request $request, $id)
     {
         // Validación de los datos recibidos
@@ -60,15 +69,26 @@ class SecretariaController extends Controller
             'apepat' => 'required|string|max:255',
             'apemat' => 'required|string|max:255',
             'fechanac' => 'required|date',
+            'correo' => 'required|string|email|max:255|unique:pacientes,correo,'.$id,
+            'contraseña' => 'nullable|string|min:8',
         ]);
 
         // Encuentra el paciente y actualiza sus datos
         $paciente = Paciente::findOrFail($id);
-        $paciente->update($request->all());
+        $paciente->update([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'correo' => $request->correo,
+            'contraseña' => $request->contraseña ? bcrypt($request->contraseña) : $paciente->contraseña,
+            'activo' => 'si', // Asegurarse de que siempre esté activo
+        ]);
 
         // Redirecciona al dashboard con un mensaje de éxito
-        return redirect()->route('dashboardSecretaria')->with('status', 'Paciente actualizado correctamente');
+        return redirect()->route('medico.dashboard')->with('status', 'Paciente actualizado correctamente');
     }
+
 
     // Marca a un paciente como inactivo (eliminado)
     public function eliminarPaciente($id)
@@ -76,7 +96,7 @@ class SecretariaController extends Controller
         $paciente = Paciente::findOrFail($id);
         $paciente->update(['activo' => 'no']);
 
-        return redirect()->route('dashboardSecretaria')->with('status', 'Paciente eliminado correctamente');
+        return redirect()->route('medico.dashboard')->with('status', 'Paciente eliminado correctamente');
     }
 
     //////////////////////////////////    PRODUCTOS    /////////////////////////////////////////
@@ -85,7 +105,7 @@ class SecretariaController extends Controller
     public function mostrarProductos()
     {
         $productos = Productos::where('activo', 'si')->get();
-        return view('secretaria.productos.productos', compact('productos'));
+        return view('medico.productos.productos', compact('productos'));
     }
 
     // Guarda un nuevo producto
@@ -107,14 +127,14 @@ class SecretariaController extends Controller
     // Muestra el formulario para agregar un nuevo producto
     public function crearProducto()
     {
-        return view('secretaria.productos.agregarProducto');
+        return view('medico.productos.agregarProducto');
     }
 
     // Muestra el formulario de edición de un producto específico
     public function editarProducto($id)
     {
         $producto = Productos::findOrFail($id);
-        return view('secretaria.productos.editarProducto', compact('producto'));
+        return view('medico.productos.editarProducto', compact('producto'));
     }
 
     // Actualiza la información de un producto específico
@@ -156,7 +176,7 @@ class SecretariaController extends Controller
         $pacientes = Paciente::where('activo', 'si')->get();
         $usuarios = User::where('activo', 'si')->get();
 
-        return view('secretaria.citas.citas', compact('citas', 'pacientes', 'usuarios'));
+        return view('medico.citas.citas', compact('citas', 'pacientes', 'usuarios'));
     }
 
     // Guarda una nueva cita
@@ -164,7 +184,7 @@ class SecretariaController extends Controller
     {
         // Validación de los datos recibidos
         $request->validate([
-            'fecha' => 'required|date',
+            'fecha' => 'required|date|after_or_equal:today',
             'hora' => 'required|date_format:H:i', // Validar formato HH:mm
             'pacienteid' => 'required|exists:pacientes,id',
             'usuariomedicoid' => 'required|exists:users,id'
@@ -199,7 +219,7 @@ class SecretariaController extends Controller
     {
         $pacientes = Paciente::where('activo', 'si')->get();
         $usuarios = User::where('activo', 'si')->get();
-        return view('secretaria.citas.agregarCita', compact('pacientes', 'usuarios'));
+        return view('medico.citas.agregarCita', compact('pacientes', 'usuarios'));
     }
 
     // Muestra el formulario de edición de una cita específica
@@ -208,7 +228,7 @@ class SecretariaController extends Controller
         $cita = Citas::findOrFail($id);
         $pacientes = Paciente::where('activo', 'si')->get();
         $usuarios = User::where('activo', 'si')->get();
-        return view('secretaria.citas.editarCita', compact('cita', 'pacientes', 'usuarios'));
+        return view('medico.citas.editarCita', compact('cita', 'pacientes', 'usuarios'));
     }
 
     // Actualiza la información de una cita específica
@@ -276,7 +296,7 @@ class SecretariaController extends Controller
     public function mostrarMedicos()
     {
         $medicos = User::where('rol', 'medico')->where('activo', 'si')->get();
-        return view('secretaria.medicos.medicos', compact('medicos'));
+        return view('medico.medicos.medicos', compact('medicos'));
     }
 
     // Guarda un nuevo médico
@@ -312,14 +332,14 @@ class SecretariaController extends Controller
     // Muestra el formulario para agregar un nuevo médico
     public function crearMedico()
     {
-        return view('secretaria.medicos.agregarMedico');
+        return view('medico.medicos.agregarMedico');
     }
 
     // Muestra el formulario de edición de un médico específico
     public function editarMedico($id)
     {
         $medico = User::findOrFail($id);
-        return view('secretaria.medicos.editarMedico', compact('medico'));
+        return view('medico.medicos.editarMedico', compact('medico'));
     }
 
     // Actualiza la información de un médico específico
@@ -367,7 +387,7 @@ class SecretariaController extends Controller
     public function mostrarServicios()
     {
         $servicios = Servicio::where('activo', 'si')->get();
-        return view('secretaria.servicios.servicios', compact('servicios'));
+        return view('medico.servicios.servicios', compact('servicios'));
     }
 
     // Guarda un nuevo servicio
@@ -389,14 +409,14 @@ class SecretariaController extends Controller
     // Muestra el formulario para agregar un nuevo servicio
     public function crearServicio()
     {
-        return view('secretaria.servicios.agregarServicio');
+        return view('medico.servicios.agregarServicio');
     }
 
     // Muestra el formulario de edición de un servicio específico
     public function editarServicio($id)
     {
         $servicio = Servicio::findOrFail($id);
-        return view('secretaria.servicios.editarServicio', compact('servicio'));
+        return view('medico.servicios.editarServicio', compact('servicio'));
     }
 
     // Actualiza la información de un servicio específico

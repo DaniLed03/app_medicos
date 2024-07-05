@@ -1,10 +1,9 @@
-@if(Auth::check() && Auth::user()->rol == 'secretaria')
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navegación Secretaria</title>
+    <title>Navegación</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .navbar-superior {
@@ -40,9 +39,7 @@
                 </div>
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white hover-bg-custom custom-button" id="user-menu-button" aria-expanded="false">
-                        <span class="text-white hidden md:block mr-2">
-                            <strong>{{ ucfirst(Auth::user()->rol) }}</strong>: {{ Auth::user()->nombres }} {{ Auth::user()->apepat }} {{ Auth::user()->apemat }} 
-                        </span>
+                        <span class="text-white hidden md:block mr-2">{{ Auth::user()->nombres }} {{ Auth::user()->apepat }} {{ Auth::user()->apemat }} @ {{ Auth::user()->telefono }}</span>
                         <img class="h-8 w-8 rounded-full" src="{{ asset('images/user-photo.jpg') }}" alt="">
                         <svg class="w-4 h-4 ml-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -51,7 +48,7 @@
                     <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
                         <div class="px-4 py-3 bg-gray-100">
                             <span class="block text-sm text-gray-500">{{ Auth::user()->email }}</span>
-                            <span class="block text-sm text-gray-500">{{ Auth::user()->telefono }}</span>
+                            <span class="block text-sm text-gray-500">{{ Auth::user()->rol }}</span>
                         </div>
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Profile</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -72,7 +69,9 @@
             <div class="flex items-center justify-between h-10">
                 <div class="hidden md:flex md:space-x-8">
                     <a href="{{ route('medico.dashboard') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pacientes</a>
+                    <a href="{{ route('medicos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Médicos</a>
                     <a href="{{ route('citas') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Citas</a>
+                    <a href="{{ route('consultas.index') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Consultas</a>
                     <a href="{{ route('servicios') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Servicios</a>
                     <a href="{{ route('productos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Productos</a>
                 </div>
@@ -94,4 +93,3 @@
     </nav>
 </body>
 </html>
-@endif

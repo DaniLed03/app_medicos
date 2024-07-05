@@ -18,6 +18,7 @@
                                     <th scope="col" class="px-6 py-4 text-white font-bold">Nombres</th>
                                     <th scope="col" class="px-6 py-4 text-white font-bold">Apellido Paterno</th>
                                     <th scope="col" class="px-6 py-4 text-white font-bold">Apellido Materno</th>
+                                    <th scope="col" class="px-6 py-4 text-white font-bold">Correo</th>
                                     <th scope="col" class="px-6 py-4 text-white font-bold">Activo</th>
                                     <th scope="col" class="px-6 py-4 text-white font-bold">Acciones</th>
                                 </tr>
@@ -30,6 +31,7 @@
                                         <td class="px-6 py-4">{{ $paciente->nombres }}</td>
                                         <td class="px-6 py-4">{{ $paciente->apepat }}</td>
                                         <td class="px-6 py-4">{{ $paciente->apemat }}</td>
+                                        <td class="px-6 py-4">{{ $paciente->correo }}</td>
                                         <td class="px-6 py-4">{{ $paciente->activo }}</td>
                                         <td class="px-6 py-4">
                                             <!-- Enlace para editar el paciente -->
@@ -47,7 +49,7 @@
                         </table>
                         <!-- Mensaje si no hay pacientes registrados -->
                         @if($pacientes->isEmpty())
-                            <p class="text-center text-gray-500 mt-4">No hay citas registradas.</p>
+                            <p class="text-center text-gray-500 mt-4">No hay pacientes registrados.</p>
                         @endif
                     </div>
                 </div>
@@ -105,6 +107,20 @@
                                     <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
                                     <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
                                 </div>
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="mt-4 col-span-2">
+                                <x-input-label for="correo" :value="__('Correo')" />
+                                <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" :value="old('correo')" required />
+                                <x-input-error :messages="$errors->get('correo')" class="mt-2" />
+                            </div>
+
+                            <!-- Contraseña -->
+                            <div class="mt-4 col-span-2">
+                                <x-input-label for="contraseña" :value="__('Contraseña')" />
+                                <x-text-input id="contraseña" class="block mt-1 w-full" type="password" name="contraseña" required />
+                                <x-input-error :messages="$errors->get('contraseña')" class="mt-2" />
                             </div>
 
                             <div class="flex items-center justify-end mt-4">

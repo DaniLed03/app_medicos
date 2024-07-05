@@ -72,7 +72,7 @@
                     </div>
                     <div class="border-t border-gray-200 mt-4"></div>
                     <div class="mt-2">
-                        @include('secretaria.servicios.agregarServicio')
+                        @include('medico.servicios.agregarServicio')
                     </div>
                 </div>
             </div>

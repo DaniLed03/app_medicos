@@ -1,2 +1,2 @@
-@include('/secretaria.dashboardSecretaria') 
+@include('/medico.dashboard') 
 <!-- Redireccionamos al dashboard de la secretaria -->

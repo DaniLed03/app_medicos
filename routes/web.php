@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SecretariaController;
+use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\MedicoController;
 use Illuminate\Support\Facades\Route;
 
 // Ruta de la página de bienvenida
@@ -21,45 +22,54 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rutas de Pacientes
-    Route::post('/pacientes/agregarPaciente', [SecretariaController::class, 'storePacientes'])->name('registrarPaciente.store');
+    Route::post('/pacientes/agregarPaciente', [MedicoController::class, 'storePacientes'])->name('registrarPaciente.store');
     Route::get('/agregarPaciente', function () {
-        return view('secretaria.pacientes.agregarPaciente');
+        return view('medico.pacientes.agregarPaciente');
     })->name('agregarPaciente');
-    Route::get('/secretaria/dashboardSecretaria', [SecretariaController::class, 'mostrarPacientes'])->name('dashboardSecretaria');
-    Route::get('/secretaria/pacientes/editar/{id}', [SecretariaController::class, 'editarPaciente'])->name('pacientes.editar');
-    Route::patch('/secretaria/pacientes/editar/{id}', [SecretariaController::class, 'updatePaciente'])->name('pacientes.update');
-    Route::delete('/secretaria/pacientes/eliminar/{id}', [SecretariaController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
+    Route::get('/medico/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('medico.dashboard');
+    Route::get('/medico/pacientes/editar/{id}', [MedicoController::class, 'editarPaciente'])->name('pacientes.editar');
+    Route::patch('/medico/pacientes/editar/{id}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
+    Route::delete('/medico/pacientes/eliminar/{id}', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
 
     // Rutas de Productos
-    Route::get('/secretaria/productos/agregar', [SecretariaController::class, 'crearProducto'])->name('productos.agregar');
-    Route::post('/secretaria/productos/agregarProducto', [SecretariaController::class, 'storeProductos'])->name('productos.store');
-    Route::get('/secretaria/productos/editar/{id}', [SecretariaController::class, 'editarProducto'])->name('productos.editar');
-    Route::patch('/secretaria/productos/editar/{id}', [SecretariaController::class, 'updateProducto'])->name('productos.update');
-    Route::delete('/secretaria/productos/eliminar/{id}', [SecretariaController::class, 'eliminarProducto'])->name('productos.eliminar');
-    Route::get('/secretaria/productos', [SecretariaController::class, 'mostrarProductos'])->name('productos');
+    Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
+    Route::post('/medico/productos/agregarProducto', [MedicoController::class, 'storeProductos'])->name('productos.store');
+    Route::get('/medico/productos/editar/{id}', [MedicoController::class, 'editarProducto'])->name('productos.editar');
+    Route::patch('/medico/productos/editar/{id}', [MedicoController::class, 'updateProducto'])->name('productos.update');
+    Route::delete('/medico/productos/eliminar/{id}', [MedicoController::class, 'eliminarProducto'])->name('productos.eliminar');
+    Route::get('/medico/productos', [MedicoController::class, 'mostrarProductos'])->name('productos');
 
     // Rutas de Citas
-    Route::get('/secretaria/citas', [SecretariaController::class, 'mostrarCitas'])->name('citas');
-    Route::post('/secretaria/citas/agregarCita', [SecretariaController::class, 'storeCitas'])->name('citas.store');
-    Route::get('/secretaria/citas/agregar', [SecretariaController::class, 'crearCita'])->name('citas.agregar');
-    Route::get('/secretaria/citas/editar/{id}', [SecretariaController::class, 'editarCita'])->name('citas.editar');
-    Route::patch('/secretaria/citas/editar/{id}', [SecretariaController::class, 'updateCita'])->name('citas.update');
-    Route::delete('/secretaria/citas/eliminar/{id}', [SecretariaController::class, 'eliminarCita'])->name('citas.eliminar');
-    Route::post('/horas-disponibles', [SecretariaController::class, 'horasDisponibles'])->name('horas.disponibles');
+    Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
+    Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
+    Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
+    Route::get('/medico/citas/editar/{id}', [MedicoController::class, 'editarCita'])->name('citas.editar');
+    Route::patch('/medico/citas/editar/{id}', [MedicoController::class, 'updateCita'])->name('citas.update');
+    Route::delete('/medico/citas/eliminar/{id}', [MedicoController::class, 'eliminarCita'])->name('citas.eliminar');
+    Route::post('/horas-disponibles', [MedicoController::class, 'horasDisponibles'])->name('horas.disponibles');
 
     // Rutas de Médicos
-    Route::get('/secretaria/medicos', [SecretariaController::class, 'mostrarMedicos'])->name('medicos');
-    Route::post('/secretaria/medicos/agregarMedico', [SecretariaController::class, 'storeMedicos'])->name('medicos.store');
-    Route::get('/secretaria/medicos/agregar', [SecretariaController::class, 'crearMedico'])->name('medicos.agregar');
-    Route::get('/secretaria/medicos/editar/{id}', [SecretariaController::class, 'editarMedico'])->name('medicos.editar');
-    Route::patch('/secretaria/medicos/editar/{id}', [SecretariaController::class, 'updateMedico'])->name('medicos.update');
-    Route::delete('/secretaria/medicos/eliminar/{id}', [SecretariaController::class, 'eliminarMedico'])->name('medicos.eliminar');
+    Route::get('/medico/medicos', [MedicoController::class, 'mostrarMedicos'])->name('medicos');
+    Route::post('/medico/medicos/agregarMedico', [MedicoController::class, 'storeMedicos'])->name('medicos.store');
+    Route::get('/medico/medicos/agregar', [MedicoController::class, 'crearMedico'])->name('medicos.agregar');
+    Route::get('/medico/medicos/editar/{id}', [MedicoController::class, 'editarMedico'])->name('medicos.editar');
+    Route::patch('/medico/medicos/editar/{id}', [MedicoController::class, 'updateMedico'])->name('medicos.update');
+    Route::delete('/medico/medicos/eliminar/{id}', [MedicoController::class, 'eliminarMedico'])->name('medicos.eliminar');
 
     // Rutas de Servicios
-    Route::get('/secretaria/servicios', [SecretariaController::class, 'mostrarServicios'])->name('servicios');
-    Route::post('/secretaria/servicios/agregarServicio', [SecretariaController::class, 'storeServicios'])->name('servicios.store');
-    Route::get('/secretaria/servicios/agregar', [SecretariaController::class, 'crearServicio'])->name('servicios.agregar');
-    Route::get('/secretaria/servicios/editar/{id}', [SecretariaController::class, 'editarServicio'])->name('servicios.editar');
-    Route::patch('/secretaria/servicios/editar/{id}', [SecretariaController::class, 'updateServicio'])->name('servicios.update');
-    Route::delete('/secretaria/servicios/eliminar/{id}', [SecretariaController::class, 'eliminarServicio'])->name('servicios.eliminar');
+    Route::get('/medico/servicios', [MedicoController::class, 'mostrarServicios'])->name('servicios');
+    Route::post('/medico/servicios/agregarServicio', [MedicoController::class, 'storeServicios'])->name('servicios.store');
+    Route::get('/medico/servicios/agregar', [MedicoController::class, 'crearServicio'])->name('servicios.agregar');
+    Route::get('/medico/servicios/editar/{id}', [MedicoController::class, 'editarServicio'])->name('servicios.editar');
+    Route::patch('/medico/servicios/editar/{id}', [MedicoController::class, 'updateServicio'])->name('servicios.update');
+    Route::delete('/medico/servicios/eliminar/{id}', [MedicoController::class, 'eliminarServicio'])->name('servicios.eliminar');
+
+    // Rutas de Consultas
+    Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');
+    Route::post('/consultas/agregar', [ConsultaController::class, 'store'])->name('consultas.store');
+    Route::get('/consultas/editar/{id}', [ConsultaController::class, 'edit'])->name('consultas.edit');
+    Route::put('/consultas/editar/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
+    Route::get('/consultas/agregar/{citaId}', [ConsultaController::class, 'create'])->name('consultas.create');
+
 });
+

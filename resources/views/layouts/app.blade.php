@@ -17,6 +17,11 @@
 
     <!-- Agregar Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.5.1/dist/cdn.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.2.2/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.4.2/dist/cdn.min.js" defer></script>
+
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -24,9 +29,17 @@
 
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100">
-        @if (request()->route()->getName() != 'welcome')
-            @include('layouts.navigationSecretaria')
-        @endif
+        @auth
+            @if (Auth::user()->rol == 'secretaria')
+                @include('layouts.navigationSecretaria')
+            @elseif (Auth::user()->rol == 'medico')
+                @include('layouts.navigationMedico')
+            @endif
+        @else
+            @if (request()->route()->getName() != 'welcome')
+                @include('layouts.navigationMedico')
+            @endif
+        @endauth
 
         <!-- Page Heading -->
         @isset($header)

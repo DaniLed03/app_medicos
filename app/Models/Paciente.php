@@ -17,6 +17,8 @@ class Paciente extends Model
         'apepat',     // Apellido paterno del paciente
         'apemat',     // Apellido materno del paciente
         'fechanac',   // Fecha de nacimiento del paciente
+        'correo',     // Correo del paciente
+        'contraseña', // Contraseña del paciente
         'activo',     // Estado del paciente (activo o inactivo)
     ];
 

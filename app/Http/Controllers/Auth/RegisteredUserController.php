@@ -53,6 +53,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return redirect(route('dashboardSecretaria'));
+        return redirect(route('dashboard'));
     }
 }

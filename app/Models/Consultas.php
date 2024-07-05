@@ -12,8 +12,19 @@ class Consultas extends Model
     protected $fillable = [
         'citai_id',
         'fechaHora',
+        'talla',
+        'temperatura',
+        'saturacion_oxigeno',
+        'frecuencia_cardiaca',
+        'peso',
+        'tension_arterial',
+        'motivoConsulta',
+        'notas_padecimiento',
+        'interrogatorio_por_aparatos',
+        'examen_fisico',
         'diagnostico',
-        'recete',
+        'plan',
+        'status',
         'totalPagar',
         'usuariomedicoid'
     ];
@@ -28,6 +39,9 @@ class Consultas extends Model
 
         static::creating(function ($model) {
             $model->fechaHora = now();
+            if (is_null($model->totalPagar)) {
+                $model->totalPagar = 70; // Valor por defecto
+            }
         });
     }
 
@@ -36,13 +50,18 @@ class Consultas extends Model
         return $this->belongsTo(Citas::class, 'citai_id');
     }
 
-    public function servicios()
-    {
-        return $this->belongsToMany(Servicio::class, 'consulta_servicio');
-    }
-
     public function productos()
     {
-        return $this->belongsToMany(Productos::class, 'consulta_producto');
+        return $this->belongsToMany(Productos::class, 'consulta_producto', 'consulta_id', 'producto_id');
+    }
+
+    public function servicios()
+    {
+        return $this->belongsToMany(Servicio::class, 'consulta_servicio', 'consulta_id', 'servicio_id');
+    }
+
+    public function recetas()
+    {
+        return $this->hasMany(ConsultaReceta::class, 'consulta_id');
     }
 }

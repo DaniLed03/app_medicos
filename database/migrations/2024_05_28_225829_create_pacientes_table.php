@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('apepat', 100); // Columna para el apellido paterno.
             $table->string('apemat', 100); // Columna para el apellido materno.
             $table->date('fechanac'); // Columna para la fecha de nacimiento.
+            $table->string('correo', 255)->unique(); // Columna para el correo del paciente.
+            $table->string('contraseña'); // Columna para la contraseña del paciente.
             $table->enum('activo', ['si', 'no'])->default('si'); // Columna para el estado (activo o inactivo) del paciente, por defecto es 'si'.
             $table->timestamps(); // Columnas para las marcas de tiempo (creación y actualización).
         });

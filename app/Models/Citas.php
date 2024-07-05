@@ -32,3 +32,4 @@ class Citas extends Model
         return $this->hasMany(Consultas::class, 'citai_id');
     }
 }
+

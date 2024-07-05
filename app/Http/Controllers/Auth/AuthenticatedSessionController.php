@@ -65,13 +65,14 @@ class AuthenticatedSessionController extends Controller
     {
         switch ($user->rol) {
             case 'medico':
-                return redirect()->route('dashboardSecretaria');
+                return redirect()->route('medico.dashboard');
             case 'secretaria':
-                return redirect()->route('dashboardSecretaria');
+                return redirect()->route('medico.dashboard');
             case 'colaborador':
-                return redirect()->route('dashboardColaborador');
+                return redirect()->route('medico.dashboard');
             default:
-                return redirect('/');
+                return redirect()->route('medico.dashboard');
         }
     }
+
 }
