@@ -80,29 +80,38 @@
                         @csrf
                         <input type="hidden" name="citai_id" value="{{ $cita->id }}">
                         <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
+                        <input type="hidden" name="status" value="en curso">
+
+                        <!-- Añadir campos ocultos para signos vitales -->
+                        <input type="hidden" name="talla" x-model="talla">
+                        <input type="hidden" name="temperatura" x-model="temperatura">
+                        <input type="hidden" name="saturacion_oxigeno" x-model="saturacion_oxigeno">
+                        <input type="hidden" name="frecuencia_cardiaca" x-model="frecuencia_cardiaca">
+                        <input type="hidden" name="peso" x-model="peso">
+                        <input type="hidden" name="tension_arterial" x-model="tension_arterial">
 
                         <!-- Motivo de la consulta -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Motivo de la consulta</h3>
-                            <textarea name="motivoConsulta" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('motivoConsulta') }}</textarea>
+                            <textarea name="motivoConsulta" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('motivoConsulta') }}</textarea>
                         </div>
 
                         <!-- Notas de padecimiento -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Notas de padecimiento</h3>
-                            <textarea name="notas_padecimiento" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('notas_padecimiento') }}</textarea>
+                            <textarea name="notas_padecimiento" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('notas_padecimiento') }}</textarea>
                         </div>
 
                         <!-- Interrogatorio por aparatos y sistemas -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Interrogatorio por aparatos y sistemas</h3>
-                            <textarea name="interrogatorio_por_aparatos" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('interrogatorio_por_aparatos') }}</textarea>
+                            <textarea name="interrogatorio_por_aparatos" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('interrogatorio_por_aparatos') }}</textarea>
                         </div>
 
                         <!-- Examen físico -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Examen físico</h3>
-                            <textarea name="examen_fisico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('examen_fisico') }}</textarea>
+                            <textarea name="examen_fisico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('examen_fisico') }}</textarea>
                         </div>
 
                         <!-- Diagnóstico -->
@@ -114,48 +123,7 @@
                         <!-- Plan -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Plan</h3>
-                            <textarea name="plan" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('plan') }}</textarea>
-                        </div>
-
-                        <!-- Estado -->
-                        <div class="bg-gray-100 p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold mb-4">Estado</h3>
-                            <select name="status" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" required>
-                                <option value="en curso" {{ old('status') == 'en curso' ? 'selected' : '' }}>En curso</option>
-                                <option value="finalizada" {{ old('status') == 'finalizada' ? 'selected' : '' }}>Finalizada</option>
-                            </select>
-                        </div>
-
-                        <!-- Total a Pagar -->
-                        <div class="bg-gray-100 p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold mb-4">Total a Pagar</h3>
-                            <input type="number" name="totalPagar" id="totalPagar" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="70" readonly>
-                        </div>
-
-                        <!-- Productos -->
-                        <div class="bg-gray-100 p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold mb-4">Productos</h3>
-                            @foreach($productos as $producto)
-                                <div class="mb-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="productos[]" value="{{ $producto->id }}" data-precio="{{ $producto->precio }}" class="producto-checkbox mr-2">
-                                        {{ $producto->nombre }} ({{ $producto->precio }} pesos)
-                                    </label>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Servicios -->
-                        <div class="bg-gray-100 p-6 rounded-lg mb-6">
-                            <h3 class="text-lg font-bold mb-4">Servicios</h3>
-                            @foreach($servicios as $servicio)
-                                <div class="mb-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" data-precio="{{ $servicio->precio }}" class="servicio-checkbox mr-2">
-                                        {{ $servicio->nombre }} ({{ $servicio->precio }} pesos)
-                                    </label>
-                                </div>
-                            @endforeach
+                            <textarea name="plan" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('plan') }}</textarea>
                         </div>
 
                         <!-- Recetas -->
@@ -165,26 +133,62 @@
                                 @if(old('recetas'))
                                     @foreach(old('recetas') as $index => $receta)
                                         <div class="receta-item mb-4">
-                                            <input type="text" name="recetas[{{ $index }}][medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Medicación" value="{{ $receta['medicacion'] }}" required>
-                                            <input type="number" name="recetas[{{ $index }}][cantidad_medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Cantidad" value="{{ $receta['cantidad_medicacion'] }}" required>
-                                            <input type="text" name="recetas[{{ $index }}][frecuencia]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Frecuencia" value="{{ $receta['frecuencia'] }}" required>
-                                            <input type="text" name="recetas[{{ $index }}][duracion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Duración" value="{{ $receta['duracion'] }}" required>
-                                            <textarea name="recetas[{{ $index }}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Notas">{{ $receta['notas'] }}</textarea>
+                                            <div class="grid grid-cols-4 gap-4 mb-4">
+                                                <input type="text" name="recetas[{{ $index }}][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" value="{{ $receta['medicacion'] }}" required>
+                                                <input type="number" name="recetas[{{ $index }}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" value="{{ $receta['cantidad_medicacion'] }}" required>
+                                                <input type="text" name="recetas[{{ $index }}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" value="{{ $receta['frecuencia'] }}" required>
+                                                <input type="text" name="recetas[{{ $index }}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" value="{{ $receta['duracion'] }}" required>
+                                            </div>
+                                            <textarea name="recetas[{{ $index }}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Agregar notas...">{{ $receta['notas'] }}</textarea>
                                             <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded">Eliminar</button>
                                         </div>
                                     @endforeach
                                 @else
                                     <div class="receta-item mb-4">
-                                        <input type="text" name="recetas[0][medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Medicación" required>
-                                        <input type="number" name="recetas[0][cantidad_medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Cantidad" required>
-                                        <input type="text" name="recetas[0][frecuencia]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Frecuencia" required>
-                                        <input type="text" name="recetas[0][duracion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Duración" required>
-                                        <textarea name="recetas[0][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Notas"></textarea>
-                                        <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded">Eliminar</button>
+                                        <div class="grid grid-cols-4 gap-4 mb-4">
+                                            <input type="text" name="recetas[0][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" required>
+                                            <input type="number" name="recetas[0][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
+                                            <input type="text" name="recetas[0][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
+                                            <input type="text" name="recetas[0][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
+                                        </div>
+                                        <textarea name="recetas[0][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none" placeholder="Agregar notas..."></textarea>
                                     </div>
                                 @endif
                             </div>
-                            <button type="button" id="add-receta" class="bg-blue-500 text-white p-2 rounded">Añadir Receta</button>
+                        </div>
+
+                        <div class="flex flex-wrap -mx-3">
+                            <!-- Productos -->
+                            <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
+                                <h3 class="text-lg font-bold mb-4">Productos</h3>
+                                @foreach($productos as $producto)
+                                    <div class="mb-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="productos[]" value="{{ $producto->id }}" data-precio="{{ $producto->precio }}" class="producto-checkbox mr-2">
+                                            {{ $producto->nombre }} ({{ $producto->precio }} pesos)
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        
+                            <!-- Servicios -->
+                            <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
+                                <h3 class="text-lg font-bold mb-4">Servicios</h3>
+                                @foreach($servicios as $servicio)
+                                    <div class="mb-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" data-precio="{{ $servicio->precio }}" class="servicio-checkbox mr-2">
+                                            {{ $servicio->nombre }} ({{ $servicio->precio }} pesos)
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Total a Pagar -->
+                        <div class="bg-gray-100 p-6 rounded-lg mb-6">
+                            <h3 class="text-lg font-bold mb-4">Total a Pagar</h3>
+                            <input type="number" name="totalPagar" id="totalPagar" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="70" readonly>
                         </div>
 
                         <div class="mt-6">
@@ -306,11 +310,13 @@
             const newItem = document.createElement('div');
             newItem.classList.add('receta-item', 'mb-4');
             newItem.innerHTML = `
-                <input type="text" name="recetas[${index}][medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Medicación" required>
-                <input type="number" name="recetas[${index}][cantidad_medicacion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Cantidad" required>
-                <input type="text" name="recetas[${index}][frecuencia]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Frecuencia" required>
-                <input type="text" name="recetas[${index}][duracion]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Duración" required>
-                <textarea name="recetas[${index}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Notas"></textarea>
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <input type="text" name="recetas[${index}][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" required>
+                    <input type="number" name="recetas[${index}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
+                    <input type="text" name="recetas[${index}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
+                    <input type="text" name="recetas[${index}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
+                </div>
+                <textarea name="recetas[${index}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Agregar notas..."></textarea>
                 <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded">Eliminar</button>
             `;
             container.appendChild(newItem);

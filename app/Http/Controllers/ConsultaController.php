@@ -11,6 +11,7 @@ use App\Models\Servicio;
 use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ConsultaController extends Controller
 {
@@ -76,10 +77,50 @@ class ConsultaController extends Controller
 
 
     // Muestra todas las consultas
-    public function index()
+    public function index(Request $request)
     {
-        $consultas = Consultas::with('cita.paciente')->get();
-        return view('medico.consultas.consultas', compact('consultas'));
+        $query = Consultas::with('cita.paciente', 'usuarioMedico');
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = Carbon::parse($request->start_date);
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $query->whereBetween('fechaHora', [$startDate, $endDate]);
+        } else {
+            $currentMonth = now()->month;
+            $currentYear = now()->year;
+            $query->whereMonth('fechaHora', $currentMonth)->whereYear('fechaHora', $currentYear);
+        }
+
+        if ($request->has('name')) {
+            $name = $request->name;
+            $query->whereHas('cita.paciente', function ($query) use ($name) {
+                $query->where('nombres', 'like', "%{$name}%")
+                    ->orWhere('apepat', 'like', "%{$name}%")
+                    ->orWhere('apemat', 'like', "%{$name}%");
+            });
+        }
+
+        $consultas = $query->paginate(10);
+
+        $months = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+        $monthName = $months[now()->month];
+        $totalConsultas = $consultas->total();
+        
+        $consultasCollection = collect($consultas->items());
+        $totalFacturacion = $consultasCollection->sum('totalPagar');
+
+        return view('medico.consultas.consultas', compact('consultas', 'monthName', 'totalConsultas', 'totalFacturacion'));
+    }
+
+
+    public function show($id)
+    {
+        $consulta = Consultas::with('cita.paciente', 'usuarioMedico')->findOrFail($id);
+        return view('medico.consultas.show', compact('consulta'));
     }
 
     // Muestra el formulario de edición de una consulta específica
@@ -142,5 +183,14 @@ class ConsultaController extends Controller
 
         // Redirecciona a la vista de consultas con un mensaje de éxito
         return redirect()->route('consultas.index')->with('status', 'Consulta actualizada correctamente');
+    }
+
+    public function terminate($id)
+    {
+        $consulta = Consultas::findOrFail($id);
+        $consulta->status = 'finalizada';
+        $consulta->save();
+
+        return response()->json(['success' => true]);
     }
 }

@@ -70,18 +70,11 @@
                 <div class="hidden md:flex md:space-x-8">
                     <a href="{{ route('medico.dashboard') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pacientes</a>
                     <a href="{{ route('medicos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Médicos</a>
+                    <a href="{{ route('enfermeras') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Enfermeras</a>
                     <a href="{{ route('citas') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Citas</a>
                     <a href="{{ route('consultas.index') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Consultas</a>
                     <a href="{{ route('servicios') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Servicios</a>
                     <a href="{{ route('productos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Productos</a>
-                </div>
-                <div class="flex items-center">
-                    <input type="text" placeholder="Buscar" class="px-2 py-1 h-8 rounded-l-md text-gray-700 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#33AD9B]">
-                    <button class="px-2 py-1 h-8 bg-[#2D7498] text-white rounded-r-md border border-gray-300">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18l6-6m0 0l-6-6m6 6H3"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="md:hidden">
                     <button class="text-white hover:bg-[#1E40AF] hover:text-white px-3 py-2 rounded-md text-sm font-medium">

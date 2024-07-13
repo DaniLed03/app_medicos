@@ -22,7 +22,6 @@ class MedicoController extends Controller
     // Guarda un nuevo paciente
     public function storePacientes(Request $request)
     {
-        // Validación de los datos recibidos
         $request->validate([
             'nombres' => 'required|string|max:255',
             'apepat' => 'required|string|max:255',
@@ -30,28 +29,44 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'correo' => 'required|string|email|max:255|unique:pacientes',
             'contraseña' => 'required|string|min:8',
+            'telefono' => 'required|string|max:20', // nuevo campo
+            'sexo' => 'required|in:masculino,femenino', // nuevo campo
         ]);
 
-        // Creación del paciente
         Paciente::create([
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
             'fechanac' => $request->fechanac,
             'correo' => $request->correo,
-            'contraseña' => bcrypt($request->contraseña), // Cifrado de la contraseña
+            'contraseña' => bcrypt($request->contraseña),
+            'telefono' => $request->telefono, // nuevo campo
+            'sexo' => $request->sexo, // nuevo campo
             'activo' => 'si',
         ]);
 
-        // Redirecciona a la vista del dashboard de la medico con un mensaje de éxito
         return redirect()->route('medico.dashboard')->with('status', 'Paciente registrado correctamente');
     }
 
     // Muestra todos los pacientes activos
-    public function mostrarPacientes()
+    public function mostrarPacientes(Request $request)
     {
-        $pacientes = Paciente::where('activo', 'si')->get();
-        return view('medico.dashboard', compact('pacientes'));
+        $query = Paciente::where('activo', 'si');
+        
+        // Filtrar por nombre si se proporciona
+        if ($request->has('name') && $request->name != '') {
+            $query->where('nombres', 'like', '%' . $request->name . '%');
+        }
+        
+        $pacientes = $query->get();
+        $totalPacientes = $pacientes->count();
+        $totalMujeres = $pacientes->where('sexo', 'femenino')->count();
+        $totalHombres = $pacientes->where('sexo', 'masculino')->count();
+        
+        $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
+        $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
+
+        return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
 
     // Muestra el formulario de edición de un paciente específico
@@ -61,9 +76,9 @@ class MedicoController extends Controller
         return view('medico.pacientes.editarPaciente', compact('paciente'));
     }
 
+
     public function updatePaciente(Request $request, $id)
     {
-        // Validación de los datos recibidos
         $request->validate([
             'nombres' => 'required|string|max:255',
             'apepat' => 'required|string|max:255',
@@ -71,9 +86,10 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'correo' => 'required|string|email|max:255|unique:pacientes,correo,'.$id,
             'contraseña' => 'nullable|string|min:8',
+            'telefono' => 'required|string|max:20', // nuevo campo
+            'sexo' => 'required|in:masculino,femenino', // nuevo campo
         ]);
 
-        // Encuentra el paciente y actualiza sus datos
         $paciente = Paciente::findOrFail($id);
         $paciente->update([
             'nombres' => $request->nombres,
@@ -82,10 +98,11 @@ class MedicoController extends Controller
             'fechanac' => $request->fechanac,
             'correo' => $request->correo,
             'contraseña' => $request->contraseña ? bcrypt($request->contraseña) : $paciente->contraseña,
-            'activo' => 'si', // Asegurarse de que siempre esté activo
+            'telefono' => $request->telefono, // nuevo campo
+            'sexo' => $request->sexo, // nuevo campo
+            'activo' => 'si',
         ]);
 
-        // Redirecciona al dashboard con un mensaje de éxito
         return redirect()->route('medico.dashboard')->with('status', 'Paciente actualizado correctamente');
     }
 
@@ -445,4 +462,97 @@ class MedicoController extends Controller
         // Redirecciona a la vista de servicios
         return redirect()->route('servicios')->with('status', 'Servicio eliminado correctamente');
     }
+
+    ////////////////////////////////    ENFERMERAS    /////////////////////////////////////////
+
+    // Muestra todas las enfermeras activas
+    public function mostrarEnfermeras()
+    {
+        $enfermeras = User::where('rol', 'enfermera')->where('activo', 'si')->get();
+        return view('medico.enfermeras.enfermeras', compact('enfermeras'));
+    }
+
+    // Guarda una nueva enfermera
+    public function storeEnfermeras(Request $request)
+    {
+        // Validación de los datos recibidos
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apepat' => 'required|string|max:255',
+            'apemat' => 'required|string|max:255',
+            'fechanac' => 'required|date',
+            'telefono' => 'required|string|max:20',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Creación de la enfermera con cifrado de la contraseña
+        User::create([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'telefono' => $request->telefono,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'rol' => 'enfermera',
+        ]);
+
+        // Redirecciona a la vista de enfermeras con un mensaje de éxito
+        return redirect()->route('enfermeras')->with('status', 'Enfermera registrada correctamente');
+    }
+
+    // Muestra el formulario para agregar una nueva enfermera
+    public function crearEnfermera()
+    {
+        return view('medico.enfermeras.agregarEnfermera');
+    }
+
+    // Muestra el formulario de edición de una enfermera específica
+    public function editarEnfermera($id)
+    {
+        $enfermera = User::findOrFail($id);
+        return view('medico.enfermeras.editarEnfermera', compact('enfermera'));
+    }
+
+    // Actualiza la información de una enfermera específica
+    public function updateEnfermera(Request $request, $id)
+    {
+        // Validación de los datos recibidos
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apepat' => 'required|string|max:255',
+            'apemat' => 'required|string|max:255',
+            'fechanac' => 'required|date',
+            'telefono' => 'required|string|max:20',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        // Encuentra la enfermera y actualiza sus datos
+        $enfermera = User::findOrFail($id);
+        $enfermera->update([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'telefono' => $request->telefono,
+            'email' => $request->email,
+            'password' => $request->password ? bcrypt($request->password) : $enfermera->password,
+        ]);
+
+        // Redirecciona a la vista de enfermeras con un mensaje de éxito
+        return redirect()->route('enfermeras')->with('status', 'Enfermera actualizada correctamente');
+    }
+
+    // Marca a una enfermera como inactiva (eliminada)
+    public function eliminarEnfermera($id)
+    {
+        $enfermera = User::findOrFail($id);
+        $enfermera->update(['activo' => 'no']);
+
+        return redirect()->route('enfermeras')->with('status', 'Enfermera eliminada correctamente');
+    }
+
 }
+

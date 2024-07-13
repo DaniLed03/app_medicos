@@ -64,4 +64,10 @@ class Consultas extends Model
     {
         return $this->hasMany(ConsultaReceta::class, 'consulta_id');
     }
+
+    public function usuarioMedico()
+    {
+        return $this->belongsTo(User::class, 'usuariomedicoid');
+    }
 }
+

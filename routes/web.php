@@ -16,6 +16,11 @@ require __DIR__.'/auth.php';
 
 // Agrupación de rutas que requieren autenticación y verificación de email
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Ruta del dashboard
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+    
     // Rutas del perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -28,8 +33,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('agregarPaciente');
     Route::get('/medico/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('medico.dashboard');
     Route::get('/medico/pacientes/editar/{id}', [MedicoController::class, 'editarPaciente'])->name('pacientes.editar');
-    Route::patch('/medico/pacientes/editar/{id}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
+    Route::match(['put', 'patch'], '/medico/pacientes/editar/{id}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
     Route::delete('/medico/pacientes/eliminar/{id}', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
+    Route::get('/medico/pacientes', [MedicoController::class, 'mostrarPacientes'])->name('pacientes.index');
 
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
@@ -70,6 +76,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/consultas/editar/{id}', [ConsultaController::class, 'edit'])->name('consultas.edit');
     Route::put('/consultas/editar/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
     Route::get('/consultas/agregar/{citaId}', [ConsultaController::class, 'create'])->name('consultas.create');
+    Route::get('consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
+    Route::put('consultas/{id}/terminate', [ConsultaController::class, 'terminate'])->name('consultas.terminate');
+
+    // Rutas de enfermeras
+    Route::get('/enfermeras', [MedicoController::class, 'mostrarEnfermeras'])->name('enfermeras');
+    Route::get('/enfermeras/create', [MedicoController::class, 'crearEnfermera'])->name('enfermeras.create');
+    Route::post('/enfermeras', [MedicoController::class, 'storeEnfermeras'])->name('enfermeras.store');
+    Route::get('/enfermeras/{id}/edit', [MedicoController::class, 'editarEnfermera'])->name('enfermeras.edit');
+    Route::put('/enfermeras/{id}', [MedicoController::class, 'updateEnfermera'])->name('enfermeras.update');
+    Route::delete('/enfermeras/{id}', [MedicoController::class, 'eliminarEnfermera'])->name('enfermeras.destroy');
 
 });
 

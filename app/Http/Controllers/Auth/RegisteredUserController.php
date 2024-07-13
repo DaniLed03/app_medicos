@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'apemat' => ['required', 'string', 'max:100'],
             'fechanac' => ['required', 'date'],
             'telefono' => ['required', 'string', 'max:20'],
-            'rol' => ['required', 'in:medico,secretaria,colaborador'],
+            'rol' => ['required', 'in:medico,secretaria,enfermera'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);

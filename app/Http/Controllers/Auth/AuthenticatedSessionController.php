@@ -68,7 +68,7 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route('medico.dashboard');
             case 'secretaria':
                 return redirect()->route('medico.dashboard');
-            case 'colaborador':
+            case 'enfermera':
                 return redirect()->route('medico.dashboard');
             default:
                 return redirect()->route('medico.dashboard');

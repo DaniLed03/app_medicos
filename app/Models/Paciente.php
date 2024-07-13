@@ -19,13 +19,15 @@ class Paciente extends Model
         'fechanac',   // Fecha de nacimiento del paciente
         'correo',     // Correo del paciente
         'contraseña', // Contraseña del paciente
+        'telefono',   // Teléfono del paciente
+        'sexo',       // Sexo del paciente
         'activo',     // Estado del paciente (activo o inactivo)
     ];
 
     /**
      * Define la relación entre el modelo Paciente y el modelo Citas.
      * Un paciente puede tener muchas citas.  
-     * */
+     */
     public function citas()
     {
         // Relación uno a muchos: Un paciente puede tener muchas citas.
