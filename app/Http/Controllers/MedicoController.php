@@ -29,8 +29,8 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'correo' => 'required|string|email|max:255|unique:pacientes',
             'contraseña' => 'required|string|min:8',
-            'telefono' => 'required|string|max:20', // nuevo campo
-            'sexo' => 'required|in:masculino,femenino', // nuevo campo
+            'telefono' => 'required|string|max:20',
+            'sexo' => 'required|in:masculino,femenino',
         ]);
 
         Paciente::create([
@@ -40,13 +40,14 @@ class MedicoController extends Controller
             'fechanac' => $request->fechanac,
             'correo' => $request->correo,
             'contraseña' => bcrypt($request->contraseña),
-            'telefono' => $request->telefono, // nuevo campo
-            'sexo' => $request->sexo, // nuevo campo
+            'telefono' => $request->telefono,
+            'sexo' => $request->sexo,
             'activo' => 'si',
         ]);
 
         return redirect()->route('medico.dashboard')->with('status', 'Paciente registrado correctamente');
     }
+
 
     // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
@@ -228,8 +229,6 @@ class MedicoController extends Controller
         // Redirecciona a la vista de citas con un mensaje de éxito
         return redirect()->route('citas')->with('status', 'Cita registrada correctamente');
     }
-
-
 
     // Muestra el formulario para agregar una nueva cita
     public function crearCita()

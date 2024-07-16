@@ -1,54 +1,126 @@
 <x-app-layout>
     <div class="bg-white overflow-hidden">
-        <!-- Hero Section -->
-        <div class="bg-primary py-12 text-center text-white">
-            <img src="{{ asset('images/LedeHealth.png') }}" alt="Lede Health" class="mx-auto h-24">
-            <h1 class="text-4xl font-bold">Bienvenido a LedeHealth</h1>
-            <p class="mt-4 text-lg">Tu tiempo es para tus pacientes. Nosotros nos encargamos del resto.</p>
-            <div class="mt-8">
-                <a href="{{ route('login') }}" class="bg-secondary text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark ml-4">Iniciar Sesión</a>
+        <!-- Navbar Section -->
+        <div class="text-white py-2 fixed top-0 left-0 right-0 z-10" style="background-color: #2D7498;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <div class="text-lg font-bold">LedeHealth</div>
+                <div class="flex space-x-4">
+                    <a href="#nosotros" class="text-white hover:underline">Nosotros</a>
+                    <a href="#por-que-ledehealth" class="text-white hover:underline">¿Por qué LedeHealth?</a>
+                    <a href="#funcionalidades" class="text-white hover:underline">Funcionalidades</a>
+                    <a href="{{ route('login') }}" class="text-white font-bold py-2 px-4 rounded-full hover:bg-secondary-dark" style="background-color: #33AD9B;">Iniciar Sesión</a>
+                </div>
             </div>
         </div>
 
-        <!-- Features Section -->
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-center text-gray-900">¿Por qué LedeHealth?</h2>
-                <div class="mt-8 flex justify-around">
-                    <div class="text-center max-w-xs">
-                        <div class="inline-block bg-primary text-white rounded-full p-4">
-                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <h3 class="mt-4 text-xl font-semibold text-gray-900">Tu tiempo es importante</h3>
-                        <p class="mt-2 text-gray-600">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
+        <!-- Hero Section -->
+        <div class="py-20 text-center text-white" style="background-color: #2D7498;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
+                <!-- Contenedor para el logo y el texto -->
+                <div class="md:flex-1 flex flex-col md:flex-row mr-12">
+                    <div class="md:w-1/2"> <!-- Logo -->
+                        <img src="{{ asset('images/LedeHealth.png') }}" alt="Lede Health" class="h-74 mx-auto">
                     </div>
-                    <div class="text-center max-w-xs">
-                        <div class="inline-block bg-primary text-white rounded-full p-4">
-                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <h3 class="mt-4 text-xl font-semibold text-gray-900">Producto construido para ti</h3>
-                        <p class="mt-2 text-gray-600">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
+                    <div class="md:w-1/2 mt-8 md:mt-0 md:text-center"> <!-- Texto -->
+                        <h1 class="text-5xl font-bold">Tu tiempo es para tus pacientes</h1>
+                        <p class="mt-4 text-xl">En LedeHealth creemos que tu valioso tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
                     </div>
-                    <div class="text-center max-w-xs">
-                        <div class="inline-block bg-primary text-white rounded-full p-4">
-                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z"/>
-                                <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z"/>
-                            </svg>
+                </div>
+                <!-- Contenedor para el carrusel -->
+                <div class="md:flex-1 mt-8 md:mt-0">
+                    <!-- Slider Section -->
+                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" data-interval="5000">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img class="d-block w-100 h-64" src="{{ asset('images/consultas.jpg') }}" alt="Consultas">
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100 h-64" src="{{ asset('images/pacientes.jpg') }}" alt="Pacientes">
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100 h-64" src="{{ asset('images/citas.jpg') }}" alt="Citas">
+                            </div>
                         </div>
-                        <h3 class="mt-4 text-xl font-semibold text-gray-900">Software en la nube</h3>
-                        <p class="mt-2 text-gray-600">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
+                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Nosotros Section -->
+        <div id="nosotros" class="py-12 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-900">Nosotros</h2>
+                <div class="mt-8 flex flex-col md:flex-row items-center md:space-x-8">
+                    <div class="md:w-1/2">
+                        <img src="{{ asset('images/team.jpg') }}" alt="Nuestro equipo" class="rounded-lg shadow-lg">
+                    </div>
+                    <div class="md:w-1/2 mt-8 md:mt-0">
+                        <p class="text-lg text-gray-600">En LedeHealth, nos dedicamos a proporcionar soluciones tecnológicas de vanguardia para el sector salud. Nuestro equipo está compuesto por profesionales apasionados y experimentados que trabajan incansablemente para ofrecer productos y servicios que mejoren la calidad de vida de los pacientes y optimicen la gestión médica.</p>
+                        <p class="mt-4 text-lg text-gray-600">Desde nuestra fundación, hemos crecido y evolucionado, siempre con el objetivo de estar a la vanguardia en tecnología de la salud. Creemos en la innovación constante y en la mejora continua de nuestros productos para satisfacer las necesidades cambiantes de nuestros clientes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="por-que-ledehealth" class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-8">
+                <div class="md:w-1/2 flex flex-col items-center md:items-start space-y-8">
+                    <h2 class="text-3xl font-bold text-center md:text-left text-gray-900">¿Por qué LedeHealth?</h2>
+                    <div class="flex items-start space-x-4">
+                        <div class="inline-block bg-feature-circle text-white rounded-full p-4">
+                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900">Tu tiempo es importante</h3>
+                            <p class="mt-2 text-gray-600">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="inline-block bg-feature-circle text-white rounded-full p-4">
+                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900">Producto construido para ti</h3>
+                            <p class="mt-2 text-gray-600">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="inline-block bg-feature-circle text-white rounded-full p-4">
+                            <svg class="w-12 h-12 text-white-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z"/>
+                                <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900">Software en la nube</h3>
+                            <p class="mt-2 text-gray-600">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex space-x-4">
+                        <a href="{{ route('register') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark ml-4">Crear cuenta ¡gratis!</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="{{ asset('images/Hospital.webp') }}" alt="Hospital" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+        </div>
+
         <!-- Functionalities Section -->
-        <div class="bg-gray-50 py-12">
+        <div id="funcionalidades" class="bg-gray-50 py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-3xl font-bold text-center text-gray-900">Funcionalidades</h2>
                 <div class="mt-8 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -153,16 +225,40 @@
 </x-app-layout>
 
 <style>
-    .bg-primary {
-        background-color: #2D7498;
-    }
-    .bg-secondary {
-        background-color: #33AD9B;
-    }
-    .bg-secondary-dark {
-        background-color: #278A75;
-    }
     .bg-tercero {
         background-color: #000000;
     }
+
+    .bg-feature-circle {
+        background-color: #2D7498;
+    }
+
+    .bg-register-button {
+        background-color: #33AD9B;
+    }
+
+    /* Cambio de color de hover para los círculos */
+    .inline-block.bg-feature-circle:hover {
+        background-color: #2D7498;
+    }
+
+    /* Cambio de color de hover para el botón "Crear cuenta" */
+    .bg-secondary:hover {
+        background-color: #33AD9B;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nav = document.querySelector('.bg-primary');
+        const navOffsetTop = nav.offsetTop;
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > navOffsetTop) {
+                nav.classList.add('sticky');
+            } else {
+                nav.classList.remove('sticky');
+            }
+        });
+    });
+</script>
