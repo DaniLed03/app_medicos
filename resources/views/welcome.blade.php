@@ -29,7 +29,7 @@
                 <!-- Contenedor para el carrusel -->
                 <div class="md:flex-1 mt-8 md:mt-0">
                     <!-- Slider Section -->
-                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" data-interval="5000">
+                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" data-interval="3000">
                         <div class="carousel-inner">
                             <div class="carousel-item active">
                                 <img class="d-block w-100 h-64" src="{{ asset('images/consultas.jpg') }}" alt="Consultas">
