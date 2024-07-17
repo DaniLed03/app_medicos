@@ -5,78 +5,21 @@
                 <div class="p-6 text-gray-900">
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
                         <div class="lg:flex lg:h-full lg:flex-col">
-                            <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none bg-white">
-                                <h1 class="text-base font-semibold leading-6 text-gray-900">
-                                    <time datetime="2022-01" id="current-month">{{ \Carbon\Carbon::now()->format('F Y') }}</time>
-                                </h1>
-                                <div class="flex items-center">
-                                    <div class="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
-                                        <button id="prev-month-btn" type="button" class="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-gray-300 pr-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pr-0 md:hover:bg-gray-50" onclick="changeMonth(-1)">
-                                            <span class="sr-only">Mes anterior</span>
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                        <span class="relative -mx-px h-5 w-px bg-gray-300 md:hidden"></span>
-                                        <button type="button" class="hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block" onclick="goToToday()">Mes</button>
-                                        <span class="relative -mx-px h-5 w-px bg-gray-300 md:hidden"></span>
-                                        <button type="button" class="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-gray-300 pl-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pl-0 md:hover:bg-gray-50" onclick="changeMonth(1)">
-                                            <span class="sr-only">Mes siguiente</span>
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <button type="button" class="ml-6 hidden border-y border-gray-300 px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block" onclick="goToToday()">Hoy</button>
-                                    <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                        {{ __('Agregar Cita') }}
-                                    </button>
-                                </div>
-                            </header>                                                       
                             <div class="lg:flex lg:flex-auto lg:flex-row">
-                                <!-- Calendar -->
-                                <div class="shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col lg:w-2/3">
-                                    <div class="grid grid-cols-7 gap-px border-b border-gray-300 text-center text-xs font-semibold leading-6 text-white lg:flex-none" style="background-color: #2D7498;">
-                                        <div class="flex justify-center py-2">
-                                            <span>L</span>
-                                            <span class="sr-only sm:not-sr-only">unes</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>M</span>
-                                            <span class="sr-only sm:not-sr-only">artes</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>M</span>
-                                            <span class="sr-only sm:not-sr-only">iércoles</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>J</span>
-                                            <span class="sr-only sm:not-sr-only">ueves</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>V</span>
-                                            <span class="sr-only sm:not-sr-only">iernes</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>S</span>
-                                            <span class="sr-only sm:not-sr-only">ábado</span>
-                                        </div>
-                                        <div class="flex justify-center py-2">
-                                            <span>D</span>
-                                            <span class="sr-only sm:not-sr-only">omingo</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
-                                        <div class="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px" id="calendar-grid">
-                                            <!-- Placeholder for dynamically generated days -->
-                                        </div>
-                                    </div>
+                                <!-- FullCalendar -->
+                                <div class="lg:flex lg:flex-auto lg:flex-col lg:w-3/4">
+                                    <div id="calendar" class="p-6 no-scrollbar"></div>
                                 </div>
                                 <!-- Appointment Table -->
-                                <div class="lg:flex lg:flex-auto lg:flex-col lg:w-1/3 lg:ml-4">
-                                    <div class="bg-white shadow overflow-hidden rounded-lg">
-                                        <div class="text-white px-4 py-2 font-bold" style="background-color: #2D7498;">Hoy</div>
-                                        <div class="p-4">
+                                <div class="lg:flex lg:flex-auto lg:flex-col lg:w-1/4 lg:ml-4">
+                                    <div class="bg-white shadow overflow-hidden rounded-lg h-full">
+                                        <div class="flex items-center justify-between px-4 py-2 font-bold text-white" style="background-color: #2D7498;">
+                                            Hoy
+                                            <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                                {{ __('Agregar Cita') }}
+                                            </button>
+                                        </div>
+                                        <div class="p-4 overflow-y-auto max-h-screen no-scrollbar">
                                             @foreach($citas as $cita)
                                                 @if($cita->fecha === \Carbon\Carbon::now()->format('Y-m-d'))
                                                     <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center cursor-pointer" onclick="window.location.href='{{ route('citas.editar', $cita->id) }}'">
@@ -111,33 +54,14 @@
         </div>
 
         <!-- Modal -->
-        <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            @include('medico.citas.agregarCita')
+        <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isModalOpen = false"></div>
+                @include('medico.citas.agregarCita')
         </div>
     </div>
 </x-app-layout>
 
 <style>
-    .calendar-day {
-        max-height: 100px; /* Adjust height as needed */
-        overflow-y: auto;
-    }
-    .calendar-day div {
-        margin-bottom: 4px; /* Space between appointments */
-    }
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .calendar-day::-webkit-scrollbar {
-        display: none;
-    }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .calendar-day {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-    }
-    .modal {
-        max-width: 400px;
-        margin: 0 auto;
-    }
     .bg-primary {
         background-color: #2D7498;
     }
@@ -158,215 +82,85 @@
         text-align: center; /* Center text horizontally */
         margin: auto; /* Center the circle within its container */
     }
-    .selectable {
-        user-select: text;
+    .fc-daygrid-day-events {
+        max-height: 80px; /* Adjust this value as needed */
+        overflow-y: auto;
+        scrollbar-width: none; /* Firefox */
     }
-    .appointment {
-        background-color: #d1d5db; /* Tailwind CSS gray-300 */
-        color: #1f2937; /* Tailwind CSS gray-800 */
-        padding: 2px 4px;
-        border-radius: 4px;
-        margin-bottom: 2px;
+    .fc-daygrid-day-events::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
     }
-    .day-circle {
-        display: inline-block;
-        margin-top: 8px; /* Ajusta el valor según sea necesario */
-        margin-bottom: 8px; /* Ajusta el valor según sea necesario */
+    .fc-daygrid-day {
+        height: 150px; /* Adjust this value to ensure uniform height */
+    }
+    .fc-daygrid-day-frame {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    /* Hide scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
     }
 </style>
 
 <script>
-    const initialDate = new Date();
-    let currentDate = new Date();
-    const citas = @json($citas);
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
 
-    function changeMonth(monthChange) {
-        const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + monthChange));
-        if (newDate < initialDate) {
-            currentDate = initialDate;
-        } else {
-            currentDate = newDate;
-        }
-        updateCalendar();
-    }
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: {!! json_encode($citas->map(function($cita) {
+                return [
+                    'title' => $cita->nombres . ' ' . $cita->apepat . ' ' . $cita->apemat,
+                    'start' => $cita->fecha . 'T' . $cita->hora,
+                    'url' => route('citas.editar', $cita->id)
+                ];
+            })) !!},
+            dateClick: function(info) {
+                // Abrir modal para agregar cita
+                document.querySelector('[x-data]').__x.$data.isModalOpen = true;
+            },
+            eventClick: function(info) {
+                // Redirigir a la página de edición de la cita
+                window.location.href = info.event.url;
+                info.jsEvent.preventDefault(); // prevents browser from following the link in current tab.
+            }
+        });
 
-    function goToToday() {
-        currentDate = new Date();
-        updateCalendar();
-    }
-
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    function updateCalendar() {
-        const currentMonth = capitalizeFirstLetter(new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(currentDate));
-        const currentYear = currentDate.getFullYear();
-        document.getElementById('current-month').textContent = `${currentMonth} ${currentYear}`;
-        
-        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-        
-        let calendarGrid = '';
-        
-        // Days of the previous month
-        for (let i = firstDayOfMonth.getDay(); i > 0; i--) {
-            const prevMonthDay = new Date(firstDayOfMonth);
-            prevMonthDay.setDate(prevMonthDay.getDate() - i);
-            calendarGrid += `<div class="relative bg-gray-50 px-3 py-2 text-gray-500">
-                                <time datetime="${prevMonthDay.toISOString().split('T')[0]}">${prevMonthDay.getDate()}</time>
-                            </div>`;
-        }
-        
-        // Days of the current month
-        for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-            const currentDay = new Date(currentYear, currentDate.getMonth(), i);
-            const dateString = currentDay.toISOString().split('T')[0];
-            let citaContent = '';
-            let isToday = currentDay.toDateString() === new Date().toDateString();
-            
-            // Check if there are any appointments for this day
-            citas.forEach(cita => {
-                if (cita.fecha === dateString) {
-                    citaContent += `<div class="appointment flex items-center justify-between p-1 cursor-pointer" onclick="window.location.href='/medico/citas/editar/${cita.id}'">
-                                        <div class="flex items-center">
-                                            <div>${cita.hora} - ${cita.nombres} ${cita.apepat} ${cita.apemat}</div>
-                                        </div>
-                                    </div>`;
-                }
-            });
-
-            calendarGrid += `<div class="relative bg-white px-3 py-2 h-24 calendar-day">
-                                <time datetime="${dateString}" class="day-circle ${isToday ? 'current-day' : ''}">${i}</time>
-                                ${citaContent}
-                            </div>`;
-        }
-        
-        // Days of the next month
-        const daysInNextMonth = 42 - (firstDayOfMonth.getDay() + lastDayOfMonth.getDate());
-        for (let i = 1; i <= daysInNextMonth; i++) {
-            const nextMonthDay = new Date(lastDayOfMonth);
-            nextMonthDay.setDate(nextMonthDay.getDate() + i);
-            calendarGrid += `<div class="relative bg-gray-50 px-3 py-2 text-gray-500">
-                                <time datetime="${nextMonthDay.toISOString().split('T')[0]}">${nextMonthDay.getDate()}</time>
-                            </div>`;
-        }
-        
-        document.getElementById('calendar-grid').innerHTML = calendarGrid;
-    }
-
-    function changeMonth(monthChange) {
-        currentDate.setMonth(currentDate.getMonth() + monthChange);
-        updateCalendar();
-    }
-
-    function goToToday() {
-        currentDate = new Date();
-        updateCalendar();
-    }
-
-    document.addEventListener('DOMContentLoaded', updateCalendar);
+        calendar.render();
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('fecha').setAttribute('min', today);
-    });
-
-    document.getElementById('fecha').addEventListener('change', function() {
-        const fecha = this.value;
+        const fechaInput = document.getElementById('fecha');
         const horaSelect = document.getElementById('hora');
 
-        if (fecha) {
-            fetch('{{ route('horas.disponibles') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ fecha: fecha })
-            })
-            .then(response => response.json())
-            .then(data => {
-                horaSelect.innerHTML = '';
-                const now = new Date();
-                const selectedDate = new Date(fecha);
-                const currentHour = now.getHours();
+        fechaInput.addEventListener('change', function() {
+            const horaOptions = horaSelect.options;
 
-                for (let i = 10; i <= 22; i++) { // Limiting hours from 10:00 AM to 10:00 PM
-                    const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+            // Limpiar las opciones de hora existentes
+            while (horaOptions.length > 0) { 
+                horaOptions.remove(0);
+            }
 
-                    const option = document.createElement('option');
-                    option.value = hour;
-                    option.textContent = hour;
-
-                    // Deshabilitar horas ya seleccionadas
-                    if (data.includes(hour)) {
-                        option.disabled = true;
-                    }
-
-                    horaSelect.appendChild(option);
-                }
-            });
-        }
-    });
-
-    document.getElementById('hora').addEventListener('change', function() {
-        const fecha = document.getElementById('fecha').value;
-        const hora = this.value;
-        const medicoId = document.getElementById('usuariomedicoid').value;
-        const errorMessage = document.getElementById('error-message');
-
-        if (fecha && hora && medicoId) {
-            fetch('{{ route('horas.disponibles') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ fecha: fecha, medicoid: medicoId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.includes(hora)) {
-                    errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
-                    errorMessage.style.display = 'block';
-                    document.getElementById('registrar-cita-btn').disabled = true;
-                } else {
-                    errorMessage.style.display = 'none';
-                    document.getElementById('registrar-cita-btn').disabled = false;
-                }
-            });
-        }
-    });
-
-    document.getElementById('cita-form').addEventListener('submit', function(event) {
-        const fecha = document.getElementById('fecha').value;
-        const hora = document.getElementById('hora').value;
-        const medicoId = document.getElementById('usuariomedicoid').value;
-        const errorMessage = document.getElementById('error-message');
-
-        if (fecha && hora && medicoId) {
-            event.preventDefault();
-            fetch('{{ route('horas.disponibles') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ fecha: fecha, hora: hora, medicoid: medicoId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.includes(hora)) {
-                    errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
-                    errorMessage.style.display = 'block';
-                    document.getElementById('registrar-cita-btn').disabled = true;
-                } else {
-                    errorMessage.style.display = 'none';
-                    document.getElementById('registrar-cita-btn').disabled = false;
-                    event.target.submit();
-                }
-            });
-        }
+            // Añadir horas desde las 10:00 AM hasta las 10:00 PM
+            for (let i = 10; i <= 22; i++) {
+                const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+                const option = document.createElement('option');
+                option.value = hour;
+                option.textContent = hour;
+                horaSelect.appendChild(option);
+            }
+        });
     });
 </script>
