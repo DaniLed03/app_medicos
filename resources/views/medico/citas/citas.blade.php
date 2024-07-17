@@ -72,7 +72,7 @@
         background-color: #278A75;
     }
     .current-day {
-        background-color: #2D7498;
+        background-color: #1DC2DF;
         border-radius: 50%;
         color: white;
         padding: 0; /* Remove padding to avoid oval shape */
@@ -107,6 +107,28 @@
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
     }
+
+    /* Custom FullCalendar Styles */
+    .fc .fc-toolbar.fc-header-toolbar {
+        background-color: white;
+        color: black;
+    }
+
+    .fc .fc-button {
+        background-color: #B0BEC5;
+        border-color: #B0BEC5;
+        color: black;
+    }
+
+    .fc .fc-button:hover {
+        background-color: #90A4AE;
+        border-color: #90A4AE;
+    }
+
+    .fc .fc-col-header-cell {
+        background-color: #2D7498;
+        color: white;
+    }
 </style>
 
 <script>
@@ -115,8 +137,9 @@
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
+            locale: 'es', // Set locale to Spanish
             headerToolbar: {
-                left: 'prev,next today',
+                left: 'prev,today,next',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
@@ -124,7 +147,8 @@
                 return [
                     'title' => $cita->nombres . ' ' . $cita->apepat . ' ' . $cita->apemat,
                     'start' => $cita->fecha . 'T' . $cita->hora,
-                    'url' => route('citas.editar', $cita->id)
+                    'url' => route('citas.editar', $cita->id),
+                    'color' => '#33AD9B'
                 ];
             })) !!},
             dateClick: function(info) {
@@ -135,7 +159,18 @@
                 // Redirigir a la página de edición de la cita
                 window.location.href = info.event.url;
                 info.jsEvent.preventDefault(); // prevents browser from following the link in current tab.
-            }
+            },
+            dayCellDidMount: function(info) {
+                var today = new Date();
+                var cellDate = new Date(info.date);
+                if (cellDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
+                    info.el.style.backgroundColor = '#EBF2F4';
+                }
+            },
+            slotMinTime: '10:00:00', // Start time for day and week views
+            slotMaxTime: '22:00:00',  // End time for day and week views
+            allDaySlot: false, // Remove the all-day slot
+            height: 'auto' // Adjust height to remove extra space
         });
 
         calendar.render();
@@ -164,3 +199,4 @@
         });
     });
 </script>
+ 
