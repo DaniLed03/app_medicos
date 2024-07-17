@@ -129,6 +129,9 @@
         background-color: #2D7498;
         color: white;
     }
+    #month:selected, #week:selected, #day:selected {
+        background-color: grey;
+    }
 </style>
 
 <script>
