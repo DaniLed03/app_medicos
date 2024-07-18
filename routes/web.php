@@ -27,7 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rutas de Pacientes
-    Route::post('/pacientes/agregarPaciente', [MedicoController::class, 'storePacientes'])->name('registrarPaciente.store');
+    Route::post('/pacientes', [MedicoController::class, 'storePacientes'])->name('pacientes.store');
     Route::get('/agregarPaciente', function () {
         return view('medico.pacientes.agregarPaciente');
     })->name('agregarPaciente');
@@ -36,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['put', 'patch'], '/medico/pacientes/editar/{id}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
     Route::delete('/medico/pacientes/eliminar/{id}', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
     Route::get('/medico/pacientes', [MedicoController::class, 'mostrarPacientes'])->name('pacientes.index');
-    Route::post('/pacientes', [MedicoController::class, 'storePacientes'])->name('store.pacientes');
+    Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
 
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
@@ -51,11 +51,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
     Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
     Route::get('/medico/citas/editar/{id}', [MedicoController::class, 'editarCita'])->name('citas.editar');
-    Route::patch('/medico/citas/editar/{id}', [MedicoController::class, 'updateCita'])->name('citas.update');
     Route::delete('/medico/citas/eliminar/{id}', [MedicoController::class, 'eliminarCita'])->name('citas.eliminar');
-    Route::post('/horas-disponibles', [MedicoController::class, 'horasDisponibles'])->name('horas.disponibles');
-
-
+    Route::get('/horas-disponibles', [MedicoController::class, 'horasDisponibles'])->name('horas.disponibles');
+    Route::delete('/medico/citas/borrar/{id}', [MedicoController::class, 'borrarCita'])->name('citas.borrar');
+    Route::patch('/medico/citas/editar/{id}', [MedicoController::class, 'updateCita'])->name('citas.update');
 
     // Rutas de Médicos
     Route::get('/medico/medicos', [MedicoController::class, 'mostrarMedicos'])->name('medicos');
@@ -82,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
     Route::put('consultas/{id}/terminate', [ConsultaController::class, 'terminate'])->name('consultas.terminate');
 
+
     // Rutas de enfermeras
     Route::get('/enfermeras', [MedicoController::class, 'mostrarEnfermeras'])->name('enfermeras');
     Route::get('/enfermeras/create', [MedicoController::class, 'crearEnfermera'])->name('enfermeras.create');
@@ -89,6 +89,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/enfermeras/{id}/edit', [MedicoController::class, 'editarEnfermera'])->name('enfermeras.edit');
     Route::put('/enfermeras/{id}', [MedicoController::class, 'updateEnfermera'])->name('enfermeras.update');
     Route::delete('/enfermeras/{id}', [MedicoController::class, 'eliminarEnfermera'])->name('enfermeras.destroy');
-
 });
-

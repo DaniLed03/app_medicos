@@ -13,6 +13,7 @@ class Citas extends Model
         'fecha',
         'hora',
         'activo',
+        'motivo_consulta', // Nuevo campo
         'pacienteid',
         'medicoid'
     ];
@@ -32,4 +33,3 @@ class Citas extends Model
         return $this->hasMany(Consultas::class, 'citai_id');
     }
 }
-

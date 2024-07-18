@@ -1,5 +1,3 @@
-<!-- dashboard.blade.php -->
-
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
@@ -40,55 +38,31 @@
 
                     <!-- Tabla de pacientes -->
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <!-- Filtro -->
-                        <form method="GET" action="{{ route('pacientes.index') }}" class="my-4 flex items-center justify-between">
-                            <div class="flex space-x-4">
-                                <input type="text" name="name" placeholder="Buscar por nombre..." class="border rounded-md px-4 py-2">
-                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Filtrar</button>
-                                <a href="{{ route('pacientes.index') }}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                    <span>Reset</span>
-                                </a>
-                            </div>
-                            <div>
-                                <button type="button" id="openModal" class="bg-button-color hover:bg-button-hover text-white py-2 px-4 rounded">
-                                    Agregar Paciente
-                                </button>
-                            </div>
-                        </form>
-                        <!-- Table -->
-                        <table class="min-w-full text-center text-sm whitespace-nowrap">
-                            <!-- Table head -->
-                            <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-table-header-color">
+                        <table id="pacientesTable" class="display nowrap" style="width:100%">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Nombres</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Apellido Paterno</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Apellido Materno</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Correo</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Teléfono</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Sexo</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Activo</th>
-                                    <th scope="col" class="px-6 py-4 text-white font-bold">Acciones</th>
+                                    <th>Nombres</th>
+                                    <th>Apellido Paterno</th>
+                                    <th>Apellido Materno</th>
+                                    <th>Correo</th>
+                                    <th>Teléfono</th>
+                                    <th>Sexo</th>
+                                    <th>Activo</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-
-                            <!-- Table body -->
                             <tbody>
                                 @foreach($pacientes as $paciente)
-                                    <tr class="border-b dark:border-neutral-600">
-                                        <td class="px-6 py-4">{{ $paciente->nombres }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->apepat }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->apemat }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->correo }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->telefono }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->sexo }}</td>
-                                        <td class="px-6 py-4">{{ $paciente->activo }}</td>
-                                        <td class="px-6 py-4">
-                                            <!-- Enlace para editar el paciente -->
+                                    <tr>
+                                        <td>{{ $paciente->nombres }}</td>
+                                        <td>{{ $paciente->apepat }}</td>
+                                        <td>{{ $paciente->apemat }}</td>
+                                        <td>{{ $paciente->correo }}</td>
+                                        <td>{{ $paciente->telefono }}</td>
+                                        <td>{{ $paciente->sexo }}</td>
+                                        <td>{{ $paciente->activo }}</td>
+                                        <td>
                                             <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700 edit-button" data-id="{{ $paciente->id }}">Editar</a>
-                                            <!-- Formulario para eliminar el paciente -->
                                             <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
                                                 @csrf
                                                 @method('DELETE')
@@ -99,7 +73,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <!-- Mensaje si no hay pacientes registrados -->
                         @if($pacientes->isEmpty())
                             <p class="text-center text-gray-500 mt-4">No hay pacientes registrados.</p>
                         @endif
@@ -128,7 +101,7 @@
                     </div>
                     <div class="border-t border-gray-200 mt-4"></div>
                     <div class="mt-2">
-                        <form method="POST" action="{{ route('registrarPaciente.store') }}" id="addPacienteForm">
+                        <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
                             @csrf
 
                             <!-- Nombres -->
@@ -138,48 +111,48 @@
                                 <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
                             </div>
 
+                            <!-- Apellido Paterno -->
+                            <div class="mt-4">
+                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
+                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
+                            </div>
+
+                            <!-- Apellido Materno -->
+                            <div class="mt-4">
+                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
+                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="mt-4">
+                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
+                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Apellido Paterno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                    <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                                </div>
-
-                                <!-- Apellido Materno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                    <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                                </div>
-
-                                <!-- Fecha de Nacimiento -->
-                                <div class="mt-4">
-                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                    <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
-                                </div>
-
                                 <!-- Teléfono -->
                                 <div class="mt-4">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
                                     <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
-                            </div>
 
-                            <!-- Sexo -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="sexo" :value="__('Sexo')" />
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" name="sexo" id="masculino" value="masculino" autocomplete="off" required> Masculino
-                                    </label>
-                                    <label class="btn btn-secondary">
-                                        <input type="radio" name="sexo" id="femenino" value="femenino" autocomplete="off" required> Femenino
-                                    </label>
+                                <!-- Sexo -->
+                                <div class="mt-4">
+                                    <x-input-label for="sexo" :value="__('Sexo')" />
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-secondary">
+                                            <input type="radio" name="sexo" id="masculino" value="masculino" autocomplete="off" required> Masculino
+                                        </label>
+                                        <label class="btn btn-secondary">
+                                            <input type="radio" name="sexo" id="femenino" value="femenino" autocomplete="off" required> Femenino
+                                        </label>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                 </div>
-                                <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                             </div>
 
                             <!-- Correo -->
@@ -238,45 +211,45 @@
                                 <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
                             </div>
 
+                            <!-- Apellido Paterno -->
+                            <div class="mt-4">
+                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                <x-text-input id="apepatEditar" class="block mt-1 w-full" type="text" name="apepat" required autofocus />
+                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
+                            </div>
+
+                            <!-- Apellido Materno -->
+                            <div class="mt-4">
+                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                <x-text-input id="apematEditar" class="block mt-1 w-full" type="text" name="apemat" required autofocus />
+                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="mt-4">
+                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                <x-text-input id="fechanacEditar" class="block mt-1 w-full" type="date" name="fechanac" required autofocus />
+                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Apellido Paterno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                    <x-text-input id="apepatEditar" class="block mt-1 w-full" type="text" name="apepat" required autofocus />
-                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                                </div>
-
-                                <!-- Apellido Materno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                    <x-text-input id="apematEditar" class="block mt-1 w-full" type="text" name="apemat" required autofocus />
-                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                                </div>
-
-                                <!-- Fecha de Nacimiento -->
-                                <div class="mt-4">
-                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                    <x-text-input id="fechanacEditar" class="block mt-1 w-full" type="date" name="fechanac" required autofocus />
-                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
-                                </div>
-
                                 <!-- Teléfono -->
                                 <div class="mt-4">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
                                     <x-text-input id="telefonoEditar" class="block mt-1 w-full" type="text" name="telefono" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
-                            </div>
 
-                            <!-- Sexo -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="sexo" :value="__('Sexo')" />
-                                <select id="sexoEditar" name="sexo" class="block mt-1 w-full" required>
-                                    <option value="" disabled>Seleccionar sexo</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
-                                </select>
-                                <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
+                                <!-- Sexo -->
+                                <div class="mt-4">
+                                    <x-input-label for="sexo" :value="__('Sexo')" />
+                                    <select id="sexoEditar" name="sexo" class="block mt-1 w-full" required>
+                                        <option value="" disabled>Seleccionar sexo</option>
+                                        <option value="masculino">Masculino</option>
+                                        <option value="femenino">Femenino</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
+                                </div>
                             </div>
 
                             <!-- Correo -->
@@ -309,38 +282,72 @@
     </div>
 </x-app-layout>
 
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
 <script>
-    document.getElementById('openModal').addEventListener('click', function() {
-        document.getElementById('modal').classList.remove('hidden');
-    });
-
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('modal').classList.add('hidden');
-    });
-
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const id = this.getAttribute('data-id');
-            const formAction = `{{ url('medico/pacientes/editar') }}/${id}`;
-            document.getElementById('editPacienteForm').setAttribute('action', formAction);
-            
-            // Fill the form with the data from the patient
-            const patient = @json($pacientes).find(p => p.id == id);
-            document.getElementById('nombresEditar').value = patient.nombres;
-            document.getElementById('apepatEditar').value = patient.apepat;
-            document.getElementById('apematEditar').value = patient.apemat;
-            document.getElementById('fechanacEditar').value = patient.fechanac;
-            document.getElementById('telefonoEditar').value = patient.telefono;
-            document.getElementById('sexoEditar').value = patient.sexo;
-            document.getElementById('correoEditar').value = patient.correo;
-
-            document.getElementById('modalEditar').classList.remove('hidden');
+    $(document).ready(function() {
+        $('#pacientesTable').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "paging": true,
+            "searching": true,
+            "info": true,
+            "scrollX": false,
+            "autoWidth": true
         });
-    });
 
-    document.getElementById('closeModalEditar').addEventListener('click', function() {
-        document.getElementById('modalEditar').classList.add('hidden');
+        document.getElementById('openModal').addEventListener('click', function() {
+            document.getElementById('modal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const id = this.getAttribute('data-id');
+                const formAction = `{{ url('medico/pacientes/editar') }}/${id}`;
+                document.getElementById('editPacienteForm').setAttribute('action', formAction);
+                
+                // Fill the form with the data from the patient
+                const patient = @json($pacientes).find(p => p.id == id);
+                document.getElementById('nombresEditar').value = patient.nombres;
+                document.getElementById('apepatEditar').value = patient.apepat;
+                document.getElementById('apematEditar').value = patient.apemat;
+                document.getElementById('fechanacEditar').value = patient.fechanac;
+                document.getElementById('telefonoEditar').value = patient.telefono;
+                document.getElementById('sexoEditar').value = patient.sexo;
+                document.getElementById('correoEditar').value = patient.correo;
+
+                document.getElementById('modalEditar').classList.remove('hidden');
+            });
+        });
+
+        document.getElementById('closeModalEditar').addEventListener('click', function() {
+            document.getElementById('modalEditar').classList.add('hidden');
+        });
     });
 </script>
 
@@ -409,5 +416,9 @@
     }
     .bg-icon-color {
         background-color: #2D7498;
+    }
+    .dataTables_wrapper .dataTables_scrollBody {
+        overflow-x: hidden;
+        overflow-y: hidden; /* Esto ocultará el scroll vertical */
     }
 </style>

@@ -48,6 +48,33 @@ class MedicoController extends Controller
         return redirect()->route('medico.dashboard')->with('status', 'Paciente registrado correctamente');
     }
 
+    public function storePacientesDesdeModal(Request $request)
+    {
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apepat' => 'required|string|max:255',
+            'apemat' => 'required|string|max:255',
+            'fechanac' => 'required|date',
+            'correo' => 'required|string|email|max:255|unique:pacientes',
+            'contraseña' => 'required|string|min:8',
+            'telefono' => 'required|string|max:20',
+            'sexo' => 'required|in:masculino,femenino',
+        ]);
+
+        $paciente = Paciente::create([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'correo' => $request->correo,
+            'contraseña' => bcrypt($request->contraseña),
+            'telefono' => $request->telefono,
+            'sexo' => $request->sexo,
+            'activo' => 'si',
+        ]);
+
+        return redirect()->route('citas')->with('status', 'Paciente registrado correctamente. Ahora puede agregar una cita.')->with('paciente_id', $paciente->id);
+    }
 
     // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
@@ -203,9 +230,10 @@ class MedicoController extends Controller
         // Validación de los datos recibidos
         $request->validate([
             'fecha' => 'required|date|after_or_equal:today',
-            'hora' => 'required|date_format:H:i', // Validar formato HH:mm
+            'hora' => 'required|date_format:H:i',
             'pacienteid' => 'required|exists:pacientes,id',
-            'usuariomedicoid' => 'required|exists:users,id'
+            'usuariomedicoid' => 'required|exists:users,id',
+            'motivo_consulta' => 'nullable|string|max:255' // Nuevo campo
         ]);
 
         // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
@@ -223,7 +251,8 @@ class MedicoController extends Controller
             'fecha' => $request->fecha,
             'hora' => $request->hora,
             'pacienteid' => $request->pacienteid,
-            'medicoid' => $request->usuariomedicoid
+            'medicoid' => $request->usuariomedicoid,
+            'motivo_consulta' => $request->motivo_consulta // Nuevo campo
         ]);
 
         // Redirecciona a la vista de citas con un mensaje de éxito
@@ -250,19 +279,23 @@ class MedicoController extends Controller
     // Actualiza la información de una cita específica
     public function updateCita(Request $request, $id)
     {
-        // Validación de los datos recibidos
         $request->validate([
             'fecha' => 'required|date',
-            'hora' => 'required|date_format:H:i', // Validar formato HH:mm
+            'hora' => 'required|date_format:H:i',
             'pacienteid' => 'required|exists:pacientes,id',
-            'usuariomedicoid' => 'required|exists:users,id'
+            'usuariomedicoid' => 'required|exists:users,id',
+            'motivo_consulta' => 'nullable|string|max:255'
         ]);
 
-        // Encuentra la cita y actualiza sus datos
         $cita = Citas::findOrFail($id);
-        $cita->update($request->all());
+        $cita->update([
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'pacienteid' => $request->pacienteid,
+            'medicoid' => $request->usuariomedicoid,
+            'motivo_consulta' => $request->motivo_consulta
+        ]);
 
-        // Redirecciona a la vista de citas con un mensaje de éxito
         return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
     }
 
@@ -273,6 +306,15 @@ class MedicoController extends Controller
         $cita->update(['activo' => 'no']);
 
         return redirect()->route('citas')->with('status', 'Cita eliminada correctamente');
+    }
+
+    // Elimina una cita de la base de datos
+    public function borrarCita($id)
+    {
+        $cita = Citas::findOrFail($id);
+        $cita->delete();
+
+        return redirect()->route('citas')->with('status', 'Cita borrada correctamente');
     }
 
     public function obtenerHorasDisponibles(Request $request)
@@ -301,10 +343,8 @@ class MedicoController extends Controller
                     ->pluck('hora')
                     ->toArray();
         return response()->json($citas);
-}
-
-
-
+    }
+    
 
     //////////////////////////////////    MEDICOS    /////////////////////////////////////////
 

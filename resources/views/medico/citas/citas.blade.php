@@ -1,5 +1,12 @@
 <x-app-layout>
-    <div class="py-12" x-data="{ isModalOpen: false }">
+    <div class="py-12" x-data="{ isModalOpen: false, isPacienteModalOpen: false }" x-init="
+        @if (session('paciente_id'))
+            isModalOpen = true;
+            setTimeout(() => {
+                document.getElementById('paciente').value = '{{ session('paciente_id') }}';
+            }, 100);
+        @endif
+    ">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -22,14 +29,14 @@
                                         <div class="p-4 overflow-y-auto max-h-screen no-scrollbar">
                                             @foreach($citas as $cita)
                                                 @if($cita->fecha === \Carbon\Carbon::now()->format('Y-m-d'))
-                                                    <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center cursor-pointer" onclick="window.location.href='{{ route('citas.editar', $cita->id) }}'">
+                                                    <div class="bg-gray-100 p-3 rounded-lg mb-3 flex items-center cursor-pointer">
                                                         <div class="bg-gray-200 p-2 rounded-full mr-3">
                                                             <svg class="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 4h10M5 11h14m-7 4h.01M12 17h.01M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                             </svg>
                                                         </div>
                                                         <div class="flex-1">
-                                                            <a href="#" class="text-lg font-semibold text-gray-900">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
+                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-lg font-semibold text-gray-900">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
                                                             <div class="text-sm text-gray-600">{{ $cita->fecha }} - {{ $cita->hora }}</div>
                                                         </div>
                                                         <form action="{{ route('citas.eliminar', $cita->id) }}" method="POST" style="display:inline;">
@@ -53,10 +60,16 @@
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- Modal Agregar Cita -->
         <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
             <div class="fixed inset-0 bg-black bg-opacity-50" @click="isModalOpen = false"></div>
-                @include('medico.citas.agregarCita')
+            @include('medico.citas.agregarCita')
+        </div>
+
+        <!-- Modal Agregar Paciente -->
+        <div x-show="isPacienteModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isPacienteModalOpen = false"></div>
+            @include('medico.pacientes.agregarPaciente')
         </div>
     </div>
 </x-app-layout>
@@ -129,8 +142,44 @@
         background-color: #2D7498;
         color: white;
     }
+
+    .fc-event {
+        color: black; /* Text color for events */
+    }
+
     #month:selected, #week:selected, #day:selected {
         background-color: grey;
+    }
+
+    /* Additional styles to manage modal z-index */
+    .modal-backdrop.show {
+        opacity: 0.5;
+    }
+
+    #agregarPacienteModal {
+        z-index: 1060;
+    }
+
+    #agregarPacienteModal .modal-backdrop {
+        z-index: 1050;
+    }
+
+    /* Estilo para el fondo oscuro */
+    .modal-backdrop {
+        z-index: 1040; /* Fondo oscuro con menor z-index */
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        justify-content: center; /* Centra horizontalmente */
+        text-align: center;
+    }
+    .modal-header h2 {
+        font-size: 1.75rem; /* Ajusta el tamaño del título */
     }
 </style>
 
@@ -140,7 +189,7 @@
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'es', // Set locale to Spanish
+            locale: 'es',
             headerToolbar: {
                 left: 'prev,today,next',
                 center: 'title',
@@ -151,17 +200,16 @@
                     'title' => $cita->nombres . ' ' . $cita->apepat . ' ' . $cita->apemat,
                     'start' => $cita->fecha . 'T' . $cita->hora,
                     'url' => route('citas.editar', $cita->id),
-                    'color' => '#33AD9B'
+                    'color' => '#33AD9B',
+                    'textColor' => 'black'
                 ];
             })) !!},
             dateClick: function(info) {
-                // Abrir modal para agregar cita
                 document.querySelector('[x-data]').__x.$data.isModalOpen = true;
             },
             eventClick: function(info) {
-                // Redirigir a la página de edición de la cita
                 window.location.href = info.event.url;
-                info.jsEvent.preventDefault(); // prevents browser from following the link in current tab.
+                info.jsEvent.preventDefault();
             },
             dayCellDidMount: function(info) {
                 var today = new Date();
@@ -170,10 +218,10 @@
                     info.el.style.backgroundColor = '#EBF2F4';
                 }
             },
-            slotMinTime: '10:00:00', // Start time for day and week views
-            slotMaxTime: '22:00:00',  // End time for day and week views
-            allDaySlot: false, // Remove the all-day slot
-            height: 'auto' // Adjust height to remove extra space
+            slotMinTime: '10:00:00',
+            slotMaxTime: '23:00:00',
+            allDaySlot: false,
+            height: 'auto'
         });
 
         calendar.render();
@@ -186,13 +234,11 @@
         fechaInput.addEventListener('change', function() {
             const horaOptions = horaSelect.options;
 
-            // Limpiar las opciones de hora existentes
             while (horaOptions.length > 0) { 
                 horaOptions.remove(0);
             }
 
-            // Añadir horas desde las 10:00 AM hasta las 10:00 PM
-            for (let i = 10; i <= 22; i++) {
+            for (let i = 10; i <= 23; i++) {
                 const hour = i < 10 ? `0${i}:00` : `${i}:00`;
                 const option = document.createElement('option');
                 option.value = hour;
@@ -202,4 +248,34 @@
         });
     });
 </script>
- 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('paciente_id'))
+            document.getElementById('paciente').value = "{{ session('paciente_id') }}";
+            isModalOpen = true; // Abre el modal automáticamente
+        @endif
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInputs = document.querySelectorAll('#fecha, #editFecha');
+        const horaSelects = document.querySelectorAll('#hora, #editHora');
+
+        fechaInputs.forEach(fechaInput => {
+            fechaInput.addEventListener('change', function() {
+                horaSelects.forEach(horaSelect => {
+                    while (horaSelect.options.length > 0) { 
+                        horaSelect.options.remove(0);
+                    }
+                    for (let i = 10; i <= 23; i++) {
+                        const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+                        const option = document.createElement('option');
+                        option.value = hour;
+                        option.textContent = hour;
+                        horaSelect.appendChild(option);
+                    }
+                });
+            });
+        });
+    });
+</script>

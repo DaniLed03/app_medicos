@@ -13,6 +13,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->time('hora');
             $table->enum('activo', ['si', 'no'])->default('si');
+            $table->string('motivo_consulta')->nullable(); // Nuevo campo
             $table->foreignId('pacienteid')->constrained('pacientes')->cascadeOnDelete();
             $table->foreignId('medicoid')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
@@ -24,3 +25,4 @@ return new class extends Migration
         Schema::dropIfExists('citas');
     }
 };
+

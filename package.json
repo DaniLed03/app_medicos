@@ -19,6 +19,9 @@
         "@fullcalendar/core": "^6.1.15",
         "@fullcalendar/daygrid": "^6.1.15",
         "@fullcalendar/interaction": "^6.1.15",
-        "@fullcalendar/timegrid": "^6.1.15"
+        "@fullcalendar/timegrid": "^6.1.15",
+        "datatables.net": "^2.0.8",
+        "datatables.net-dt": "^2.0.8",
+        "sweetalert2": "^11.12.2"
     }
 }

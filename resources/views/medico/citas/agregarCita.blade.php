@@ -1,93 +1,116 @@
-<!-- resources/views/agregarCita.blade.php -->
-<form method="POST" id="cita-form" action="{{ route('citas.store') }}" class="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto relative" x-data="citaForm()">
-    @csrf
-    <button type="button" @click="isModalOpen = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-    </button>
-    <h2 class="text-2xl font-bold text-center mb-4" style="color: #316986;">Agregar Cita</h2>
-    <hr class="mb-4">
-
-    <!-- Fecha y Hora -->
-    <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-            <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-            <input id="fecha" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" type="date" name="fecha" :value="old('fecha')" required autofocus min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
-            @error('fecha')
-                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-            @enderror
+<div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full modal-content">
+    <div class="modal-header relative">
+        <div class="absolute right-0 top-0">
+            <button type="button" class="text-gray" @click="isModalOpen = false">
+                <svg class="h-6 w-6 fill-none stroke-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
-
-        <div>
-            <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
-            <select id="hora" name="hora" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                <!-- Options will be dynamically populated -->
-            </select>
-            @error('hora')
-                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-            @enderror
+        <h2 class="font-bold text-center w-full" style="color:#2D7498">Agregar Cita</h2>
+    </div>
+    <form method="POST" action="{{ route('citas.store') }}">
+        @csrf
+        <div class="form-group flex">
+            <div class="mr-2 w-1/2">
+                <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
+                <input type="date" name="fecha" id="fecha" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            </div>
+            <div class="ml-2 w-1/2">
+                <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
+                <select name="hora" id="hora" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                    <!-- Options will be dynamically added here by JavaScript -->
+                </select>
+            </div>
         </div>
-    </div>
-
-    <!-- Paciente -->
-    <div class="relative mb-4">
-        <label for="search" class="block text-sm font-medium text-gray-700">Buscar Paciente</label>
-        <input type="text" id="search" x-model="search" @input="filterPacientes" @focus="showOptions = true" @blur="hideOptions()" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Escribe para buscar...">
-        <ul x-show="showOptions && filteredPacientes.length > 0" @mousedown.away="showOptions = false" class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-            <template x-for="paciente in filteredPacientes" :key="paciente.id">
-                <li @click="selectPaciente(paciente)" class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white">
-                    <span x-text="paciente.nombres + ' ' + paciente.apepat + ' ' + paciente.apemat" class="block truncate"></span>
-                </li>
-            </template>
-        </ul>
-        <input type="hidden" name="pacienteid" x-model="selectedPaciente.id">
-    </div>
-
-    <!-- Usuario Médico (Visible but Disabled Field and Hidden Field) -->
-    <div class="mb-4">
-        <label for="usuariomedico" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
-        <input id="usuariomedico" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" type="text" value="Daniel Ledezma Donjuan" disabled />
-        <input type="hidden" id="usuariomedicoid" name="usuariomedicoid" value="1">
-    </div>
-
-    <div id="error-message" class="text-red-500 text-sm mt-2" style="display: none;"></div>
-
-    <div class="flex items-center justify-end mt-4">
-        <button type="submit" id="registrar-cita-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Registrar Cita
-        </button>
-    </div>
-</form>
+        <div class="form-group">
+            <label for="pacienteid" class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+            <div class="flex items-center">
+                <select name="pacienteid" id="paciente" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                    @foreach($pacientes as $paciente)
+                        <option value="{{ $paciente->id }}">{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</option>
+                    @endforeach
+                </select>
+                <button type="button" class="ml-2 bg-button-color text-white p-2 rounded-md" @click="isPacienteModalOpen = true">+</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="usuariomedico" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
+            <input id="usuariomedico" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600" type="text" value="Daniel Ledezma Donjuan" disabled />
+            <input type="hidden" id="usuariomedicoid" name="usuariomedicoid" value="1">
+        </div>
+        <div class="form-group">
+            <label for="motivo_consulta" class="block text-sm font-medium text-gray-700">Motivo de la consulta</label>
+            <textarea name="motivo_consulta" id="motivo_consulta" rows="6" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" style="resize: none;"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded-md">Registrar Cita</button>
+        </div>
+    </form>
+</div>
 
 <script>
-    function citaForm() {
-        return {
-            search: '',
-            pacientes: @json($pacientes),
-            filteredPacientes: [],
-            selectedPaciente: null,
-            showOptions: false,
-            filterPacientes() {
-                this.filteredPacientes = this.pacientes.filter(paciente => {
-                    const searchLower = this.search.toLowerCase();
-                    const nombresLower = paciente.nombres.toLowerCase();
-                    const apepatLower = paciente.apepat.toLowerCase();
-                    const apematLower = paciente.apemat.toLowerCase();
-                    return nombresLower.includes(searchLower) || apepatLower.includes(searchLower) || apematLower.includes(searchLower);
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInput = document.getElementById('fecha');
+        const horaSelect = document.getElementById('hora');
+        const usuarioMedicoInput = document.getElementById('usuariomedicoid');
+
+        fechaInput.addEventListener('change', function() {
+            fetchHorasDisponibles();
+        });
+
+        usuarioMedicoInput.addEventListener('change', function() {
+            fetchHorasDisponibles();
+        });
+
+        function fetchHorasDisponibles() {
+            const fecha = fechaInput.value;
+            const medicoid = usuarioMedicoInput.value;
+
+            if (!fecha || !medicoid) return;
+
+            fetch(`/horas-disponibles?fecha=${fecha}&medicoid=${medicoid}`)
+                .then(response => response.json())
+                .then(data => {
+                    const horaOptions = horaSelect.options;
+                    while (horaOptions.length > 0) {
+                        horaOptions.remove(0);
+                    }
+
+                    for (let i = 10; i <= 23; i++) {
+                        const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+                        if (!data.includes(hour)) {
+                            const option = document.createElement('option');
+                            option.value = hour;
+                            option.textContent = hour;
+                            horaSelect.appendChild(option);
+                        }
+                    }
                 });
-                this.showOptions = true; // Show options while typing
-            },
-            selectPaciente(paciente) {
-                this.search = `${paciente.nombres} ${paciente.apepat} ${paciente.apemat}`;
-                this.selectedPaciente = paciente;
-                this.showOptions = false;
-            },
-            hideOptions() {
-                setTimeout(() => {
-                    this.showOptions = false;
-                }, 100); // Delay to allow click event to register
-            }
         }
-    }
+
+        // Set the min date to today
+        fechaInput.min = new Date().toISOString().split("T")[0];
+    });
+
+    // Mostrar alerta de SweetAlert2 si hay mensajes de éxito
+    @if(session('status'))
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '{{ session('status') }}',
+                showConfirmButton: false,
+                timer: 2500
+            });
+    @endif
+
+    // Mostrar alerta de SweetAlert2 si hay mensajes de error
+    @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                html: '<ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
+            });
+    @endif
+
 </script>

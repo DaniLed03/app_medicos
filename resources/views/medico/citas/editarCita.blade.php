@@ -1,208 +1,107 @@
 <x-app-layout>
-    <div class="py-12 flex flex-col items-center justify-center">
-        <div class="max-w-4xl w-full mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg mb-6">
+    <div class="py-12">
+        <div class="max-w-full mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="flex items-center justify-between">
-                        <h1 class="text-2xl font-bold" style="color: #316986;">Reagendar Cita</h1>
+                    <div class="overflow-x-auto bg-white dark:bg-neutral-700">
+                        <div class="lg:flex lg:h-full lg:flex-col">
+                            <div class="lg:flex lg:flex-auto lg:flex-row">
+                                <!-- Formulario Editar Cita -->
+                                <div class="lg:flex lg:flex-auto lg:flex-col lg:w-full">
+                                    <div class="bg-white shadow overflow-hidden rounded-lg h-full">
+                                        <div class="flex items-center justify-between px-4 py-2 font-bold text-white" style="background-color: #2D7498;">
+                                            Cita
+                                        </div>
+                                        <div class="p-4">
+                                            <!-- Datos del Paciente -->
+                                            <div class="flex items-center mb-6">
+                                                <!-- Icono con iniciales -->
+                                                <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
+                                                    {{ substr($cita->paciente->nombres, 0, 1) }}{{ substr($cita->paciente->apepat, 0, 1) }}
+                                                </div>
+                                                <!-- Nombre del paciente -->
+                                                <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
+                                                    {{ $cita->paciente->nombres }} {{ $cita->paciente->apepat }} {{ $cita->paciente->apemat }}
+                                                </h2>
+                                            </div>
+
+                                            <form method="POST" action="{{ route('citas.update', $cita->id) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                
+                                                <div class="form-group flex">
+                                                    <div class="mr-2 w-1/2">
+                                                        <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
+                                                        <input type="date" name="fecha" id="fecha" min="{{ now()->toDateString() }}" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ $cita->fecha }}" required>
+                                                    </div>
+                                                    <div class="ml-2 w-1/2">
+                                                        <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
+                                                        <select name="hora" id="hora" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                                                            @for ($i = 10; $i <= 23; $i++)
+                                                                @php
+                                                                    $hour = $i < 10 ? '0' . $i . ':00' : $i . ':00';
+                                                                @endphp
+                                                                <option value="{{ $hour }}" {{ $cita->hora == $hour ? 'selected' : '' }}>{{ $hour }}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <input type="hidden" name="pacienteid" value="{{ $cita->pacienteid }}">
+
+                                                <div class="form-group">
+                                                    <label for="usuariomedico" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
+                                                    <input id="usuariomedico" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600" type="text" value="{{ $cita->medico->nombres }} {{ $cita->medico->apepat }} {{ $cita->medico->apemat }}" disabled />
+                                                    <input type="hidden" name="usuariomedicoid" value="{{ $cita->medicoid }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="motivo_consulta" class="block text-sm font-medium text-gray-700">Motivo de la consulta</label>
+                                                    <textarea name="motivo_consulta" id="motivo_consulta" rows="6" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" style="resize: none;">{{ $cita->motivo_consulta }}</textarea>
+                                                </div>
+                                                <div class="flex justify-end">
+                                                    <button type="submit" class="bg-blue-500 text-white p-2 rounded-md mr-2">Actualizar Cita</button>
+                                                    <a href="{{ route('consultas.create', ['citaId' => $cita->id]) }}" class="bg-green-500 text-white p-2 rounded-md mr-2">Añadir Consulta</a>
+                                                    <form action="{{ route('citas.borrar', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas borrar esta cita? Esta acción no se puede deshacer.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="bg-red-500 text-white p-2 rounded-md">Borrar Cita</button>
+                                                    </form>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <hr class="my-4">
-
-                    <form method="POST" action="{{ route('citas.update', $cita->id) }}" class="space-y-4" id="cita-edit-form">
-                        @csrf
-                        @method('PATCH')
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Fecha -->
-                            <div>
-                                <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                                <input id="fecha" name="fecha" type="date" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500" value="{{ $cita->fecha }}" required autofocus>
-                                @error('fecha')
-                                    <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Hora -->
-                            <div>
-                                <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
-                                <select id="hora" name="hora" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500" required>
-                                    <!-- Opciones de horas se rellenarán con JavaScript -->
-                                </select>
-                                @error('hora')
-                                    <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Paciente -->
-                        <div>
-                            <label for="pacienteid" class="block text-sm font-medium text-gray-700">Paciente</label>
-                            <select id="pacienteid" name="pacienteid" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500" required>
-                                @foreach($pacientes as $paciente)
-                                    <option value="{{ $paciente->id }}" {{ $cita->pacienteid == $paciente->id ? 'selected' : '' }}>
-                                        {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('pacienteid')
-                                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Usuario Médico -->
-                        <div>
-                            <label for="usuariomedicoid" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
-                            <select id="usuariomedicoid" name="usuariomedicoid" class="block w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500" required>
-                                @foreach($usuarios as $usuario)
-                                    <option value="{{ $usuario->id }}" {{ $cita->usuariomedicoid == $usuario->id ? 'selected' : '' }}>
-                                        {{ $usuario->nombres }} {{ $usuario->apepat }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('usuariomedicoid')
-                                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="flex items-center justify-end mt-4 space-x-2">
-                            <a href="{{ route('consultas.create', ['citaId' => $cita->id]) }}" class="text-gray-800 cursor-pointer">
-                                <svg class="w-10 h-10" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                  <path fill-rule="evenodd" d="M8 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1h2a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2Zm6 1h-4v2H9a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2h-1V4Zm-6 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm1 3a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z" clip-rule="evenodd"/>
-                                </svg>
-                            </a>
-                            <button id="actualizar-cita-btn" type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                Actualizar Cita
-                            </button>
-                        </div>
-
-                        <div id="error-message-edit" class="text-red-500 text-sm mt-2" style="display: none;"></div>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha').setAttribute('min', today);
-            
-            populateHours();
-        });
-
-        document.getElementById('fecha').addEventListener('change', function() {
-            const fecha = this.value;
-            const horaSelect = document.getElementById('hora');
-
-            if (fecha) {
-                fetch('{{ route('horas.disponibles') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ fecha: fecha })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    horaSelect.innerHTML = '';
-                    const now = new Date();
-                    const selectedDate = new Date(fecha);
-                    const currentHour = now.getHours();
-
-                    for (let i = 10; i <= 22; i++) { // Mostrar horas de 10:00 AM a 10:00 PM
-                        const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-
-                        const option = document.createElement('option');
-                        option.value = hour;
-                        option.textContent = hour;
-
-                        // Deshabilitar horas ya seleccionadas
-                        if (data.includes(hour)) {
-                            option.disabled = true;
-                        }
-
-                        horaSelect.appendChild(option);
-                    }
-                });
-            }
-        });
-
-        document.getElementById('hora').addEventListener('change', function() {
-            const fecha = document.getElementById('fecha').value;
-            const hora = this.value;
-            const medicoId = document.getElementById('usuariomedicoid').value;
-            const errorMessage = document.getElementById('error-message-edit');
-
-            if (fecha && hora && medicoId) {
-                fetch('{{ route('horas.disponibles') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ fecha: fecha, medicoid: medicoId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.includes(hora)) {
-                        errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
-                        errorMessage.style.display = 'block';
-                        document.getElementById('actualizar-cita-btn').disabled = true;
-                    } else {
-                        errorMessage.style.display = 'none';
-                        document.getElementById('actualizar-cita-btn').disabled = false;
-                    }
-                });
-            }
-        });
-
-        document.getElementById('cita-edit-form').addEventListener('submit', function(event) {
-            const fecha = document.getElementById('fecha').value;
-            const hora = document.getElementById('hora').value;
-            const medicoId = document.getElementById('usuariomedicoid').value;
-            const errorMessage = document.getElementById('error-message-edit');
-
-            if (fecha && hora && medicoId) {
-                event.preventDefault();
-                fetch('{{ route('horas.disponibles') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ fecha: fecha, hora: hora, medicoid: medicoId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.includes(hora)) {
-                        errorMessage.textContent = 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.';
-                        errorMessage.style.display = 'block';
-                        document.getElementById('actualizar-cita-btn').disabled = true;
-                    } else {
-                        errorMessage.style.display = 'none';
-                        document.getElementById('actualizar-cita-btn').disabled = false;
-                        event.target.submit();
-                    }
-                });
-            }
-        });
-
-        function populateHours() {
-            const horaSelect = document.getElementById('hora');
-            const horas = [
-                '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
-                '18:00', '19:00', '20:00', '21:00', '22:00'
-            ];
-
-            horas.forEach(hora => {
-                const option = document.createElement('option');
-                option.value = hora;
-                option.textContent = hora;
-                horaSelect.appendChild(option);
-            });
-
-            horaSelect.value = "{{ $cita->hora }}";
-        }
-    </script>
 </x-app-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInput = document.getElementById('fecha');
+        const horaSelect = document.getElementById('hora');
+
+        fechaInput.addEventListener('change', function() {
+            const horaOptions = horaSelect.options;
+
+            while (horaOptions.length > 0) { 
+                horaOptions.remove(0);
+            }
+
+            for (let i = 10; i <= 23; i++) {
+                const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+                const option = document.createElement('option');
+                option.value = hour;
+                option.textContent = hour;
+                horaSelect.appendChild(option);
+            }
+        });
+
+        // Set the min date to today
+        fechaInput.min = new Date().toISOString().split("T")[0];
+    });
+</script>
