@@ -26,17 +26,46 @@
         <div class="w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900">
-                    <div class="flex items-center mb-6">
-                        <!-- Icono con iniciales -->
-                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
-                            {{ substr($consulta->cita->paciente->nombres, 0, 1) }}{{ substr($consulta->cita->paciente->apepat, 0, 1) }}
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <!-- Icono con iniciales -->
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
+                                {{ substr($consulta->cita->paciente->nombres, 0, 1) }}{{ substr($consulta->cita->paciente->apepat, 0, 1) }}
+                            </div>
+                            <!-- Nombre del paciente -->
+                            <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
+                                {{ $consulta->cita->paciente->nombres }} {{ $consulta->cita->paciente->apepat }} {{ $consulta->cita->paciente->apemat }}
+                            </h2>
                         </div>
-                        <!-- Nombre del paciente -->
-                        <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
-                            {{ $consulta->cita->paciente->nombres }} {{ $consulta->cita->paciente->apepat }} {{ $consulta->cita->paciente->apemat }}
-                        </h2>
+                        <!-- Información adicional del paciente -->
+                        <div class="flex items-center space-x-4 bg-[#2D7498] border rounded-lg p-4 text-white">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4Zm12 12V5H7v11h10Zm-5 1a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="ml-1">{{ $consulta->cita->paciente->sexo }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
+                                </svg>
+                                <span class="ml-1">{{ $consulta->cita->paciente->fechanac }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
+                                </svg>
+                                <span class="ml-1">{{ $consulta->cita->paciente->telefono }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M5.024 3.783A1 1 0 0 1 6 3h12a1 1 0 0 1 .976.783L20.802 12h-4.244a1.99 1.99 0 0 0-1.824 1.205 2.978 2.978 0 0 1-5.468 0A1.991 1.991 0 0 0 7.442 12H3.198l1.826-8.217ZM3 14v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-4.43a4.978 4.978 0 0 1-9.14 0H3Z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="ml-1">{{ $consulta->cita->paciente->correo }}</span>
+                            </div>
+                        </div>
                     </div>
-                    
+
                     <!-- Signos vitales -->
                     <div class="bg-gray-100 p-6 rounded-lg mb-6">
                         <div class="flex justify-between items-center">
@@ -130,19 +159,26 @@
                         <!-- Recetas -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Recetas</h3>
-                            <div id="recetas-container">
+                            <div id="recetas-container" class="space-y-2">
                                 @foreach($consulta->recetas as $index => $receta)
-                                    <div class="receta-item mb-4">
-                                        <div class="grid grid-cols-4 gap-4 mb-4">
+                                    <div class="receta-item flex items-center mb-2">
+                                        <div class="grid grid-cols-4 gap-4 flex-1">
                                             <input type="text" name="recetas[{{ $index }}][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" value="{{ old('recetas.'.$index.'.medicacion', $receta->medicacion) }}" required>
                                             <input type="number" name="recetas[{{ $index }}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" value="{{ old('recetas.'.$index.'.cantidad_medicacion', $receta->cantidad_medicacion) }}" required>
                                             <input type="text" name="recetas[{{ $index }}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" value="{{ old('recetas.'.$index.'.frecuencia', $receta->frecuencia) }}" required>
                                             <input type="text" name="recetas[{{ $index }}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" value="{{ old('recetas.'.$index.'.duracion', $receta->duracion) }}" required>
+                                            <textarea name="recetas[{{ $index }}][notas]" class="hidden">{{ old('recetas.'.$index.'.notas', $receta->notas) }}</textarea>
                                         </div>
-                                        <textarea name="recetas[{{ $index }}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Agregar notas...">{{ old('recetas.'.$index.'.notas', $receta->notas) }}</textarea>
+                                        @if($index > 0)
+                                            <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
+                                                <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
+                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-4" placeholder="Agregar notas...">{{ old('notas_unica', $consulta->notas_receta) }}</textarea>
+                            <input type="hidden" name="notas_unica" id="hidden-notas-unica">
                         </div>
 
                         <div class="flex flex-wrap -mx-3">
@@ -150,11 +186,16 @@
                             <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
                                 <h3 class="text-lg font-bold mb-4">Productos</h3>
                                 @foreach($productos as $producto)
-                                    <div class="mb-2">
+                                    <div class="mb-2 flex items-center justify-between">
                                         <label class="flex items-center">
                                             <input type="checkbox" name="productos[]" value="{{ $producto->id }}" data-precio="{{ $producto->precio }}" class="producto-checkbox mr-2" {{ in_array($producto->id, $consulta_productos) ? 'checked' : '' }}>
                                             {{ $producto->nombre }} ({{ $producto->precio }} pesos)
                                         </label>
+                                        <div class="flex items-center space-x-2">
+                                            <button type="button" class="bg-gray-300 text-gray-700 px-2 py-1 rounded minus-button">-</button>
+                                            <span class="product-quantity">1</span>
+                                            <button type="button" class="bg-gray-300 text-gray-700 px-2 py-1 rounded plus-button">+</button>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -163,11 +204,16 @@
                             <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
                                 <h3 class="text-lg font-bold mb-4">Servicios</h3>
                                 @foreach($servicios as $servicio)
-                                    <div class="mb-2">
+                                    <div class="mb-2 flex items-center justify-between">
                                         <label class="flex items-center">
                                             <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" data-precio="{{ $servicio->precio }}" class="servicio-checkbox mr-2" {{ in_array($servicio->id, $consulta_servicios) ? 'checked' : '' }}>
                                             {{ $servicio->nombre }} ({{ $servicio->precio }} pesos)
                                         </label>
+                                        <div class="flex items-center space-x-2">
+                                            <button type="button" class="bg-gray-300 text-gray-700 px-2 py-1 rounded minus-button">-</button>
+                                            <span class="service-quantity">1</span>
+                                            <button type="button" class="bg-gray-300 text-gray-700 px-2 py-1 rounded plus-button">+</button>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -267,7 +313,9 @@
             const productoCheckboxes = document.querySelectorAll('.producto-checkbox');
             const servicioCheckboxes = document.querySelectorAll('.servicio-checkbox');
             const totalPagarInput = document.getElementById('totalPagar');
-            
+            const notasUnicaInput = document.getElementById('notas-unica');
+            const hiddenNotasUnicaInput = document.getElementById('hidden-notas-unica');
+
             function actualizarTotal() {
                 let total = 70; // Valor por defecto de la consulta
                 productoCheckboxes.forEach(checkbox => {
@@ -283,6 +331,34 @@
                 totalPagarInput.value = total;
             }
 
+            function actualizarNotas() {
+                const notas = notasUnicaInput.value;
+                hiddenNotasUnicaInput.value = notas;
+                const notasFields = document.querySelectorAll('textarea[name^="recetas"][name$="[notas]"]');
+                notasFields.forEach(field => {
+                    field.value = notas;
+                });
+            }
+
+            function inicializarNotas() {
+                const notasFields = document.querySelectorAll('textarea[name^="recetas"][name$="[notas]"]');
+                let todasIguales = true;
+                let primeraNota = null;
+
+                notasFields.forEach(field => {
+                    if (primeraNota === null) {
+                        primeraNota = field.value;
+                    } else if (field.value !== primeraNota) {
+                        todasIguales = false;
+                    }
+                });
+
+                if (todasIguales && primeraNota !== null) {
+                    notasUnicaInput.value = primeraNota;
+                    hiddenNotasUnicaInput.value = primeraNota;
+                }
+            }
+
             productoCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', actualizarTotal);
             });
@@ -290,6 +366,9 @@
                 checkbox.addEventListener('change', actualizarTotal);
             });
 
+            notasUnicaInput.addEventListener('input', actualizarNotas);
+
+            inicializarNotas(); // Inicializa el campo de notas única
             actualizarTotal(); // Para calcular el total inicial si ya hay productos o servicios seleccionados
         });
 
@@ -297,23 +376,46 @@
             const container = document.getElementById('recetas-container');
             const index = container.children.length;
             const newItem = document.createElement('div');
-            newItem.classList.add('receta-item', 'mb-4');
+            newItem.classList.add('receta-item', 'flex', 'items-center', 'mb-2');
             newItem.innerHTML = `
-                <div class="grid grid-cols-4 gap-4 mb-4">
+                <div class="grid grid-cols-4 gap-4 flex-1">
                     <input type="text" name="recetas[${index}][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" required>
                     <input type="number" name="recetas[${index}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
                     <input type="text" name="recetas[${index}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
                     <input type="text" name="recetas[${index}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
+                    <textarea name="recetas[${index}][notas]" class="hidden"></textarea>
                 </div>
-                <textarea name="recetas[${index}][notas]" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2" placeholder="Agregar notas..."></textarea>
-                <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded">Eliminar</button>
+                <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
+                    <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             `;
             container.appendChild(newItem);
+
+            // Update notes for the newly added medication
+            actualizarNotas();
         });
 
         document.addEventListener('click', function (event) {
-            if (event.target.classList.contains('remove-receta')) {
+            if (event.target.closest('.remove-receta')) {
                 event.target.closest('.receta-item').remove();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('plus-button')) {
+                const quantityElement = event.target.previousElementSibling;
+                let quantity = parseInt(quantityElement.textContent);
+                quantity++;
+                quantityElement.textContent = quantity;
+                actualizarTotal();
+            } else if (event.target.classList.contains('minus-button')) {
+                const quantityElement = event.target.nextElementSibling;
+                let quantity = parseInt(quantityElement.textContent);
+                if (quantity > 1) {
+                    quantity--;
+                    quantityElement.textContent = quantity;
+                    actualizarTotal();
+                }
             }
         });
 

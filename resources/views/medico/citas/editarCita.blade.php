@@ -25,7 +25,7 @@
                                                 </h2>
                                             </div>
 
-                                            <form method="POST" action="{{ route('citas.update', $cita->id) }}">
+                                            <form id="update-cita-form" method="POST" action="{{ route('citas.update', $cita->id) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 
@@ -59,14 +59,14 @@
                                                     <textarea name="motivo_consulta" id="motivo_consulta" rows="6" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" style="resize: none;">{{ $cita->motivo_consulta }}</textarea>
                                                 </div>
                                                 <div class="flex justify-end">
-                                                    <button type="submit" class="bg-blue-500 text-white p-2 rounded-md mr-2">Actualizar Cita</button>
+                                                    <button type="button" class="bg-blue-500 text-white p-2 rounded-md mr-2" onclick="confirmUpdate()">Actualizar Cita</button>
                                                     <a href="{{ route('consultas.create', ['citaId' => $cita->id]) }}" class="bg-green-500 text-white p-2 rounded-md mr-2">Añadir Consulta</a>
-                                                    <form action="{{ route('citas.borrar', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas borrar esta cita? Esta acción no se puede deshacer.');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="bg-red-500 text-white p-2 rounded-md">Borrar Cita</button>
-                                                    </form>
+                                                    <button type="button" class="bg-red-500 text-white p-2 rounded-md" onclick="confirmDelete()">Borrar Cita</button>
                                                 </div>
+                                            </form>
+                                            <form id="delete-cita-form" action="{{ route('citas.borrar', $cita->id) }}" method="POST" style="display:none;">
+                                                @csrf
+                                                @method('DELETE')
                                             </form>
                                         </div>
                                     </div>
@@ -78,30 +78,92 @@
             </div>
         </div>
     </div>
-</x-app-layout>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const fechaInput = document.getElementById('fecha');
-        const horaSelect = document.getElementById('hora');
+    <script>
+        function confirmUpdate() {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡Deseas actualizar esta cita!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, ¡actualízala!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Asegúrate de que este ID corresponde al formulario de actualización
+                    document.getElementById('update-cita-form').submit();
+                    Swal.fire({
+                        title: "¡Cita Actualizada!",
+                        text: "La cita ha sido actualizada.",
+                        icon: "success"
+                    });
+                }
+            });
+        }
 
-        fechaInput.addEventListener('change', function() {
-            const horaOptions = horaSelect.options;
+        function confirmDelete() {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esto!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, ¡bórralo!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-cita-form').submit();
+                    Swal.fire({
+                        title: "¡Borrado!",
+                        text: "La cita ha sido borrada.",
+                        icon: "success"
+                    });
+                }
+            });
+        }
 
-            while (horaOptions.length > 0) { 
-                horaOptions.remove(0);
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.getElementById('fecha');
+            const horaSelect = document.getElementById('hora');
+            const usuarioMedicoInput = document.getElementById('usuariomedicoid');
+
+            function fetchHorasDisponibles() {
+                const fecha = fechaInput.value;
+                const medicoid = usuarioMedicoInput.value;
+
+                if (!fecha || !medicoid) return;
+
+                fetch(`/horas-disponibles?fecha=${fecha}&medicoid=${medicoid}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const horaOptions = horaSelect.options;
+                        while (horaOptions.length > 0) {
+                            horaOptions.remove(0);
+                        }
+
+                        for (let i = 10; i <= 23; i++) {
+                            const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+                            if (!data.includes(hour)) {
+                                const option = document.createElement('option');
+                                option.value = hour;
+                                option.textContent = hour;
+                                horaSelect.appendChild(option);
+                            }
+                        }
+
+                        horaSelect.value = '{{ $cita->hora }}';
+                    });
             }
 
-            for (let i = 10; i <= 23; i++) {
-                const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                const option = document.createElement('option');
-                option.value = hour;
-                option.textContent = hour;
-                horaSelect.appendChild(option);
-            }
+            fechaInput.addEventListener('change', fetchHorasDisponibles);
+            usuarioMedicoInput.addEventListener('change', fetchHorasDisponibles);
+
+            // Initialize options
+            fetchHorasDisponibles();
+
+            // Set the min date to today
+            fechaInput.min = new Date().toISOString().split("T")[0];
         });
-
-        // Set the min date to today
-        fechaInput.min = new Date().toISOString().split("T")[0];
-    });
-</script>
+    </script>
+</x-app-layout>

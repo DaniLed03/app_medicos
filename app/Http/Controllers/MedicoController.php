@@ -45,7 +45,7 @@ class MedicoController extends Controller
             'activo' => 'si',
         ]);
 
-        return redirect()->route('medico.dashboard')->with('status', 'Paciente registrado correctamente');
+        return redirect()->route('medico.dashboard')->with('status');
     }
 
     public function storePacientesDesdeModal(Request $request)
@@ -73,7 +73,7 @@ class MedicoController extends Controller
             'activo' => 'si',
         ]);
 
-        return redirect()->route('citas')->with('status', 'Paciente registrado correctamente. Ahora puede agregar una cita.')->with('paciente_id', $paciente->id);
+        return redirect()->route('citas')->with('status')->with('paciente_id', $paciente->id);
     }
 
     // Muestra todos los pacientes activos
@@ -296,7 +296,7 @@ class MedicoController extends Controller
             'motivo_consulta' => $request->motivo_consulta
         ]);
 
-        return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
+        return redirect()->route('citas')->with('status');
     }
 
     // Marca una cita como inactiva (eliminada)
@@ -305,7 +305,7 @@ class MedicoController extends Controller
         $cita = Citas::findOrFail($id);
         $cita->update(['activo' => 'no']);
 
-        return redirect()->route('citas')->with('status', 'Cita eliminada correctamente');
+        return redirect()->route('citas')->with('status');
     }
 
     // Elimina una cita de la base de datos
@@ -314,7 +314,7 @@ class MedicoController extends Controller
         $cita = Citas::findOrFail($id);
         $cita->delete();
 
-        return redirect()->route('citas')->with('status', 'Cita borrada correctamente');
+        return redirect()->route('citas')->with('status');
     }
 
     public function obtenerHorasDisponibles(Request $request)
