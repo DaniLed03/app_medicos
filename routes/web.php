@@ -81,7 +81,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
     Route::put('consultas/{id}/terminate', [ConsultaController::class, 'terminate'])->name('consultas.terminate');
 
-
     // Rutas de enfermeras
     Route::get('/enfermeras', [MedicoController::class, 'mostrarEnfermeras'])->name('enfermeras');
     Route::get('/enfermeras/create', [MedicoController::class, 'crearEnfermera'])->name('enfermeras.create');
@@ -89,4 +88,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/enfermeras/{id}/edit', [MedicoController::class, 'editarEnfermera'])->name('enfermeras.edit');
     Route::put('/enfermeras/{id}', [MedicoController::class, 'updateEnfermera'])->name('enfermeras.update');
     Route::delete('/enfermeras/{id}', [MedicoController::class, 'eliminarEnfermera'])->name('enfermeras.destroy');
+
+    // Rutas de Secretarias
+    Route::get('/secretarias', [MedicoController::class, 'mostrarSecretarias'])->name('secretarias');
+    Route::get('/secretarias/create', [MedicoController::class, 'crearSecretaria'])->name('secretarias.create');
+    Route::post('/secretarias', [MedicoController::class, 'storeSecretarias'])->name('secretarias.store');
+    Route::get('/secretarias/{id}/edit', [MedicoController::class, 'editarSecretaria'])->name('secretarias.edit');
+    Route::put('/secretarias/{id}', [MedicoController::class, 'updateSecretaria'])->name('secretarias.update');
+    Route::delete('/secretarias/{id}', [MedicoController::class, 'eliminarSecretaria'])->name('secretarias.destroy');
+
+
 });

@@ -169,7 +169,11 @@
                                             <input type="text" name="recetas[{{ $index }}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" value="{{ old('recetas.'.$index.'.duracion', $receta->duracion) }}" required>
                                             <textarea name="recetas[{{ $index }}][notas]" class="hidden">{{ old('recetas.'.$index.'.notas', $receta->notas) }}</textarea>
                                         </div>
-                                        @if($index > 0)
+                                        @if($index === 0)
+                                            <button id="add-receta" type="button" class="bg-blue-500 text-white p-2 rounded ml-2">
+                                                <svg class="w-5 h-5" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a1 1 0 00-1 1v6H5a1 1 0 000 2h6v6a1 1 0 002 0v-6h6a1 1 0 000-2h-6V5a1 1 0 00-1-1z"></path></svg>
+                                            </button>
+                                        @else
                                             <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
                                                 <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                                             </button>
@@ -375,6 +379,7 @@
         document.getElementById('add-receta').addEventListener('click', function () {
             const container = document.getElementById('recetas-container');
             const index = container.children.length;
+            const notasUnicaValue = document.getElementById('notas-unica').value;
             const newItem = document.createElement('div');
             newItem.classList.add('receta-item', 'flex', 'items-center', 'mb-2');
             newItem.innerHTML = `
@@ -383,16 +388,13 @@
                     <input type="number" name="recetas[${index}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
                     <input type="text" name="recetas[${index}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
                     <input type="text" name="recetas[${index}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
-                    <textarea name="recetas[${index}][notas]" class="hidden"></textarea>
+                    <textarea name="recetas[${index}][notas]" class="hidden">${notasUnicaValue}</textarea>
                 </div>
                 <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
                     <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             `;
             container.appendChild(newItem);
-
-            // Update notes for the newly added medication
-            actualizarNotas();
         });
 
         document.addEventListener('click', function (event) {

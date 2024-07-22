@@ -1,3 +1,5 @@
+register.blade.php
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,6 +93,18 @@
                                 </select>
                             </div>
                             @error('rol')
+                                <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <select id="sexo" name="sexo" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
+                                    <option value="masculino" {{ old('sexo') == 'masculino' ? 'selected' : '' }}>Masculino</option>
+                                    <option value="femenino" {{ old('sexo') == 'femenino' ? 'selected' : '' }}>Femenino</option>
+                                </select>
+                            </div>
+                            @error('sexo')
                                 <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
                             @enderror
                         </div>

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'fechanac',   // Fecha de nacimiento del usuario
         'telefono',   // Teléfono del usuario
         'rol',        // Rol del usuario (ej. admin, doctor, paciente)
+        'sexo',
         'activo',     // Estado del usuario (activo o inactivo)
         'email',      // Correo electrónico del usuario
         'password',   // Contraseña del usuario

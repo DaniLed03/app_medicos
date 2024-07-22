@@ -11,7 +11,7 @@
                             </button>
                         </div>
                         <!-- Table -->
-                        <table class="min-w-full text-center text-sm whitespace-nowrap">
+                        <table id="serviciosTable" class="min-w-full text-center text-sm whitespace-nowrap">
                             <!-- Table head -->
                             <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-custom-color text-white font-bold">
                                 <tr>
@@ -43,10 +43,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <!-- Mensaje si no hay servicios registrados -->
-                        @if($servicios->isEmpty())
-                            <p class="text-center text-gray-500 mt-4">No hay servicios registrados.</p>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -80,13 +76,48 @@
     </div>
 </x-app-layout>
 
-<script>
-    document.getElementById('openModal').addEventListener('click', function() {
-        document.getElementById('modal').classList.remove('hidden');
-    });
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('modal').classList.add('hidden');
+<script>
+    $(document).ready(function() {
+        $('#serviciosTable').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay pacientes registrados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "paging": true,
+            "searching": true,
+            "info": true,
+            "scrollX": false,
+            "autoWidth": true,
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
+        });
+
+        document.getElementById('openModal').addEventListener('click', function() {
+            document.getElementById('modal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('modal').classList.add('hidden');
+        });
     });
 </script>
 

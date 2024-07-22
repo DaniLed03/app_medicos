@@ -12,17 +12,18 @@ return new class extends Migration
     {
         // Crear la tabla 'users' para almacenar la información de los usuarios.
         Schema::create('users', function (Blueprint $table) {
-            $table->id(); // Columna para el ID único del usuario.
-            $table->string('nombres', 100); // Columna para los nombres del usuario.
-            $table->string('apepat', 100); // Columna para el apellido paterno.
-            $table->string('apemat', 100); // Columna para el apellido materno.
-            $table->date('fechanac'); // Columna para la fecha de nacimiento.
-            $table->string('telefono', 20); // Columna para el teléfono.
-            $table->enum('rol', ['medico', 'secretaria', 'colaborador', 'admin']); // Columna para el rol del usuario.
-            $table->enum('activo', ['si', 'no'])->default('si'); // Columna para el estado (activo o inactivo) del usuario, por defecto es 'si'.
-            $table->string('email')->unique(); // Columna para el correo electrónico, que debe ser único.
-            $table->string('password'); // Columna para la contraseña.
-            $table->timestamps(); // Columnas para las marcas de tiempo (creación y actualización).
+            $table->id();
+            $table->string('nombres', 100);
+            $table->string('apepat', 100);
+            $table->string('apemat', 100);
+            $table->date('fechanac');
+            $table->string('telefono', 20);
+            $table->enum('rol', ['medico', 'secretaria', 'colaborador', 'admin', 'enfermera']);
+            $table->enum('sexo', ['masculino', 'femenino']); 
+            $table->enum('activo', ['si', 'no'])->default('si');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->timestamps();
         });
 
         // Crear la tabla 'password_reset_tokens' para almacenar tokens de restablecimiento de contraseña.

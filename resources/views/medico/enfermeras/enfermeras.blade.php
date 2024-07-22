@@ -3,44 +3,65 @@
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <div class="flex my-4 mx-4 items-center justify-between">
-                            <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Enfermeras</h1>
-                            <button id="openModalAgregar" class="bg-button-color hover:bg-button-hover text-white py-2 px-4 rounded">
+                    <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Enfermeras</h1>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <!-- Contenedor de Total Enfermeras -->
+                            <div class="bg-white p-4 shadow-2xl rounded-md flex items-center space-x-4">
+                                <div class="bg-icon-color p-2 rounded-full">
+                                    <svg class="w-8 h-8 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-1.5 8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-3Zm6.82-3.096a5.51 5.51 0 0 0-2.797-6.293 3.5 3.5 0 1 1 2.796 6.292ZM19.5 18h.5a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-1.1a5.503 5.503 0 0 1-.471.762A5.998 5.998 0 0 1 19.5 18ZM4 7.5a3.5 3.5 0 0 1 5.477-2.889 5.5 5.5 0 0 0-2.796 6.293A3.501 3.501 0 0 1 4 7.5ZM7.1 12H6a4 4 0 0 0-4 4 2 2 0 0 0 2 2h.5a5.998 5.998 0 0 1 3.071-5.238A5.505 5.505 0 0 1 7.1 12Z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <h2 class="text-lg font-bold">Total Enfermeras: {{ $totalEnfermeras }}</h2>
+                                </div>
+                            </div>
+                            <!-- Contenedor de Mujeres y Hombres -->
+                            <div class="bg-white p-4 shadow-2xl rounded-md flex items-center space-x-4">
+                                <div class="bg-icon-color p-2 rounded-full">
+                                    <img src="{{ asset('images/woman.svg') }}" class="w-8 h-8 text-white" alt="Icono de Mujer">
+                                </div>
+                                <div class="text-center">
+                                    <h2 class="text-lg font-bold">Mujeres: {{ number_format($porcentajeMujeres, 1) }}%</h2>
+                                </div>
+                                <div class="bg-icon-color p-2 rounded-full">
+                                    <img src="{{ asset('images/man.svg') }}" class="w-8 h-8 text-white" alt="Icono de Hombre">
+                                </div>
+                                <div class="text-center">
+                                    <h2 class="text-lg font-bold">Hombres: {{ number_format($porcentajeHombres, 1) }}%</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button id="openModalAgregar" class="bg-button-color hover:bg-button-hover text-white font py-2 px-4 rounded">
                                 Agregar Enfermera
                             </button>
                         </div>
-                        <!-- Table -->
-                        <table class="min-w-full text-center text-sm whitespace-nowrap">
-                            <!-- Table head -->
-                            <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-table-header-color text-white font-bold">
+                    </div>
+                    <!-- Tabla de enfermeras -->
+                    <div class="overflow-x-auto bg-white dark:bg-neutral-700">
+                        <table id="enfermerasTable" class="display nowrap" style="width:100%">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-4">ID</th>
-                                    <th scope="col" class="px-6 py-4">Nombres</th>
-                                    <th scope="col" class="px-6 py-4">Apellido Paterno</th>
-                                    <th scope="col" class="px-6 py-4">Apellido Materno</th>
-                                    <th scope="col" class="px-6 py-4">Fecha de Nacimiento</th>
-                                    <th scope="col" class="px-6 py-4">Teléfono</th>
-                                    <th scope="col" class="px-6 py-4">Email</th>
-                                    <th scope="col" class="px-6 py-4">Acciones</th>
+                                    <th>Nombres</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Sexo</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-
-                            <!-- Table body -->
                             <tbody>
                                 @foreach($enfermeras as $enfermera)
-                                    <tr class="border-b dark:border-neutral-600">
-                                        <td class="px-6 py-4">{{ $enfermera->id }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->nombres }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->apepat }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->apemat }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->fechanac }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->telefono }}</td>
-                                        <td class="px-6 py-4">{{ $enfermera->email }}</td>
-                                        <td class="px-6 py-4">
-                                            <!-- Enlace para editar la enfermera -->
+                                    <tr>
+                                        <td>{{ $enfermera->nombres }} {{ $enfermera->apepat }} {{ $enfermera->apemat }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($enfermera->fechanac)->format('j M, Y') }}</td>
+                                        <td>{{ $enfermera->sexo }}</td>
+                                        <td>{{ $enfermera->telefono }}</td>
+                                        <td>{{ $enfermera->email }}</td>
+                                        <td>
                                             <a href="#" data-id="{{ $enfermera->id }}" class="text-blue-500 hover:underline editarEnfermera">Editar</a>
-                                            <!-- Formulario para eliminar la enfermera -->
                                             <form action="{{ route('enfermeras.destroy', $enfermera->id) }}" method="POST" class="inline-block">
                                                 @csrf
                                                 @method('DELETE')
@@ -51,10 +72,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <!-- Mensaje si no hay enfermeras registradas -->
-                        @if($enfermeras->isEmpty())
-                            <p class="text-center text-gray-500 mt-4">No hay enfermeras registradas.</p>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -114,30 +131,65 @@
     </div>
 </x-app-layout>
 
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
 <script>
-    document.getElementById('openModalAgregar').addEventListener('click', function() {
-        document.getElementById('modalAgregar').classList.remove('hidden');
-    });
-
-    document.getElementById('closeModalAgregar').addEventListener('click', function() {
-        document.getElementById('modalAgregar').classList.add('hidden');
-    });
-
-    document.querySelectorAll('.editarEnfermera').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const id = this.getAttribute('data-id');
-            fetch(`/enfermeras/${id}/edit`)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('formEditarEnfermera').innerHTML = html;
-                    document.getElementById('modalEditar').classList.remove('hidden');
-                });
+    $(document).ready(function() {
+        $('#enfermerasTable').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay enfermeras registradas",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "paging": true,
+            "searching": true,
+            "info": true,
+            "scrollX": false,
+            "autoWidth": true,
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
         });
-    });
 
-    document.getElementById('closeModalEditar').addEventListener('click', function() {
-        document.getElementById('modalEditar').classList.add('hidden');
+        document.getElementById('openModalAgregar').addEventListener('click', function() {
+            document.getElementById('modalAgregar').classList.remove('hidden');
+        });
+
+        document.getElementById('closeModalAgregar').addEventListener('click', function() {
+            document.getElementById('modalAgregar').classList.add('hidden');
+        });
+
+        document.querySelectorAll('.editarEnfermera').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const id = this.getAttribute('data-id');
+                fetch(`/enfermeras/${id}/edit`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('formEditarEnfermera').innerHTML = html;
+                        document.getElementById('modalEditar').classList.remove('hidden');
+                    });
+            });
+        });
+
+        document.getElementById('closeModalEditar').addEventListener('click', function() {
+            document.getElementById('modalEditar').classList.add('hidden');
+        });
     });
 </script>
 
@@ -148,7 +200,27 @@
     .hover\:bg-button-hover:hover {
         background-color: #278A75;
     }
-    .bg-table-header-color {
+    .bg-icon-color {
         background-color: #2D7498;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #2D7498;
+        color: white;
+    }
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    .dataTables_wrapper .dataTables_scrollBody {
+        overflow-x: hidden;
+        overflow-y: hidden; /* Esto ocultará el scroll vertical */
     }
 </style>

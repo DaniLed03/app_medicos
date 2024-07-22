@@ -352,7 +352,14 @@ class MedicoController extends Controller
     public function mostrarMedicos()
     {
         $medicos = User::where('rol', 'medico')->where('activo', 'si')->get();
-        return view('medico.medicos.medicos', compact('medicos'));
+        $totalMedicos = $medicos->count();
+        $totalMujeres = $medicos->where('sexo', 'femenino')->count();
+        $totalHombres = $medicos->where('sexo', 'masculino')->count();
+
+        $porcentajeMujeres = $totalMedicos > 0 ? ($totalMujeres / $totalMedicos) * 100 : 0;
+        $porcentajeHombres = $totalMedicos > 0 ? ($totalHombres / $totalMedicos) * 100 : 0;
+
+        return view('medico.medicos.medicos', compact('medicos', 'totalMedicos', 'porcentajeMujeres', 'porcentajeHombres'));
     }
 
     // Guarda un nuevo médico
@@ -367,6 +374,7 @@ class MedicoController extends Controller
             'telefono' => 'required|string|max:20',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino', // Nueva validación
         ]);
 
         // Creación del médico con cifrado de la contraseña
@@ -379,11 +387,13 @@ class MedicoController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'rol' => 'medico',
+            'sexo' => $request->sexo, // Nuevo campo
         ]);
 
         // Redirecciona a la vista de médicos con un mensaje de éxito
         return redirect()->route('medicos')->with('status', 'Médico registrado correctamente');
     }
+
 
     // Muestra el formulario para agregar un nuevo médico
     public function crearMedico()
@@ -408,8 +418,9 @@ class MedicoController extends Controller
             'apemat' => 'required|string|max:255',
             'fechanac' => 'required|date',
             'telefono' => 'required|string|max:20',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino', // Nueva validación
         ]);
 
         // Encuentra el médico y actualiza sus datos
@@ -422,11 +433,13 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => $request->password ? bcrypt($request->password) : $medico->password,
+            'sexo' => $request->sexo, // Nuevo campo
         ]);
 
         // Redirecciona a la vista de médicos con un mensaje de éxito
         return redirect()->route('medicos')->with('status', 'Médico actualizado correctamente');
     }
+
 
     // Marca a un médico como inactivo (eliminado)
     public function eliminarMedico($id)
@@ -508,7 +521,14 @@ class MedicoController extends Controller
     public function mostrarEnfermeras()
     {
         $enfermeras = User::where('rol', 'enfermera')->where('activo', 'si')->get();
-        return view('medico.enfermeras.enfermeras', compact('enfermeras'));
+        $totalEnfermeras = $enfermeras->count();
+        $totalMujeres = $enfermeras->where('sexo', 'femenino')->count();
+        $totalHombres = $enfermeras->where('sexo', 'masculino')->count();
+
+        $porcentajeMujeres = $totalEnfermeras > 0 ? ($totalMujeres / $totalEnfermeras) * 100 : 0;
+        $porcentajeHombres = $totalEnfermeras > 0 ? ($totalHombres / $totalEnfermeras) * 100 : 0;
+
+        return view('medico.enfermeras.enfermeras', compact('enfermeras', 'totalEnfermeras', 'porcentajeMujeres', 'porcentajeHombres'));
     }
 
     // Guarda una nueva enfermera
@@ -523,6 +543,7 @@ class MedicoController extends Controller
             'telefono' => 'required|string|max:20',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino', // Nueva validación
         ]);
 
         // Creación de la enfermera con cifrado de la contraseña
@@ -535,11 +556,13 @@ class MedicoController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'rol' => 'enfermera',
+            'sexo' => $request->sexo, // Nuevo campo
         ]);
 
         // Redirecciona a la vista de enfermeras con un mensaje de éxito
         return redirect()->route('enfermeras')->with('status', 'Enfermera registrada correctamente');
     }
+
 
     // Muestra el formulario para agregar una nueva enfermera
     public function crearEnfermera()
@@ -564,10 +587,11 @@ class MedicoController extends Controller
             'apemat' => 'required|string|max:255',
             'fechanac' => 'required|date',
             'telefono' => 'required|string|max:20',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino', // Nueva validación
         ]);
-
+    
         // Encuentra la enfermera y actualiza sus datos
         $enfermera = User::findOrFail($id);
         $enfermera->update([
@@ -578,11 +602,13 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => $request->password ? bcrypt($request->password) : $enfermera->password,
+            'sexo' => $request->sexo, // Nuevo campo
         ]);
-
+    
         // Redirecciona a la vista de enfermeras con un mensaje de éxito
         return redirect()->route('enfermeras')->with('status', 'Enfermera actualizada correctamente');
     }
+    
 
     // Marca a una enfermera como inactiva (eliminada)
     public function eliminarEnfermera($id)
@@ -593,5 +619,109 @@ class MedicoController extends Controller
         return redirect()->route('enfermeras')->with('status', 'Enfermera eliminada correctamente');
     }
 
+    //////////////////////////////////    SECRETARIAS    /////////////////////////////////////////
+
+    // Muestra todas las secretarias activas
+    public function mostrarSecretarias()
+    {
+        $secretarias = User::where('rol', 'secretaria')->where('activo', 'si')->get();
+        $totalSecretarias = $secretarias->count();
+        $totalMujeres = $secretarias->where('sexo', 'femenino')->count();
+        $totalHombres = $secretarias->where('sexo', 'masculino')->count();
+
+        $porcentajeMujeres = $totalSecretarias > 0 ? ($totalMujeres / $totalSecretarias) * 100 : 0;
+        $porcentajeHombres = $totalSecretarias > 0 ? ($totalHombres / $totalSecretarias) * 100 : 0;
+
+        return view('medico.secretaria.secretarias', compact('secretarias', 'totalSecretarias', 'porcentajeMujeres', 'porcentajeHombres'));
+    }
+
+
+    // Guarda una nueva secretaria
+    public function storeSecretarias(Request $request)
+    {
+        // Validación de los datos recibidos
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apepat' => 'required|string|max:255',
+            'apemat' => 'required|string|max:255',
+            'fechanac' => 'required|date',
+            'telefono' => 'required|string|max:20',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino',
+        ]);
+
+        // Creación de la secretaria con cifrado de la contraseña
+        User::create([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'telefono' => $request->telefono,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'rol' => 'secretaria',
+            'sexo' => $request->sexo,
+        ]);
+
+        // Redirecciona a la vista de secretarias con un mensaje de éxito
+        return redirect()->route('secretarias')->with('status', 'Secretaria registrada correctamente');
+    }
+
+    // Muestra el formulario para agregar una nueva secretaria
+    public function crearSecretaria()
+    {
+        return view('medico.Secretaria.agregarSecretaria');
+    }
+
+    // Muestra el formulario de edición de una secretaria específica
+    public function editarSecretaria($id)
+    {
+        $secretaria = User::findOrFail($id);
+        return view('medico.Secretaria.editarSecretaria', compact('secretaria'));
+    }
+
+    // Actualiza la información de una secretaria específica
+    public function updateSecretaria(Request $request, $id)
+    {
+        // Validación de los datos recibidos
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apepat' => 'required|string|max:255',
+            'apemat' => 'required|string|max:255',
+            'fechanac' => 'required|date',
+            'telefono' => 'required|string|max:20',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'sexo' => 'required|in:masculino,femenino',
+        ]);
+
+        // Encuentra la secretaria y actualiza sus datos
+        $secretaria = User::findOrFail($id);
+        $secretaria->update([
+            'nombres' => $request->nombres,
+            'apepat' => $request->apepat,
+            'apemat' => $request->apemat,
+            'fechanac' => $request->fechanac,
+            'telefono' => $request->telefono,
+            'email' => $request->email,
+            'password' => $request->password ? bcrypt($request->password) : $secretaria->password,
+            'sexo' => $request->sexo,
+        ]);
+
+        // Redirecciona a la vista de secretarias con un mensaje de éxito
+        return redirect()->route('secretarias')->with('status', 'Secretaria actualizada correctamente');
+    }
+
+    // Marca a una secretaria como inactiva (eliminada)
+    public function eliminarSecretaria($id)
+    {
+        $secretaria = User::findOrFail($id);
+        $secretaria->update(['activo' => 'no']);
+
+        return redirect()->route('secretarias')->with('status', 'Secretaria eliminada correctamente');
+    }
 }
+
+
 

@@ -35,22 +35,8 @@
                             </div>
                         </div>
 
-                        <!-- Filtro -->
-                        <form method="GET" action="{{ route('consultas.index') }}" class="my-4 flex space-x-4">
-                            <input type="date" name="start_date" class="border rounded-md px-4 py-2">
-                            <input type="date" name="end_date" class="border rounded-md px-4 py-2">
-                            <input type="text" name="name" placeholder="Buscar por nombre de paciente..." class="border rounded-md px-4 py-2">
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Filtrar</button>
-                            <a href="{{ route('consultas.index') }}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center space-x-2">
-                                <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                                <span>Reset</span>
-                            </a>
-                        </form>
-
                         <!-- Table -->
-                        <table class="min-w-full text-center text-sm whitespace-nowrap">
+                        <table id="consultasTable" class="min-w-full text-center text-sm whitespace-nowrap">
                             <!-- Table head -->
                             <thead class="uppercase tracking-wider border-b-2 bg-table-header-color text-white">
                                 <tr>
@@ -94,9 +80,6 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay consultas registradas en el rango de fechas seleccionado.</td>
-                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -111,7 +94,42 @@
     </div>
 </x-app-layout>
 
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+
 <script>
+    $(document).ready(function() {
+        $('#consultasTable').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay pacientes registrados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "paging": true,
+            "searching": true,
+            "info": true,
+            "scrollX": false,
+            "autoWidth": true,
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
+        });
+    });
+
     function terminarConsulta(event, id) {
         event.preventDefault();
         if (confirm('¿Está seguro de que desea terminar la consulta?')) {

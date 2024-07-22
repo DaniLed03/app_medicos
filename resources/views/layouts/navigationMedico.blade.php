@@ -71,6 +71,7 @@
                     <a href="{{ route('medico.dashboard') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pacientes</a>
                     <a href="{{ route('medicos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Médicos</a>
                     <a href="{{ route('enfermeras') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Enfermeras</a>
+                    <a href="{{ route('secretarias') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Secretarias</a>
                     <a href="{{ route('citas') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Citas</a>
                     <a href="{{ route('consultas.index') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Consultas</a>
                     <a href="{{ route('servicios') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Servicios</a>

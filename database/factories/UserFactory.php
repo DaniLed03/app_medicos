@@ -19,6 +19,7 @@ class UserFactory extends Factory
             'fechanac' => $this->faker->date,
             'telefono' => $this->faker->phoneNumber,
             'rol' => 'medico',
+            'sexo' => $this->faker->randomElement(['masculino', 'femenino']), // Nuevo campo
             'activo' => 'si',
             'email' => $this->faker->unique()->safeEmail,
             'password' => bcrypt('password'),
