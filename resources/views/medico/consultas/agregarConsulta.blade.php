@@ -173,7 +173,7 @@
                                 </div>
                                 <!-- Additional Recetas will be added here -->
                             </div>
-                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none" placeholder="Agregar notas..."></textarea>
+                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-2" placeholder="Agregar notas..."></textarea>
                             <input type="hidden" name="notas_unica" id="hidden-notas-unica">
                         </div>
 

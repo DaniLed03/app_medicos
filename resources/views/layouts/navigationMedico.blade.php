@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navegación</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.min.js" defer></script>
     <style>
         .navbar-superior {
             background-color: #2D7498; /* Color especificado para el navbar superior */
@@ -65,22 +66,36 @@
     
     <!-- Navbar inferior -->
     <nav class="navbar-inferior">
-        <div class="max-w-screen-xl mx-auto px-4">
+        <div class="max-w-screen-xl mx-auto px-4" x-data="{ open: false }">
             <div class="flex items-center justify-between h-10">
                 <div class="hidden md:flex md:space-x-8">
-                    <a href="{{ route('medico.dashboard') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pacientes</a>
-                    <a href="{{ route('medicos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Médicos</a>
-                    <a href="{{ route('enfermeras') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Enfermeras</a>
-                    <a href="{{ route('secretarias') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Secretarias</a>
-                    <a href="{{ route('citas') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Citas</a>
-                    <a href="{{ route('consultas.index') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Consultas</a>
-                    <a href="{{ route('servicios') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Servicios</a>
-                    <a href="{{ route('productos') }}" class="text-white hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Productos</a>
+                    <a href="{{ route('medico.dashboard') }}" class="text-white {{ request()->routeIs('medico.dashboard') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pacientes</a>
+                    <a href="{{ route('medicos') }}" class="text-white {{ request()->routeIs('medicos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Médicos</a>
+                    <a href="{{ route('enfermeras') }}" class="text-white {{ request()->routeIs('enfermeras') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Enfermeras</a>
+                    <a href="{{ route('secretarias') }}" class="text-white {{ request()->routeIs('secretarias') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Secretarias</a>
+                    <a href="{{ route('citas') }}" class="text-white {{ request()->routeIs('citas') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Citas</a>
+                    <a href="{{ route('consultas.index') }}" class="text-white {{ request()->routeIs('consultas.index') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Consultas</a>
+                    <a href="{{ route('servicios') }}" class="text-white {{ request()->routeIs('servicios') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Servicios</a>
+                    <a href="{{ route('productos') }}" class="text-white {{ request()->routeIs('productos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-sm font-medium">Productos</a>
                 </div>
                 <div class="md:hidden">
-                    <button class="text-white hover:bg-[#1E40AF] hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                        Menu
+                    <button @click="open = !open" class="text-white hover:bg-[#1E40AF] hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
                     </button>
+                </div>
+            </div>
+            <div x-show="open" class="md:hidden">
+                <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+                    <a href="{{ route('medico.dashboard') }}" class="block text-white {{ request()->routeIs('medico.dashboard') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Pacientes</a>
+                    <a href="{{ route('medicos') }}" class="block text-white {{ request()->routeIs('medicos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Médicos</a>
+                    <a href="{{ route('enfermeras') }}" class="block text-white {{ request()->routeIs('enfermeras') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Enfermeras</a>
+                    <a href="{{ route('secretarias') }}" class="block text-white {{ request()->routeIs('secretarias') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Secretarias</a>
+                    <a href="{{ route('citas') }}" class="block text-white {{ request()->routeIs('citas') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Citas</a>
+                    <a href="{{ route('consultas.index') }}" class="block text-white {{ request()->routeIs('consultas.index') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Consultas</a>
+                    <a href="{{ route('servicios') }}" class="block text-white {{ request()->routeIs('servicios') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Servicios</a>
+                    <a href="{{ route('productos') }}" class="block text-white {{ request()->routeIs('productos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Productos</a>
                 </div>
             </div>
         </div>

@@ -181,7 +181,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-4" placeholder="Agregar notas...">{{ old('notas_unica', $consulta->notas_receta) }}</textarea>
+                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-2" placeholder="Agregar notas...">{{ old('notas_unica', $consulta->notas_receta) }}</textarea>
                             <input type="hidden" name="notas_unica" id="hidden-notas-unica">
                         </div>
 

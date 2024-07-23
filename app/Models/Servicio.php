@@ -12,6 +12,8 @@ class Servicio extends Model
     protected $fillable = [
         'nombre',
         'precio',
+        'descripcion', // Nueva columna
+        'cantidad', // Nueva columna
         'activo'
     ];
 

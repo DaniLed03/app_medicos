@@ -41,10 +41,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
     Route::post('/medico/productos/agregarProducto', [MedicoController::class, 'storeProductos'])->name('productos.store');
-    Route::get('/medico/productos/editar/{id}', [MedicoController::class, 'editarProducto'])->name('productos.editar');
     Route::patch('/medico/productos/editar/{id}', [MedicoController::class, 'updateProducto'])->name('productos.update');
     Route::delete('/medico/productos/eliminar/{id}', [MedicoController::class, 'eliminarProducto'])->name('productos.eliminar');
     Route::get('/medico/productos', [MedicoController::class, 'mostrarProductos'])->name('productos');
+    Route::get('/productos/{id}/editar', [MedicoController::class, 'editarProducto'])->name('productos.editar');
+
 
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
@@ -68,9 +69,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/servicios', [MedicoController::class, 'mostrarServicios'])->name('servicios');
     Route::post('/medico/servicios/agregarServicio', [MedicoController::class, 'storeServicios'])->name('servicios.store');
     Route::get('/medico/servicios/agregar', [MedicoController::class, 'crearServicio'])->name('servicios.agregar');
-    Route::get('/medico/servicios/editar/{id}', [MedicoController::class, 'editarServicio'])->name('servicios.editar');
     Route::patch('/medico/servicios/editar/{id}', [MedicoController::class, 'updateServicio'])->name('servicios.update');
     Route::delete('/medico/servicios/eliminar/{id}', [MedicoController::class, 'eliminarServicio'])->name('servicios.eliminar');
+    Route::get('/servicios/{id}/editar', [MedicoController::class, 'editarServicio'])->name('servicios.editar');
+
 
     // Rutas de Consultas
     Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');

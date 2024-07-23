@@ -160,6 +160,8 @@ class MedicoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string|max:1000',
+            'cantidad' => 'required|integer|min:0'
         ]);
 
         // Creación del producto
@@ -189,6 +191,8 @@ class MedicoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string|max:1000',
+            'cantidad' => 'required|integer|min:0'
         ]);
 
         // Encuentra el producto y actualiza sus datos
@@ -466,6 +470,8 @@ class MedicoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string|max:1000',
+            'cantidad' => 'required|integer|min:0'
         ]);
 
         // Creación del servicio
@@ -495,6 +501,8 @@ class MedicoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'precio' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string|max:1000',
+            'cantidad' => 'required|integer|min:0'
         ]);
 
         // Encuentra el servicio y actualiza sus datos

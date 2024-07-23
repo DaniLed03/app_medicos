@@ -6,7 +6,7 @@
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
                         <div class="flex my-4 mx-4 items-center justify-between">
                             <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Servicios</h1>
-                            <button id="openModal" class="bg-button-color hover:bg-button-hover text-white py-2 px-4 rounded">
+                            <button id="openAddModal" class="bg-button-color hover:bg-button-hover text-white py-2 px-4 rounded">
                                 Agregar Servicio
                             </button>
                         </div>
@@ -16,8 +16,9 @@
                             <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-custom-color text-white font-bold">
                                 <tr>
                                     <th scope="col" class="px-6 py-4">Nombre</th>
+                                    <th scope="col" class="px-6 py-4">Descripción</th>
                                     <th scope="col" class="px-6 py-4">Precio</th>
-                                    <th scope="col" class="px-6 py-4">Activo</th>
+                                    <th scope="col" class="px-6 py-4">Cantidad</th>
                                     <th scope="col" class="px-6 py-4">Acciones</th>
                                 </tr>
                             </thead>
@@ -27,11 +28,12 @@
                                 @foreach($servicios as $servicio)
                                     <tr class="border-b dark:border-neutral-600">
                                         <td class="px-6 py-4">{{ $servicio->nombre }}</td>
+                                        <td class="px-6 py-4">{{ $servicio->descripcion }}</td>
                                         <td class="px-6 py-4">{{ $servicio->precio }}</td>
-                                        <td class="px-6 py-4">{{ $servicio->activo }}</td>
+                                        <td class="px-6 py-4">{{ $servicio->cantidad }}</td>
                                         <td class="px-6 py-4">
                                             <!-- Enlace para editar el servicio -->
-                                            <a href="{{ route('servicios.editar', $servicio->id) }}" class="text-blue-500 hover:underline">Editar</a>
+                                            <button data-id="{{ $servicio->id }}" class="openEditModal text-blue-500 hover:underline">Editar</button>
                                             <!-- Formulario para eliminar el servicio -->
                                             <form action="{{ route('servicios.eliminar', $servicio->id) }}" method="POST" class="inline-block">
                                                 @csrf
@@ -49,8 +51,8 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <!-- Add Modal -->
+    <div id="addModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
             <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
@@ -60,7 +62,7 @@
                             <h3 class="text-2xl leading-6 font-bold text-center text-gray-900 w-full" style="color: #316986;">
                                 Agregar Servicio
                             </h3>
-                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-2xl" id="closeModal">
+                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-2xl" id="closeAddModal">
                                 <span class="sr-only">Close</span>
                                 &times;
                             </button>
@@ -69,6 +71,32 @@
                     <div class="border-t border-gray-200 mt-4"></div>
                     <div class="mt-2">
                         @include('medico.servicios.agregarServicio')
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="sm:flex sm:items-center w-full">
+                            <h3 class="text-2xl leading-6 font-bold text-center text-gray-900 w-full" style="color: #316986;">
+                                Editar Servicio
+                            </h3>
+                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-2xl" id="closeEditModal">
+                                <span class="sr-only">Close</span>
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 mt-4"></div>
+                    <div class="mt-2">
+                        <div id="editFormContainer"></div>
                     </div>
                 </div>
             </div>
@@ -85,7 +113,7 @@
         $('#serviciosTable').DataTable({
             "language": {
                 "decimal": "",
-                "emptyTable": "No hay pacientes registrados",
+                "emptyTable": "No hay servicios registrados",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
                 "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
                 "infoFiltered": "(Filtrado de _MAX_ total entradas)",
@@ -111,12 +139,32 @@
             "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
         });
 
-        document.getElementById('openModal').addEventListener('click', function() {
-            document.getElementById('modal').classList.remove('hidden');
+        // Open Add Modal
+        document.getElementById('openAddModal').addEventListener('click', function() {
+            document.getElementById('addModal').classList.remove('hidden');
         });
 
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('modal').classList.add('hidden');
+        // Close Add Modal
+        document.getElementById('closeAddModal').addEventListener('click', function() {
+            document.getElementById('addModal').classList.add('hidden');
+        });
+
+        // Open Edit Modal
+        $('.openEditModal').on('click', function() {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '/servicios/' + id + '/editar',
+                method: 'GET',
+                success: function(response) {
+                    $('#editFormContainer').html(response);
+                    $('#editModal').removeClass('hidden');
+                }
+            });
+        });
+
+        // Close Edit Modal
+        document.getElementById('closeEditModal').addEventListener('click', function() {
+            document.getElementById('editModal').classList.add('hidden');
         });
     });
 </script>
