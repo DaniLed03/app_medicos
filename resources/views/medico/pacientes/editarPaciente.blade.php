@@ -3,7 +3,7 @@
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <!-- Patient Header -->
+                    <!-- Nombre y contenedor azul -->
                     <div class="flex flex-wrap justify-between items-center mb-6">
                         <!-- Nombre del paciente -->
                         <div class="flex items-center mb-4 md:mb-0">
@@ -18,7 +18,7 @@
                         <!-- Información adicional del paciente -->
                         <div class="relative flex items-center justify-center space-x-4 bg-[#2D7498] border rounded-lg p-4 text-white">
                             <!-- Botón con el icono -->
-                            <button id="edit-info-btn" class="absolute top-0 right-0 m-2" onclick="enableFields('info')">
+                            <button id="edit-info-btn" class="absolute top-0 right-0 m-2" onclick="openEditModal()">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
                                 </svg>
@@ -57,122 +57,127 @@
                         </div>
                     </div>
 
-                    <div class="mt-2">
-                        <form method="POST" action="{{ route('pacientes.update', $paciente->id) }}" id="editPacienteForm">
+                    <!-- Tabs -->
+                    <ul class="flex border-b" id="tabs">
+                        <li class="-mb-px mr-1">
+                            <a class="tab-link active-tab" href="#datos" onclick="openTab(event, 'datos')">Datos del Paciente</a>
+                        </li>
+                        <li class="mr-1">
+                            <a class="tab-link" href="#padres" onclick="openTab(event, 'padres')">Padres</a>
+                        </li>
+                        <li class="mr-1">
+                            <a class="tab-link" href="#antecedentes" onclick="openTab(event, 'antecedentes')">Antecedentes Familiares</a>
+                        </li>
+                        <li class="mr-1">
+                            <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Facturación</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div id="datos" class="tab-content">
+                        <!-- Información Personal -->
+                        <div class="mt-3">
+                            <form method="POST" action="{{ route('pacientes.update', $paciente->id) }}" id="editPacienteForm">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="tab" value="datos">
+
+                                <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="personal">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-lg font-semibold">Información Personal</h3>
+                                        <button type="button" class="text-gray-800" onclick="enableFields('personal')">
+                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <!-- Dirección -->
+                                        <div class="mt-4 md:col-span-2">
+                                            <x-input-label for="direccionEditar" :value="__('Dirección')" />
+                                            <x-text-input id="direccionEditar" class="block mt-1 w-full" type="text" name="direccion" value="{{ $paciente->direccion }}" disabled />
+                                            <x-input-error :messages="$errors->get('direccion')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Lugar de Nacimiento -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="lugar_naciEditar" :value="__('Lugar de Nacimiento')" />
+                                            <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci }}" disabled />
+                                            <x-input-error :messages="$errors->get('lugar_naci')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Hospital -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="hospitalEditar" :value="__('Hospital')" />
+                                            <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital }}" disabled />
+                                            <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                                        <!-- CURP -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="curpEditar" :value="__('CURP')" />
+                                            <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp }}" disabled />
+                                            <x-input-error :messages="$errors->get('curp')" class="mt-2" />
+                                        </div>
+                                        
+                                        <!-- Hora -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="horaEditar" :value="__('Hora de Nacimiento')" />
+                                            <x-text-input id="horaEditar" class="block mt-1 w-full" type="time" step="1" name="hora" value="{{ $paciente->hora }}" disabled />
+                                            <x-input-error :messages="$errors->get('hora')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Peso -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="pesoEditar" :value="__('Peso (kg)')" />
+                                            <x-text-input id="pesoEditar" class="block mt-1 w-full" type="number" step="0.01" name="peso" value="{{ $paciente->peso }}" disabled />
+                                            <x-input-error :messages="$errors->get('peso')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Talla -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="tallaEditar" :value="__('Talla (cm)')" />
+                                            <x-text-input id="tallaEditar" class="block mt-1 w-full" type="number" name="talla" value="{{ $paciente->talla }}" disabled />
+                                            <x-input-error :messages="$errors->get('talla')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Tipo de Parto -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="tipopartoEditar" :value="__('Tipo de Parto')" />
+                                            <x-text-input id="tipopartoEditar" class="block mt-1 w-full" type="text" name="tipoparto" value="{{ $paciente->tipoparto }}" disabled />
+                                            <x-input-error :messages="$errors->get('tipoparto')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Tipo de Sangre -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="tiposangreEditar" :value="__('Tipo de Sangre')" />
+                                            <x-text-input id="tiposangreEditar" class="block mt-1 w-full" type="text" name="tiposangre" value="{{ $paciente->tiposangre }}" disabled />
+                                            <x-input-error :messages="$errors->get('tiposangre')" class="mt-2" />
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end mt-4">
+                                        <x-primary-button class="ml-4 hidden" id="personal-update" onclick="submitForm('editPacienteForm')">
+                                            {{ __('Actualizar Información Personal') }}
+                                        </x-primary-button>
+                                        <x-secondary-button class="ml-4 hidden" id="personal-cancel" onclick="disableFields('personal')">
+                                            {{ __('Cancelar') }}
+                                        </x-secondary-button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="padres" class="tab-content hidden mt-3">
+                        <!-- Contacto de Emergencias -->
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->id) }}" id="padresForm">
                             @csrf
                             @method('PATCH')
-
-                            <!-- Información Personal -->
-                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="personal">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Información Personal</h3>
-                                    <button type="button" class="text-gray-800" onclick="enableFields('personal')">
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <!-- Dirección -->
-                                    <div class="mt-4 md:col-span-2">
-                                        <x-input-label for="direccionEditar" :value="__('Dirección')" />
-                                        <x-text-input id="direccionEditar" class="block mt-1 w-full" type="text" name="direccion" value="{{ $paciente->direccion }}" disabled />
-                                        <x-input-error :messages="$errors->get('direccion')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Lugar de Nacimiento -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="lugar_naciEditar" :value="__('Lugar de Nacimiento')" />
-                                        <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci }}" disabled />
-                                        <x-input-error :messages="$errors->get('lugar_naci')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Hospital -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="hospitalEditar" :value="__('Hospital')" />
-                                        <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital }}" disabled />
-                                        <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                                    <!-- CURP -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="curpEditar" :value="__('CURP')" />
-                                        <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp }}" disabled />
-                                        <x-input-error :messages="$errors->get('curp')" class="mt-2" />
-                                    </div>
-                                    
-                                    <!-- Hora -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="horaEditar" :value="__('Hora de Nacimiento')" />
-                                        <x-text-input id="horaEditar" class="block mt-1 w-full" type="time" step="1" name="hora" value="{{ $paciente->hora }}" disabled />
-                                        <x-input-error :messages="$errors->get('hora')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Peso -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="pesoEditar" :value="__('Peso (kg)')" />
-                                        <x-text-input id="pesoEditar" class="block mt-1 w-full" type="number" step="0.01" name="peso" value="{{ $paciente->peso }}" disabled />
-                                        <x-input-error :messages="$errors->get('peso')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Talla -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="tallaEditar" :value="__('Talla (cm)')" />
-                                        <x-text-input id="tallaEditar" class="block mt-1 w-full" type="number" name="talla" value="{{ $paciente->talla }}" disabled />
-                                        <x-input-error :messages="$errors->get('talla')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Tipo de Parto -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="tipopartoEditar" :value="__('Tipo de Parto')" />
-                                        <x-text-input id="tipopartoEditar" class="block mt-1 w-full" type="text" name="tipoparto" value="{{ $paciente->tipoparto }}" disabled />
-                                        <x-input-error :messages="$errors->get('tipoparto')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Tipo de Sangre -->
-                                    <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="tiposangreEditar" :value="__('Tipo de Sangre')" />
-                                        <x-text-input id="tiposangreEditar" class="block mt-1 w-full" type="text" name="tiposangre" value="{{ $paciente->tiposangre }}" disabled />
-                                        <x-input-error :messages="$errors->get('tiposangre')" class="mt-2" />
-                                    </div>
-                                </div>
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4 hidden" id="personal-update">
-                                        {{ __('Actualizar Información Personal') }}
-                                    </x-primary-button>
-                                    <x-secondary-button class="ml-4 hidden" id="personal-cancel" onclick="disableFields('personal')">
-                                        {{ __('Cancelar') }}
-                                    </x-secondary-button>
-                                </div>
-                            </div>
-
-                            <!-- Antecedentes -->
-                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="antecedentes">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Antecedentes</h3>
-                                    <button type="button" class="text-gray-800" onclick="enableFields('antecedentes')">
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <textarea id="antecedentesEditar" name="antecedentes" class="block mt-1 w-full form-input rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" style="resize: none; height: 100px;" disabled>{{ $paciente->antecedentes }}</textarea>
-                                <x-input-error :messages="$errors->get('antecedentes')" class="mt-2" />
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4 hidden" id="antecedentes-update">
-                                        {{ __('Actualizar Antecedentes') }}
-                                    </x-primary-button>
-                                    <x-secondary-button class="ml-4 hidden" id="antecedentes-cancel" onclick="disableFields('antecedentes')">
-                                        {{ __('Cancelar') }}
-                                    </x-secondary-button>
-                                </div>
-                            </div>
-
-                            <!-- Contacto de Emergencias -->
+                            <input type="hidden" name="tab" value="padres">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="emergencias">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Contacto de Emergencias</h3>
+                                    <h3 class="text-lg font-semibold">Padres</h3>
                                     <button type="button" class="text-gray-800" onclick="enableFields('emergencias')">
                                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                             <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
@@ -202,7 +207,7 @@
                                     </div>
                                 </div>
                                 <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4 hidden" id="emergencias-update">
+                                    <x-primary-button class="ml-4 hidden" id="emergencias-update" onclick="submitForm('padresForm')">
                                         {{ __('Actualizar Contacto de Emergencias') }}
                                     </x-primary-button>
                                     <x-secondary-button class="ml-4 hidden" id="emergencias-cancel" onclick="disableFields('emergencias')">
@@ -210,8 +215,44 @@
                                     </x-secondary-button>
                                 </div>
                             </div>
+                        </form>
+                    </div>
 
-                            <!-- Información de Facturación -->
+                    <div id="antecedentes" class="tab-content hidden mt-3">
+                        <!-- Antecedentes -->
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->id) }}" id="antecedentesForm">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="tab" value="antecedentes">
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="antecedentes">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Antecedentes Familiares</h3>
+                                    <button type="button" class="text-gray-800" onclick="enableFields('antecedentes')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <textarea id="antecedentesEditar" name="antecedentes" class="block mt-1 w-full form-input rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" style="resize: none; height: 450px;" disabled>{{ $paciente->antecedentes }}</textarea>
+                                <x-input-error :messages="$errors->get('antecedentes')" class="mt-2" />
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4 hidden" id="antecedentes-update" onclick="submitForm('antecedentesForm')">
+                                        {{ __('Actualizar Antecedentes') }}
+                                    </x-primary-button>
+                                    <x-secondary-button class="ml-4 hidden" id="antecedentes-cancel" onclick="disableFields('antecedentes')">
+                                        {{ __('Cancelar') }}
+                                    </x-secondary-button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="facturacion" class="tab-content hidden mt-3">
+                        <!-- Información de Facturación -->
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->id) }}" id="facturacionForm">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="tab" value="facturacion">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="facturacion">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-semibold">Información de Facturación</h3>
@@ -259,7 +300,7 @@
                                     </div>
                                 </div>
                                 <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4 hidden" id="facturacion-update">
+                                    <x-primary-button class="ml-4 hidden" id="facturacion-update" onclick="submitForm('facturacionForm')">
                                         {{ __('Actualizar Información de Facturación') }}
                                     </x-primary-button>
                                     <x-secondary-button class="ml-4 hidden" id="facturacion-cancel" onclick="disableFields('facturacion')">
@@ -267,7 +308,6 @@
                                     </x-secondary-button>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                 </div>
@@ -359,6 +399,26 @@
         </div>
     </div>
 
+    <style>
+        .tab-link {
+            color: black;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-weight: normal;
+            border-bottom: 2px solid transparent;
+        }
+
+        .active-tab {
+            font-weight: bold;
+            border-bottom: 2px solid #2D7498;
+        }
+
+        .tab-link:hover {
+            font-weight: bold;
+        }
+    </style>
+
     <script>
         function openEditModal() {
             document.getElementById('editModal').classList.remove('hidden');
@@ -395,5 +455,30 @@
                 editButton.classList.remove('hidden');
             }
         }
+
+        function submitForm(formId) {
+            document.getElementById(formId).submit();
+        }
+
+        function openTab(event, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementById("tabs").getElementsByTagName("a");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active-tab", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            event.currentTarget.className += " active-tab";
+        }
+
+        // Set default tab
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab') || 'datos';
+            openTab({currentTarget: document.querySelector(`[href="#${tab}"]`)}, tab);
+        });
     </script>
 </x-app-layout>

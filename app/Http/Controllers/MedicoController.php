@@ -151,8 +151,11 @@ class MedicoController extends Controller
         // Ensure the no_exp field remains the same
         $paciente->update(['no_exp' => $paciente->id]);
 
-        return redirect()->route('pacientes.editar', ['id' => $id])->with('status', 'Paciente actualizado correctamente');
+        // Redirect to the correct tab based on the form that was submitted
+        $tab = $request->input('tab', 'datos'); // Get the tab from the request or default to 'datos'
+        return redirect()->route('pacientes.editar', ['id' => $id, 'tab' => $tab])->with('status', 'Paciente actualizado correctamente');
     }
+
 
     // Marca a un paciente como inactivo (eliminado)
     public function eliminarPaciente($id)
