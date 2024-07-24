@@ -53,11 +53,6 @@
             <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" :value="old('correo')" required />
             <x-input-error :messages="$errors->get('correo')" class="mt-2" />
         </div>
-        <div class="form-group">
-            <x-input-label for="contraseña" :value="__('Contraseña')" />
-            <x-text-input id="contraseña" class="block mt-1 w-full" type="password" name="contraseña" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('contraseña')" class="mt-2" />
-        </div>
         <div class="modal-footer">
             <button type="submit" class="bg-blue-500 text-white p-2 rounded-md">Registrar Usuario</button>
         </div>

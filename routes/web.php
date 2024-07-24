@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/medico/pacientes/eliminar/{id}', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
     Route::get('/medico/pacientes', [MedicoController::class, 'mostrarPacientes'])->name('pacientes.index');
     Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
+    Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
+
 
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');

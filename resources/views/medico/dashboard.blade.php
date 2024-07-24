@@ -47,6 +47,7 @@
                         <table id="pacientesTable" class="display nowrap" style="width:100%">
                             <thead>
                                 <tr>
+                                    <th>No. Exp</th>
                                     <th>Nombre del Paciente</th>
                                     <th>Fecha de Nacimiento</th>
                                     <th>Sexo</th>
@@ -58,13 +59,14 @@
                             <tbody>
                                 @foreach($pacientes as $paciente)
                                     <tr>
+                                        <td>{{ $paciente->no_exp }}</td>
                                         <td>{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</td>
                                         <td>{{ \Carbon\Carbon::parse($paciente->fechanac)->format('j M, Y') }}</td>
                                         <td>{{ $paciente->sexo }}</td>
                                         <td>{{ $paciente->telefono }}</td>
                                         <td>{{ $paciente->correo }}</td>
                                         <td>
-                                            <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700 edit-button" data-id="{{ $paciente->id }}">Editar</a>
+                                            <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
                                             <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
                                                 @csrf
                                                 @method('DELETE')
@@ -81,11 +83,11 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Agregar -->
     <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
-            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-6xl sm:w-full" style="margin: 50px 0; height: auto;">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="sm:flex sm:items-center w-full">
@@ -102,45 +104,54 @@
                     <div class="mt-2">
                         <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
                             @csrf
-
-                            <!-- Nombres -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="nombres" :value="__('Nombres')" />
-                                <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                            <!-- Número de Expediente -->
+                            <div class="mt-4 md:col-span-1 text-right">
+                                <x-input-label for="no_exp" :value="__('No. Expediente')" />
+                                <div class="w-1/2 inline-block text-left">
+                                    <x-text-input id="no_exp" class="block mt-1 w-full" type="text" name="no_exp" :value="old('no_exp')" required readonly />
+                                    <x-input-error :messages="$errors->get('no_exp')" class="mt-2" />
+                                </div>
                             </div>
 
-                            <!-- Apellido Paterno -->
-                            <div class="mt-4">
-                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Nombres -->
+                                <div class="mt-4 md:col-span-1">
+                                    <x-input-label for="nombres" :value="__('Nombres')" />
+                                    <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                                </div>
 
-                            <!-- Apellido Materno -->
-                            <div class="mt-4">
-                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                            </div>
+                                <!-- Apellido Paterno -->
+                                <div class="mt-4 md:col-span-1">
+                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                    <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
+                                </div>
 
-                            <!-- Fecha de Nacimiento -->
-                            <div class="mt-4">
-                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                                <!-- Apellido Materno -->
+                                <div class="mt-4 md:col-span-1">
+                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                    <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                                </div>
                             </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <!-- Fecha de Nacimiento -->
+                                <div class="mt-4 md:col-span-1">
+                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                    <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
+                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                                </div>
 
-                            <div class="grid grid-cols-2 gap-4">
                                 <!-- Teléfono -->
-                                <div class="mt-4">
+                                <div class="mt-4 md:col-span-1">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
                                     <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
 
                                 <!-- Sexo -->
-                                <div class="mt-4">
+                                <div class="mt-4 md:col-span-1">
                                     <x-input-label for="sexo" :value="__('Sexo')" />
                                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                         <label class="btn btn-secondary">
@@ -154,126 +165,25 @@
                                 </div>
                             </div>
 
-                            <!-- Correo -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="correo" :value="__('Correo')" />
-                                <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" :value="old('correo')" required />
-                                <x-input-error :messages="$errors->get('correo')" class="mt-2" />
-                            </div>
-
-                            <!-- Contraseña -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="contraseña" :value="__('Contraseña')" />
-                                <x-text-input id="contraseña" class="block mt-1 w-full" type="password" name="contraseña" required />
-                                <x-input-error :messages="$errors->get('contraseña')" class="mt-2" />
-                            </div>
+                            <!-- Campos ocultos -->
+                            <input type="hidden" name="hora" value="null">
+                            <input type="hidden" name="lugar_naci" value="null">
+                            <input type="hidden" name="hospital" value="null">
+                            <input type="hidden" name="peso" value="null">
+                            <input type="hidden" name="talla" value="null">
+                            <input type="hidden" name="tipoparto" value="null">
+                            <input type="hidden" name="tiposangre" value="null">
+                            <input type="hidden" name="antecedentes" value="null">
+                            <input type="hidden" name="padre" value="null">
+                            <input type="hidden" name="madre" value="null">
+                            <input type="hidden" name="direccion" value="null">
+                            <input type="hidden" name="telefono2" value="null">
+                            <input type="hidden" name="correo" value="null">
+                            <input type="hidden" name="curp" value="null">
 
                             <div class="flex items-center justify-end mt-4">
                                 <x-primary-button class="ml-4">
                                     {{ __('Registrar Usuario') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Editar -->
-    <div id="modalEditar" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
-            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="sm:flex sm:items-center w-full">
-                            <h3 class="text-2xl leading-6 font-bold text-center text-gray-900 w-full" style="color: #316986;">
-                                Editar Paciente
-                            </h3>
-                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-4xl" id="closeModalEditar">
-                                <span class="sr-only">Close</span>
-                                &times;
-                            </button>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-200 mt-4"></div>
-                    <div class="mt-2">
-                        <form method="POST" action="" id="editPacienteForm">
-                            @csrf
-                            @method('PATCH')
-
-                            <!-- Nombres -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="nombres" :value="__('Nombres')" />
-                                <x-text-input id="nombresEditar" class="block mt-1 w-full" type="text" name="nombres" required autofocus />
-                                <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
-                            </div>
-
-                            <!-- Apellido Paterno -->
-                            <div class="mt-4">
-                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                <x-text-input id="apepatEditar" class="block mt-1 w-full" type="text" name="apepat" required autofocus />
-                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                            </div>
-
-                            <!-- Apellido Materno -->
-                            <div class="mt-4">
-                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                <x-text-input id="apematEditar" class="block mt-1 w-full" type="text" name="apemat" required autofocus />
-                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                            </div>
-
-                            <!-- Fecha de Nacimiento -->
-                            <div class="mt-4">
-                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                <x-text-input id="fechanacEditar" class="block mt-1 w-full" type="date" name="fechanac" required autofocus />
-                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Teléfono -->
-                                <div class="mt-4">
-                                    <x-input-label for="telefono" :value="__('Teléfono')" />
-                                    <x-text-input id="telefonoEditar" class="block mt-1 w-full" type="text" name="telefono" required autofocus />
-                                    <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
-                                </div>
-
-                                <!-- Sexo -->
-                                <div class="mt-4">
-                                    <x-input-label for="sexo" :value="__('Sexo')" />
-                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="masculinoEditar" value="masculino" autocomplete="off" required> Masculino
-                                        </label>
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="femeninoEditar" value="femenino" autocomplete="off" required> Femenino
-                                        </label>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
-                                </div>
-                            </div>
-
-                            <!-- Correo -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="correo" :value="__('Correo')" />
-                                <x-text-input id="correoEditar" class="block mt-1 w-full" type="email" name="correo" required />
-                                <x-input-error :messages="$errors->get('correo')" class="mt-2" />
-                            </div>
-
-                            <!-- Contraseña -->
-                            <div class="mt-4 col-span-2">
-                                <x-input-label for="contraseña" :value="__('Contraseña')" />
-                                <x-text-input id="contraseñaEditar" class="block mt-1 w-full" type="password" name="contraseña" />
-                                <x-input-error :messages="$errors->get('contraseña')" class="mt-2" />
-                                <small class="text-gray-500">Dejar en blanco para mantener la contraseña actual.</small>
-                            </div>
-
-                            <input type="hidden" name="activo" value="si">
-
-                            <div class="flex items-center justify-end mt-4">
-                                <x-primary-button class="ml-4">
-                                    {{ __('Actualizar Paciente') }}
                                 </x-primary-button>
                             </div>
                         </form>
@@ -320,6 +230,14 @@
         });
 
         document.getElementById('openModal').addEventListener('click', function() {
+            // Genera un nuevo número de expediente incrementado
+            const lastId = {{ $pacientes->last()->id ?? 0 }};
+            const nextNoExp = lastId + 1;
+
+            // Asigna el número de expediente al campo correspondiente
+            document.getElementById('no_exp').value = nextNoExp;
+
+            // Muestra el modal
             document.getElementById('modal').classList.remove('hidden');
         });
 
@@ -336,11 +254,25 @@
                 
                 // Fill the form with the data from the patient
                 const patient = @json($pacientes).find(p => p.id == id);
+                document.getElementById('no_expEditar').value = patient.id; // Auto-increment based on ID
                 document.getElementById('nombresEditar').value = patient.nombres;
                 document.getElementById('apepatEditar').value = patient.apepat;
                 document.getElementById('apematEditar').value = patient.apemat;
                 document.getElementById('fechanacEditar').value = patient.fechanac;
+                document.getElementById('horaEditar').value = patient.hora;
+                document.getElementById('pesoEditar').value = patient.peso;
+                document.getElementById('tallaEditar').value = patient.talla;
+                document.getElementById('lugar_naciEditar').value = patient.lugar_naci;
+                document.getElementById('hospitalEditar').value = patient.hospital;
+                document.getElementById('tipopartoEditar').value = patient.tipoparto;
+                document.getElementById('tiposangreEditar').value = patient.tiposangre;
+                document.getElementById('antecedentesEditar').value = patient.antecedentes;
+                document.getElementById('padreEditar').value = patient.padre;
+                document.getElementById('madreEditar').value = patient.madre;
+                document.getElementById('direccionEditar').value = patient.direccion;
                 document.getElementById('telefonoEditar').value = patient.telefono;
+                document.getElementById('telefono2Editar').value = patient.telefono2;
+                document.getElementById('curpEditar').value = patient.curp; 
                 document.querySelector(`input[name="sexo"][value="${patient.sexo}"]`).checked = true;
                 document.getElementById('correoEditar').value = patient.correo;
 

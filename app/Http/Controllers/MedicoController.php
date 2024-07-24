@@ -23,23 +23,21 @@ class MedicoController extends Controller
     public function storePacientes(Request $request)
     {
         $request->validate([
+            'no_exp' => 'required|string|max:100|unique:pacientes',
             'nombres' => 'required|string|max:255',
             'apepat' => 'required|string|max:255',
             'apemat' => 'required|string|max:255',
             'fechanac' => 'required|date',
-            'correo' => 'required|string|email|max:255|unique:pacientes',
-            'contraseña' => 'required|string|min:8',
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
         ]);
 
         Paciente::create([
+            'no_exp' => $request->no_exp,
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
             'fechanac' => $request->fechanac,
-            'correo' => $request->correo,
-            'contraseña' => bcrypt($request->contraseña),
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
             'activo' => 'si',
@@ -50,38 +48,46 @@ class MedicoController extends Controller
 
     public function storePacientesDesdeModal(Request $request)
     {
-        $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apepat' => 'required|string|max:255',
-            'apemat' => 'required|string|max:255',
+        // Valida los campos requeridos
+        $validatedData = $request->validate([
+            'nombres' => 'required|string|max:100',
+            'apepat' => 'required|string|max:100',
+            'apemat' => 'required|string|max:100',
             'fechanac' => 'required|date',
-            'correo' => 'required|string|email|max:255|unique:pacientes',
-            'contraseña' => 'required|string|min:8',
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
+            'correo' => 'required|string|email|max:255|unique:pacientes',
         ]);
 
-        $paciente = Paciente::create([
-            'nombres' => $request->nombres,
-            'apepat' => $request->apepat,
-            'apemat' => $request->apemat,
-            'fechanac' => $request->fechanac,
-            'correo' => $request->correo,
-            'contraseña' => bcrypt($request->contraseña),
-            'telefono' => $request->telefono,
-            'sexo' => $request->sexo,
-            'activo' => 'si',
-        ]);
+        // Filtra los campos no nulos
+        $optionalFields = [
+            'hora', 'peso', 'talla', 'lugar_naci', 'hospital',
+            'tipoparto', 'tiposangre', 'antecedentes', 'padre',
+            'madre', 'direccion', 'telefono2'
+        ];
 
-        return redirect()->route('citas')->with('status')->with('paciente_id', $paciente->id);
+        foreach ($optionalFields as $field) {
+            if ($request->filled($field)) {
+                $validatedData[$field] = $request->input($field);
+            }
+        }
+
+        // Guarda el paciente sin el número de expediente
+        $paciente = Paciente::create($validatedData);
+
+        // Actualiza el campo no_exp con el ID del paciente
+        $paciente->update(['no_exp' => $paciente->id]);
+
+        // Redirige con el ID del paciente
+        return redirect()->route('citas')->with('status', 'Paciente agregado exitosamente')->with('paciente_id', $paciente->id);
     }
+
 
     // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
     {
         $query = Paciente::where('activo', 'si');
         
-        // Filtrar por nombre si se proporciona
         if ($request->has('name') && $request->name != '') {
             $query->where('nombres', 'like', '%' . $request->name . '%');
         }
@@ -108,32 +114,62 @@ class MedicoController extends Controller
     public function updatePaciente(Request $request, $id)
     {
         $request->validate([
+            'no_exp' => 'required|string|max:100|unique:pacientes,no_exp,'.$id,
             'nombres' => 'required|string|max:255',
             'apepat' => 'required|string|max:255',
             'apemat' => 'required|string|max:255',
-            'fechanac' => 'required|date',
-            'correo' => 'required|string|email|max:255|unique:pacientes,correo,'.$id,
-            'contraseña' => 'nullable|string|min:8',
-            'telefono' => 'required|string|max:20', // nuevo campo
-            'sexo' => 'required|in:masculino,femenino', // nuevo campo
+            'fechanac' => 'nullable|date',
+            'hora' => 'nullable|date_format:H:i',
+            'peso' => 'nullable|numeric',
+            'talla' => 'nullable|numeric',
+            'lugar_naci' => 'nullable|string|max:255',
+            'hospital' => 'nullable|string|max:255',
+            'tipoparto' => 'nullable|string|max:255',
+            'tiposangre' => 'nullable|string|max:255',
+            'antecedentes' => 'nullable|string',
+            'padre' => 'nullable|string|max:255',
+            'madre' => 'nullable|string|max:255',
+            'direccion' => 'nullable|string|max:255',
+            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,'.$id,
+            'telefono' => 'required|string|max:20',
+            'telefono2' => 'nullable|string|max:20',
+            'sexo' => 'required|in:masculino,femenino',
+            'curp' => 'nullable|string|max:18|unique:pacientes,curp,'.$id,
         ]);
 
         $paciente = Paciente::findOrFail($id);
-        $paciente->update([
+        
+        $data = [
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
-            'fechanac' => $request->fechanac,
+            'hora' => $request->hora,
+            'peso' => $request->peso,
+            'talla' => $request->talla,
+            'lugar_naci' => $request->lugar_naci,
+            'hospital' => $request->hospital,
+            'tipoparto' => $request->tipoparto,
+            'tiposangre' => $request->tiposangre,
+            'antecedentes' => $request->antecedentes,
+            'padre' => $request->padre,
+            'madre' => $request->madre,
+            'direccion' => $request->direccion,
             'correo' => $request->correo,
-            'contraseña' => $request->contraseña ? bcrypt($request->contraseña) : $paciente->contraseña,
-            'telefono' => $request->telefono, // nuevo campo
-            'sexo' => $request->sexo, // nuevo campo
+            'telefono' => $request->telefono,
+            'telefono2' => $request->telefono2,
+            'sexo' => $request->sexo,
+            'curp' => $request->curp,
             'activo' => 'si',
-        ]);
+        ];
+        
+        if (!empty($request->fechanac)) {
+            $data['fechanac'] = $request->fechanac;
+        }
 
-        return redirect()->route('medico.dashboard')->with('status', 'Paciente actualizado correctamente');
+        $paciente->update($data);
+
+        return redirect()->route('pacientes.editar', ['id' => $id])->with('status', 'Paciente actualizado correctamente');
     }
-
 
     // Marca a un paciente como inactivo (eliminado)
     public function eliminarPaciente($id)
