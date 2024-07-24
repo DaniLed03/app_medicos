@@ -30,9 +30,15 @@ class Paciente extends Model
         'telefono',
         'telefono2',
         'sexo',
-        'curp', // Add this line
+        'curp',
         'activo',
+        'Nombre_fact',
+        'Direccion_fact',
+        'RFC',
+        'Regimen_fiscal',
+        'CFDI'
     ];
+    
 
     public function citas()
     {

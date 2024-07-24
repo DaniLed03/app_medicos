@@ -113,13 +113,13 @@ class MedicoController extends Controller
 
     public function updatePaciente(Request $request, $id)
     {
+        // Validation of the request data
         $request->validate([
-            'no_exp' => 'required|string|max:100|unique:pacientes,no_exp,'.$id,
-            'nombres' => 'required|string|max:255',
-            'apepat' => 'required|string|max:255',
-            'apemat' => 'required|string|max:255',
+            'nombres' => 'nullable|string|max:255',
+            'apepat' => 'nullable|string|max:255',
+            'apemat' => 'nullable|string|max:255',
             'fechanac' => 'nullable|date',
-            'hora' => 'nullable|date_format:H:i',
+            'hora' => 'nullable|date_format:H:i:s',
             'peso' => 'nullable|numeric',
             'talla' => 'nullable|numeric',
             'lugar_naci' => 'nullable|string|max:255',
@@ -131,42 +131,25 @@ class MedicoController extends Controller
             'madre' => 'nullable|string|max:255',
             'direccion' => 'nullable|string|max:255',
             'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,'.$id,
-            'telefono' => 'required|string|max:20',
+            'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
-            'sexo' => 'required|in:masculino,femenino',
+            'sexo' => 'nullable|in:masculino,femenino',
             'curp' => 'nullable|string|max:18|unique:pacientes,curp,'.$id,
+            'Nombre_fact' => 'nullable|string|max:255',
+            'Direccion_fact' => 'nullable|string|max:255',
+            'RFC' => 'nullable|string|max:255',
+            'Regimen_fiscal' => 'nullable|string|max:255',
+            'CFDI' => 'nullable|string|max:255',
         ]);
 
+        // Find the patient
         $paciente = Paciente::findOrFail($id);
-        
-        $data = [
-            'nombres' => $request->nombres,
-            'apepat' => $request->apepat,
-            'apemat' => $request->apemat,
-            'hora' => $request->hora,
-            'peso' => $request->peso,
-            'talla' => $request->talla,
-            'lugar_naci' => $request->lugar_naci,
-            'hospital' => $request->hospital,
-            'tipoparto' => $request->tipoparto,
-            'tiposangre' => $request->tiposangre,
-            'antecedentes' => $request->antecedentes,
-            'padre' => $request->padre,
-            'madre' => $request->madre,
-            'direccion' => $request->direccion,
-            'correo' => $request->correo,
-            'telefono' => $request->telefono,
-            'telefono2' => $request->telefono2,
-            'sexo' => $request->sexo,
-            'curp' => $request->curp,
-            'activo' => 'si',
-        ];
-        
-        if (!empty($request->fechanac)) {
-            $data['fechanac'] = $request->fechanac;
-        }
 
-        $paciente->update($data);
+        // Update the patient's data
+        $paciente->update($request->except('no_exp'));
+
+        // Ensure the no_exp field remains the same
+        $paciente->update(['no_exp' => $paciente->id]);
 
         return redirect()->route('pacientes.editar', ['id' => $id])->with('status', 'Paciente actualizado correctamente');
     }

@@ -18,7 +18,7 @@
                         <!-- Información adicional del paciente -->
                         <div class="relative flex items-center justify-center space-x-4 bg-[#2D7498] border rounded-lg p-4 text-white">
                             <!-- Botón con el icono -->
-                            <button class="absolute top-0 right-0 m-2" onclick="openEditModal()">
+                            <button id="edit-info-btn" class="absolute top-0 right-0 m-2" onclick="enableFields('info')">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
                                 </svg>
@@ -63,27 +63,34 @@
                             @method('PATCH')
 
                             <!-- Información Personal -->
-                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
-                                <h3 class="text-lg font-semibold mb-4">Información Personal</h3>
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="personal">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Información Personal</h3>
+                                    <button type="button" class="text-gray-800" onclick="enableFields('personal')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <!-- Dirección -->
                                     <div class="mt-4 md:col-span-2">
                                         <x-input-label for="direccionEditar" :value="__('Dirección')" />
-                                        <x-text-input id="direccionEditar" class="block mt-1 w-full" type="text" name="direccion" value="{{ $paciente->direccion }}" autofocus />
+                                        <x-text-input id="direccionEditar" class="block mt-1 w-full" type="text" name="direccion" value="{{ $paciente->direccion }}" disabled />
                                         <x-input-error :messages="$errors->get('direccion')" class="mt-2" />
                                     </div>
 
                                     <!-- Lugar de Nacimiento -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="lugar_naciEditar" :value="__('Lugar de Nacimiento')" />
-                                        <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci }}" autofocus />
+                                        <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci }}" disabled />
                                         <x-input-error :messages="$errors->get('lugar_naci')" class="mt-2" />
                                     </div>
 
                                     <!-- Hospital -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="hospitalEditar" :value="__('Hospital')" />
-                                        <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital }}" autofocus />
+                                        <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital }}" disabled />
                                         <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
                                     </div>
                                 </div>
@@ -91,87 +98,176 @@
                                     <!-- CURP -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="curpEditar" :value="__('CURP')" />
-                                        <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp }}" autofocus />
+                                        <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp }}" disabled />
                                         <x-input-error :messages="$errors->get('curp')" class="mt-2" />
                                     </div>
                                     
                                     <!-- Hora -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="horaEditar" :value="__('Hora de Nacimiento')" />
-                                        <x-text-input id="horaEditar" class="block mt-1 w-full" type="time" name="hora" value="{{ $paciente->hora }}" autofocus />
+                                        <x-text-input id="horaEditar" class="block mt-1 w-full" type="time" step="1" name="hora" value="{{ $paciente->hora }}" disabled />
                                         <x-input-error :messages="$errors->get('hora')" class="mt-2" />
                                     </div>
 
                                     <!-- Peso -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="pesoEditar" :value="__('Peso (kg)')" />
-                                        <x-text-input id="pesoEditar" class="block mt-1 w-full" type="number" step="0.01" name="peso" value="{{ $paciente->peso }}" autofocus />
+                                        <x-text-input id="pesoEditar" class="block mt-1 w-full" type="number" step="0.01" name="peso" value="{{ $paciente->peso }}" disabled />
                                         <x-input-error :messages="$errors->get('peso')" class="mt-2" />
                                     </div>
 
                                     <!-- Talla -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="tallaEditar" :value="__('Talla (cm)')" />
-                                        <x-text-input id="tallaEditar" class="block mt-1 w-full" type="number" maxlength="5" name="talla" value="{{ $paciente->talla }}" autofocus />
+                                        <x-text-input id="tallaEditar" class="block mt-1 w-full" type="number" name="talla" value="{{ $paciente->talla }}" disabled />
                                         <x-input-error :messages="$errors->get('talla')" class="mt-2" />
                                     </div>
 
                                     <!-- Tipo de Parto -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="tipopartoEditar" :value="__('Tipo de Parto')" />
-                                        <x-text-input id="tipopartoEditar" class="block mt-1 w-full" type="text" maxlength="5" name="tipoparto" value="{{ $paciente->tipoparto }}" autofocus />
+                                        <x-text-input id="tipopartoEditar" class="block mt-1 w-full" type="text" name="tipoparto" value="{{ $paciente->tipoparto }}" disabled />
                                         <x-input-error :messages="$errors->get('tipoparto')" class="mt-2" />
                                     </div>
 
                                     <!-- Tipo de Sangre -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="tiposangreEditar" :value="__('Tipo de Sangre')" />
-                                        <x-text-input id="tiposangreEditar" class="block mt-1 w-full" type="text" maxlength="5" name="tiposangre" value="{{ $paciente->tiposangre }}" autofocus />
+                                        <x-text-input id="tiposangreEditar" class="block mt-1 w-full" type="text" name="tiposangre" value="{{ $paciente->tiposangre }}" disabled />
                                         <x-input-error :messages="$errors->get('tiposangre')" class="mt-2" />
                                     </div>
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4 hidden" id="personal-update">
+                                        {{ __('Actualizar Información Personal') }}
+                                    </x-primary-button>
+                                    <x-secondary-button class="ml-4 hidden" id="personal-cancel" onclick="disableFields('personal')">
+                                        {{ __('Cancelar') }}
+                                    </x-secondary-button>
                                 </div>
                             </div>
 
                             <!-- Antecedentes -->
-                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
-                                <x-input-label for="antecedentesEditar" :value="__('Antecedentes')" />
-                                <textarea id="antecedentesEditar" name="antecedentes" class="block mt-1 w-full form-input rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" style="resize: none; height: 100px;" autofocus>{{ $paciente->antecedentes }}</textarea>
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="antecedentes">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Antecedentes</h3>
+                                    <button type="button" class="text-gray-800" onclick="enableFields('antecedentes')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <textarea id="antecedentesEditar" name="antecedentes" class="block mt-1 w-full form-input rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" style="resize: none; height: 100px;" disabled>{{ $paciente->antecedentes }}</textarea>
                                 <x-input-error :messages="$errors->get('antecedentes')" class="mt-2" />
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4 hidden" id="antecedentes-update">
+                                        {{ __('Actualizar Antecedentes') }}
+                                    </x-primary-button>
+                                    <x-secondary-button class="ml-4 hidden" id="antecedentes-cancel" onclick="disableFields('antecedentes')">
+                                        {{ __('Cancelar') }}
+                                    </x-secondary-button>
+                                </div>
                             </div>
 
                             <!-- Contacto de Emergencias -->
-                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
-                                <h3 class="text-lg font-semibold mb-4">Contacto de Emergencias</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="emergencias">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Contacto de Emergencias</h3>
+                                    <button type="button" class="text-gray-800" onclick="enableFields('emergencias')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <!-- Padre -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="padreEditar" :value="__('Padre')" />
-                                        <x-text-input id="padreEditar" class="block mt-1 w-full" type="text" name="padre" value="{{ $paciente->padre }}" autofocus />
+                                        <x-text-input id="padreEditar" class="block mt-1 w-full" type="text" name="padre" value="{{ $paciente->padre }}" disabled />
                                         <x-input-error :messages="$errors->get('padre')" class="mt-2" />
                                     </div>
-
+                                
                                     <!-- Madre -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="madreEditar" :value="__('Madre')" />
-                                        <x-text-input id="madreEditar" class="block mt-1 w-full" type="text" name="madre" value="{{ $paciente->madre }}" autofocus />
+                                        <x-text-input id="madreEditar" class="block mt-1 w-full" type="text" name="madre" value="{{ $paciente->madre }}" disabled />
                                         <x-input-error :messages="$errors->get('madre')" class="mt-2" />
                                     </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                
                                     <!-- Teléfono Secundario -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="telefono2Editar" :value="__('Teléfono Secundario')" />
-                                        <x-text-input id="telefono2Editar" class="block mt-1 w-full" type="text" name="telefono2" value="{{ $paciente->telefono2 }}" autofocus />
+                                        <x-text-input id="telefono2Editar" class="block mt-1 w-full" type="text" name="telefono2" value="{{ $paciente->telefono2 }}" disabled />
                                         <x-input-error :messages="$errors->get('telefono2')" class="mt-2" />
                                     </div>
                                 </div>
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4 hidden" id="emergencias-update">
+                                        {{ __('Actualizar Contacto de Emergencias') }}
+                                    </x-primary-button>
+                                    <x-secondary-button class="ml-4 hidden" id="emergencias-cancel" onclick="disableFields('emergencias')">
+                                        {{ __('Cancelar') }}
+                                    </x-secondary-button>
+                                </div>
                             </div>
 
-                            <div class="flex items-center justify-end mt-4">
-                                <x-primary-button class="ml-4">
-                                    {{ __('Actualizar Paciente') }}
-                                </x-primary-button>
+                            <!-- Información de Facturación -->
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="facturacion">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Información de Facturación</h3>
+                                    <button type="button" class="text-gray-800" onclick="enableFields('facturacion')">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path fill-rule="evenodd" d="M5 8a4 4 0 1 1 7.796 1.263l-2.533 2.534A4 4 0 0 1 5 8Zm4.06 5H7a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h2.172a2.999 2.999 0 0 1-.114-1.588l.674-3.372a3 3 0 0 1 .82-1.533L9.06 13Zm9.032-5a2.907 2.907 0 0 0-2.056.852L9.967 14.92a1 1 0 0 0-.273.51l-.675 3.373a1 1 0 0 0 1.177 1.177l3.372-.675a1 1 0 0 0 .511-.273l6.07-6.07a2.91 2.91 0 0 0-.944-4.742A2.907 2.907 0 0 0 18.092 8Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Nombre de Facturación -->
+                                    <div class="mt-4">
+                                        <x-input-label for="Nombre_factEditar" :value="__('Nombre de Facturación')" />
+                                        <x-text-input id="Nombre_factEditar" class="block mt-1 w-full" type="text" name="Nombre_fact" value="{{ $paciente->Nombre_fact }}" disabled />
+                                        <x-input-error :messages="$errors->get('Nombre_fact')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Dirección de Facturación -->
+                                    <div class="mt-4">
+                                        <x-input-label for="Direccion_factEditar" :value="__('Dirección de Facturación')" />
+                                        <x-text-input id="Direccion_factEditar" class="block mt-1 w-full" type="text" name="Direccion_fact" value="{{ $paciente->Direccion_fact }}" disabled />
+                                        <x-input-error :messages="$errors->get('Direccion_fact')" class="mt-2" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <!-- RFC -->
+                                    <div class="mt-4">
+                                        <x-input-label for="RFCEditar" :value="__('RFC')" />
+                                        <x-text-input id="RFCEditar" class="block mt-1 w-full" type="text" name="RFC" value="{{ $paciente->RFC }}" disabled />
+                                        <x-input-error :messages="$errors->get('RFC')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Régimen Fiscal -->
+                                    <div class="mt-4">
+                                        <x-input-label for="Regimen_fiscalEditar" :value="__('Régimen Fiscal')" />
+                                        <x-text-input id="Regimen_fiscalEditar" class="block mt-1 w-full" type="text" name="Regimen_fiscal" value="{{ $paciente->Regimen_fiscal }}" disabled />
+                                        <x-input-error :messages="$errors->get('Regimen_fiscal')" class="mt-2" />
+                                    </div>
+
+                                    <!-- CFDI -->
+                                    <div class="mt-4">
+                                        <x-input-label for="CFDIEditar" :value="__('CFDI')" />
+                                        <x-text-input id="CFDIEditar" class="block mt-1 w-full" type="text" name="CFDI" value="{{ $paciente->CFDI }}" disabled />
+                                        <x-input-error :messages="$errors->get('CFDI')" class="mt-2" />
+                                    </div>
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4 hidden" id="facturacion-update">
+                                        {{ __('Actualizar Información de Facturación') }}
+                                    </x-primary-button>
+                                    <x-secondary-button class="ml-4 hidden" id="facturacion-cancel" onclick="disableFields('facturacion')">
+                                        {{ __('Cancelar') }}
+                                    </x-secondary-button>
+                                </div>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -270,6 +366,34 @@
 
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function enableFields(sectionId) {
+            const section = document.getElementById(sectionId);
+            const inputs = section.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.disabled = false;
+            });
+            document.getElementById(`${sectionId}-update`).classList.remove('hidden');
+            document.getElementById(`${sectionId}-cancel`).classList.remove('hidden');
+            const editButton = section.querySelector('button');
+            if (editButton) {
+                editButton.classList.add('hidden');
+            }
+        }
+
+        function disableFields(sectionId) {
+            const section = document.getElementById(sectionId);
+            const inputs = section.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+            document.getElementById(`${sectionId}-update`).classList.add('hidden');
+            document.getElementById(`${sectionId}-cancel`).classList.add('hidden');
+            const editButton = section.querySelector('button');
+            if (editButton) {
+                editButton.classList.remove('hidden');
+            }
         }
     </script>
 </x-app-layout>

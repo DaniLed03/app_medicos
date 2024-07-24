@@ -6,35 +6,41 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();
-            $table->string('no_exp', 100)->nullable()->unique(); // Número de expediente
-            $table->string('nombres', 100);
-            $table->string('apepat', 100);
-            $table->string('apemat', 100);
-            $table->date('fechanac');
+            $table->string('no_exp')->unique();
+            $table->string('nombres');
+            $table->string('apepat');
+            $table->string('apemat');
+            $table->date('fechanac')->nullable();
             $table->time('hora')->nullable();
-            $table->float('peso')->nullable();
-            $table->float('talla')->nullable();
-            $table->string('lugar_naci', 255)->nullable();
-            $table->string('hospital', 255)->nullable();
-            $table->string('tipoparto', 255)->nullable();
-            $table->string('tiposangre', 255)->nullable();
+            $table->decimal('peso', 5, 2)->nullable();
+            $table->integer('talla')->nullable();
+            $table->string('lugar_naci')->nullable();
+            $table->string('hospital')->nullable();
+            $table->string('tipoparto')->nullable();
+            $table->string('tiposangre')->nullable();
             $table->text('antecedentes')->nullable();
-            $table->string('padre', 255)->nullable();
-            $table->string('madre', 255)->nullable();
-            $table->string('direccion', 255)->nullable();
-            $table->string('correo', 255)->nullable()->unique();
-            $table->string('telefono', 20);
-            $table->string('telefono2', 20)->nullable();
+            $table->string('padre')->nullable();
+            $table->string('madre')->nullable();
+            $table->string('direccion')->nullable();
+            $table->string('correo')->nullable();
+            $table->string('telefono');
+            $table->string('telefono2')->nullable();
             $table->enum('sexo', ['masculino', 'femenino']);
-            $table->string('curp', 18)->nullable()->unique(); // Add this line for CURP
+            $table->string('curp')->unique()->nullable();
             $table->enum('activo', ['si', 'no'])->default('si');
+            $table->string('Nombre_fact')->nullable();
+            $table->string('Direccion_fact')->nullable();
+            $table->string('RFC')->nullable();
+            $table->string('Regimen_fiscal')->nullable();
+            $table->string('CFDI')->nullable();
             $table->timestamps();
         });
     }
+
 
     public function down(): void
     {
