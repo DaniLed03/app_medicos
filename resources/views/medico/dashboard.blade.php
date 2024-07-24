@@ -87,7 +87,7 @@
     <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
-            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-6xl sm:w-full" style="margin: 50px 0; height: auto;">
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full" style="margin: 50px 0; height: auto;">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="sm:flex sm:items-center w-full">
@@ -112,44 +112,45 @@
                                     <x-input-error :messages="$errors->get('no_exp')" class="mt-2" />
                                 </div>
                             </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                            <div class="grid grid-cols-1 gap-4">
                                 <!-- Nombres -->
-                                <div class="mt-4 md:col-span-1">
+                                <div class="mt-4">
                                     <x-input-label for="nombres" :value="__('Nombres')" />
                                     <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
                                     <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
                                 </div>
-
+                        
                                 <!-- Apellido Paterno -->
-                                <div class="mt-4 md:col-span-1">
+                                <div class="mt-4">
                                     <x-input-label for="apepat" :value="__('Apellido Paterno')" />
                                     <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
                                     <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
                                 </div>
-
+                        
                                 <!-- Apellido Materno -->
-                                <div class="mt-4 md:col-span-1">
+                                <div class="mt-4">
                                     <x-input-label for="apemat" :value="__('Apellido Materno')" />
                                     <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
                                     <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        
                                 <!-- Fecha de Nacimiento -->
-                                <div class="mt-4 md:col-span-1">
+                                <div class="mt-4">
                                     <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
                                     <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
                                     <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
                                 </div>
-
+                            </div>
+                        
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Teléfono -->
-                                <div class="mt-4 md:col-span-1">
+                                <div class="mt-4">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
                                     <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
-
+                        
                                 <!-- Sexo -->
                                 <div class="mt-4 md:col-span-1">
                                     <x-input-label for="sexo" :value="__('Sexo')" />
@@ -164,7 +165,7 @@
                                     <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                 </div>
                             </div>
-
+                        
                             <!-- Campos ocultos -->
                             <input type="hidden" name="hora" value="null">
                             <input type="hidden" name="lugar_naci" value="null">
@@ -180,13 +181,14 @@
                             <input type="hidden" name="telefono2" value="null">
                             <input type="hidden" name="correo" value="null">
                             <input type="hidden" name="curp" value="null">
-
+                        
                             <div class="flex items-center justify-end mt-4">
                                 <x-primary-button class="ml-4">
                                     {{ __('Registrar Usuario') }}
                                 </x-primary-button>
                             </div>
                         </form>
+                        
                     </div>
                 </div>
             </div>
