@@ -27,7 +27,8 @@ class Consultas extends Model
         'plan',
         'status',
         'totalPagar',
-        'usuariomedicoid'
+        'usuariomedicoid',
+        'circunferencia_cabeza' // New field
     ];
 
     protected $casts = [
@@ -49,16 +50,6 @@ class Consultas extends Model
     public function cita()
     {
         return $this->belongsTo(Citas::class, 'citai_id');
-    }
-
-    public function productos()
-    {
-        return $this->belongsToMany(Productos::class, 'consulta_producto', 'consulta_id', 'producto_id');
-    }
-
-    public function servicios()
-    {
-        return $this->belongsToMany(Servicio::class, 'consulta_servicio', 'consulta_id', 'servicio_id');
     }
 
     public function recetas()

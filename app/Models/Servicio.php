@@ -16,9 +16,4 @@ class Servicio extends Model
         'cantidad', // Nueva columna
         'activo'
     ];
-
-    public function consultas()
-    {
-        return $this->belongsToMany(Consultas::class, 'consulta_servicio');
-    }
 }

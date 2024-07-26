@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('citai_id')->nullable()->constrained('citas')->cascadeOnDelete();
-            $table->foreignId('pacienteid')->constrained('pacientes')->cascadeOnDelete(); // Added field
+            $table->foreignId('pacienteid')->constrained('pacientes')->cascadeOnDelete();
             $table->timestamp('fechaHora')->useCurrent();
             $table->string('talla')->nullable();
             $table->string('temperatura')->nullable();
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('status')->default('en curso');
             $table->decimal('totalPagar', 10, 2)->default(0);
             $table->foreignId('usuariomedicoid')->constrained('users')->cascadeOnDelete();
+            $table->string('circunferencia_cabeza')->nullable(); // New field
             $table->timestamps();
         });
     }

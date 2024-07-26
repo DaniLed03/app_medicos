@@ -11,11 +11,8 @@ class ConsultaReceta extends Model
 
     protected $fillable = [
         'consulta_id',
-        'medicacion',
-        'cantidad_medicacion',
-        'frecuencia',
-        'duracion',
-        'notas'
+        'tipo_de_receta', // New field
+        'receta' // New field
     ];
 
     public function consulta()

@@ -4,15 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Consultas;
 use App\Models\Paciente;
-use App\Models\Productos;
 use App\Models\User;
 use App\Models\Citas;
-use App\Models\Servicio;
 use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-
 
 class ConsultaController extends Controller
 {
@@ -20,10 +17,8 @@ class ConsultaController extends Controller
     {
         $cita = Citas::with('paciente')->findOrFail($citaId);
         $medico = Auth::user();
-        $productos = Productos::all();
-        $servicios = Servicio::all();
 
-        return view('medico.consultas.agregarConsulta', compact('cita', 'medico', 'productos', 'servicios'));
+        return view('medico.consultas.agregarConsulta', compact('cita', 'medico'));
     }
 
     public function store(Request $request)
@@ -45,14 +40,10 @@ class ConsultaController extends Controller
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
-            'productos' => 'array',
-            'servicios' => 'array',
+            'circunferencia_cabeza' => 'nullable|string', // New field
             'recetas' => 'array',
-            'recetas.*.medicacion' => 'required|string',
-            'recetas.*.cantidad_medicacion' => 'required|integer',
-            'recetas.*.frecuencia' => 'required|string',
-            'recetas.*.duracion' => 'required|string',
-            'recetas.*.notas' => 'nullable|string'
+            'recetas.*.tipo_de_receta' => 'required|string',
+            'recetas.*.receta' => 'required|string'
         ]);
 
         // Obtener el paciente desde la cita
@@ -60,23 +51,16 @@ class ConsultaController extends Controller
         $pacienteId = $cita->pacienteid;
 
         // Creación de la consulta
-        $consultaData = $request->all();
-        $consultaData['pacienteid'] = $pacienteId; // Asignar el pacienteid desde la cita
+        $consultaData = $request->except('recetas'); // Exclude recetas from consultaData
+        $consultaData['pacienteid'] = $pacienteId;
         $consultaData['talla'] = $request->hidden_talla;
         $consultaData['temperatura'] = $request->hidden_temperatura;
         $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
         $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
+        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza; // New field
         $consulta = Consultas::create($consultaData);
-
-        // Adjuntar productos y servicios
-        if ($request->has('productos')) {
-            $consulta->productos()->attach($request->productos);
-        }
-        if ($request->has('servicios')) {
-            $consulta->servicios()->attach($request->servicios);
-        }
 
         // Guardar recetas
         if ($request->has('recetas')) {
@@ -88,14 +72,13 @@ class ConsultaController extends Controller
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
 
+
     public function createWithoutCita($pacienteId)
     {
         $paciente = Paciente::findOrFail($pacienteId);
         $medico = Auth::user();
-        $productos = Productos::all();
-        $servicios = Servicio::all();
 
-        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'productos', 'servicios'));
+        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico'));
     }
 
     public function storeWithoutCita(Request $request)
@@ -117,33 +100,21 @@ class ConsultaController extends Controller
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
-            'productos' => 'array',
-            'servicios' => 'array',
             'recetas' => 'array',
-            'recetas.*.medicacion' => 'required|string',
-            'recetas.*.cantidad_medicacion' => 'required|integer',
-            'recetas.*.frecuencia' => 'required|string',
-            'recetas.*.duracion' => 'required|string',
-            'recetas.*.notas' => 'nullable|string'
+            'recetas.*.tipo_de_receta' => 'required|string',
+            'recetas.*.receta' => 'required|string'
         ]);
 
         // Creación de la consulta
-        $consultaData = $request->all();
+        $consultaData = $request->except('recetas'); // Exclude recetas from consultaData
         $consultaData['talla'] = $request->hidden_talla;
         $consultaData['temperatura'] = $request->hidden_temperatura;
         $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
         $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
+        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza; // New field
         $consulta = Consultas::create($consultaData);
-
-        // Adjuntar productos y servicios
-        if ($request->has('productos')) {
-            $consulta->productos()->attach($request->productos);
-        }
-        if ($request->has('servicios')) {
-            $consulta->servicios()->attach($request->servicios);
-        }
 
         // Guardar recetas
         if ($request->has('recetas')) {
@@ -154,7 +125,6 @@ class ConsultaController extends Controller
 
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
-
 
 
     public function index(Request $request)
@@ -198,34 +168,25 @@ class ConsultaController extends Controller
         return view('medico.consultas.consultas', compact('consultas', 'monthName', 'totalConsultas', 'totalFacturacion'));
     }
     
-
     public function show($id)
     {
         $consulta = Consultas::with('cita.paciente', 'usuarioMedico')->findOrFail($id);
         return view('medico.consultas.show', compact('consulta'));
     }
 
-    // Muestra el formulario de edición de una consulta específica
     public function edit($id)
     {
         $consulta = Consultas::findOrFail($id);
-        $productos = Productos::all();
-        $servicios = Servicio::all();
-        $consulta_productos = $consulta->productos->pluck('id')->toArray();
-        $consulta_servicios = $consulta->servicios->pluck('id')->toArray();
 
         if ($consulta->cita) {
-            return view('medico.consultas.editarConsulta', compact('consulta', 'productos', 'servicios', 'consulta_productos', 'consulta_servicios'));
+            return view('medico.consultas.editarConsulta', compact('consulta'));
         } else {
-            return view('medico.consultas.editarConsultaSinCita', compact('consulta', 'productos', 'servicios', 'consulta_productos', 'consulta_servicios'));
+            return view('medico.consultas.editarConsultaSinCita', compact('consulta'));
         }
     }
 
-
-    // Actualiza la información de una consulta específica
     public function update(Request $request, $id)
     {
-        // Validación de los datos recibidos
         $request->validate([
             'talla' => 'nullable|string',
             'temperatura' => 'nullable|string',
@@ -241,27 +202,14 @@ class ConsultaController extends Controller
             'plan' => 'nullable|string',
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric|min:0',
-            'productos' => 'array',
-            'servicios' => 'array',
             'recetas' => 'array',
-            'recetas.*.medicacion' => 'required|string',
-            'recetas.*.cantidad_medicacion' => 'required|integer',
-            'recetas.*.frecuencia' => 'required|string',
-            'recetas.*.duracion' => 'required|string',
-            'recetas.*.notas' => 'nullable|string'
+            'recetas.*.tipo_de_receta' => 'required|string',
+            'recetas.*.receta' => 'required|string'
         ]);
 
-        // Encuentra la consulta y actualiza sus datos
         $consulta = Consultas::findOrFail($id);
         $consulta->update($request->all());
 
-        // Actualizar productos asociados a la consulta
-        $consulta->productos()->sync($request->productos);
-
-        // Actualizar servicios asociados a la consulta
-        $consulta->servicios()->sync($request->servicios);
-
-        // Actualizar recetas
         $consulta->recetas()->delete();
         if ($request->has('recetas')) {
             foreach ($request->recetas as $receta) {
@@ -269,9 +217,9 @@ class ConsultaController extends Controller
             }
         }
 
-        // Redirecciona a la vista de consultas con un mensaje de éxito
         return redirect()->route('consultas.index')->with('status', 'Consulta actualizada correctamente');
     }
+
 
     public function terminate($id)
     {
