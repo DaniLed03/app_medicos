@@ -1,18 +1,18 @@
 <x-app-layout>
     <div x-data="{ 
         openModal: false, 
-        talla: '{{ $consulta->talla }}', 
-        temperatura: '{{ $consulta->temperatura }}', 
-        saturacion_oxigeno: '{{ $consulta->saturacion_oxigeno }}', 
-        frecuencia_cardiaca: '{{ $consulta->frecuencia_cardiaca }}', 
-        peso: '{{ $consulta->peso }}', 
-        tension_arterial: '{{ $consulta->tension_arterial }}',
-        temp_talla: '{{ $consulta->talla }}', 
-        temp_temperatura: '{{ $consulta->temperatura }}', 
-        temp_saturacion_oxigeno: '{{ $consulta->saturacion_oxigeno }}', 
-        temp_frecuencia_cardiaca: '{{ $consulta->frecuencia_cardiaca }}', 
-        temp_peso: '{{ $consulta->peso }}', 
-        temp_tension_arterial: '{{ $consulta->tension_arterial }}',
+        talla: '', 
+        temperatura: '', 
+        saturacion_oxigeno: '', 
+        frecuencia_cardiaca: '', 
+        peso: '', 
+        tension_arterial: '',
+        temp_talla: '', 
+        temp_temperatura: '', 
+        temp_saturacion_oxigeno: '', 
+        temp_frecuencia_cardiaca: '', 
+        temp_peso: '', 
+        temp_tension_arterial: '',
         guardarSignosVitales() {
             this.talla = this.temp_talla + ' m';
             this.temperatura = this.temp_temperatura + ' c';
@@ -28,46 +28,50 @@
                 <div class="p-6 text-gray-900">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center">
+                            <!-- Icono con iniciales -->
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
-                                {{ substr($consulta->cita->paciente->nombres, 0, 1) }}{{ substr($consulta->cita->paciente->apepat, 0, 1) }}
+                                {{ substr($paciente->nombres, 0, 1) }}{{ substr($paciente->apepat, 0, 1) }}
                             </div>
+                            <!-- Nombre del paciente -->
                             <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
-                                {{ $consulta->cita->paciente->nombres }} {{ $consulta->cita->paciente->apepat }} {{ $consulta->cita->paciente->apemat }}
+                                {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}
                             </h2>
                         </div>
+                        <!-- Información adicional del paciente -->
                         <div class="flex items-center space-x-4 bg-[#2D7498] border rounded-lg p-4 text-white">
                             <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4Zm12 12V5H7v11h10Zm-5 1a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z" clip-rule="evenodd"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->sexo }}</span>
+                                <span class="ml-1">{{ $paciente->sexo }}</span>
                             </div>
                             <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->fechanac }}</span>
+                                <span class="ml-1">{{ $paciente->fechanac }}</span>
                             </div>
                             <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->telefono }}</span>
+                                <span class="ml-1">{{ $paciente->telefono }}</span>
                             </div>
                             <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5.024 3.783A1 1 0 0 1 6 3h12a1 1 0 0 1 .976.783L20.802 12h-4.244a1.99 1.99 0 0 0-1.824 1.205 2.978 2.978 0 0 1-5.468 0A1.991 1.991 0 0 0 7.442 12H3.198l1.826-8.217ZM3 14v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-4.43a4.978 4.978 0 0 1-9.14 0H3Z" clip-rule="evenodd"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->correo }}</span>
+                                <span class="ml-1">{{ $paciente->correo }}</span>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Signos vitales -->
                     <div class="bg-gray-100 p-6 rounded-lg mb-6">
                         <div class="flex justify-between items-center">
                             <h3 class="text-lg font-bold mb-4">Signos vitales</h3>
                             <button @click="openModal = true" class="text-blue-500 hover:text-blue-700">
-                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
                                 </svg>
                             </button>
@@ -100,13 +104,14 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('consultas.update', $consulta->id) }}">
+                    <!-- Formulario para agregar consulta -->
+                    <form method="POST" action="{{ route('consultas.storeWithoutCita') }}">
                         @csrf
-                        @method('PUT')
-                        <input type="hidden" name="citai_id" value="{{ $consulta->citai_id }}">
-                        <input type="hidden" name="usuariomedicoid" value="{{ $consulta->usuariomedicoid }}">
+                        <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
+                        <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
                         <input type="hidden" name="status" value="en curso">
 
+                        <!-- Añadir campos ocultos para signos vitales -->
                         <input type="hidden" name="talla" x-model="talla">
                         <input type="hidden" name="temperatura" x-model="temperatura">
                         <input type="hidden" name="saturacion_oxigeno" x-model="saturacion_oxigeno">
@@ -114,71 +119,72 @@
                         <input type="hidden" name="peso" x-model="peso">
                         <input type="hidden" name="tension_arterial" x-model="tension_arterial">
 
+                        <!-- Motivo de la consulta -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Motivo de la consulta</h3>
-                            <textarea name="motivoConsulta" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('motivoConsulta', $consulta->motivoConsulta) }}</textarea>
+                            <textarea name="motivoConsulta" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('motivoConsulta') }}</textarea>
                         </div>
 
+                        <!-- Notas de padecimiento -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Notas de padecimiento</h3>
-                            <textarea name="notas_padecimiento" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('notas_padecimiento', $consulta->notas_padecimiento) }}</textarea>
+                            <textarea name="notas_padecimiento" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('notas_padecimiento') }}</textarea>
                         </div>
 
+                        <!-- Interrogatorio por aparatos y sistemas -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Interrogatorio por aparatos y sistemas</h3>
-                            <textarea name="interrogatorio_por_aparatos" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('interrogatorio_por_aparatos', $consulta->interrogatorio_por_aparatos) }}</textarea>
+                            <textarea name="interrogatorio_por_aparatos" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('interrogatorio_por_aparatos') }}</textarea>
                         </div>
 
+                        <!-- Examen físico -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Examen físico</h3>
-                            <textarea name="examen_fisico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('examen_fisico', $consulta->examen_fisico) }}</textarea>
+                            <textarea name="examen_fisico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('examen_fisico') }}</textarea>
                         </div>
 
+                        <!-- Diagnóstico -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Diagnóstico</h3>
-                            <input type="text" name="diagnostico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="{{ old('diagnostico', $consulta->diagnostico) }}" required>
+                            <input type="text" name="diagnostico" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="{{ old('diagnostico') }}" required>
                         </div>
 
+                        <!-- Plan -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Plan</h3>
-                            <textarea name="plan" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('plan', $consulta->plan) }}</textarea>
+                            <textarea name="plan" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none">{{ old('plan') }}</textarea>
                         </div>
 
+                        <!-- Recetas -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Recetas</h3>
                             <div id="recetas-container" class="space-y-2">
-                                @foreach($consulta->recetas as $index => $receta)
-                                    <div class="receta-item flex items-center mb-2">
-                                        <div class="grid grid-cols-4 gap-4 flex-1">
-                                            <input type="text" name="recetas[{{ $index }}][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" value="{{ old('recetas.'.$index.'.medicacion', $receta->medicacion) }}" required>
-                                            <input type="number" name="recetas[{{ $index }}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" value="{{ old('recetas.'.$index.'.cantidad_medicacion', $receta->cantidad_medicacion) }}" required>
-                                            <input type="text" name="recetas[{{ $index }}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" value="{{ old('recetas.'.$index.'.frecuencia', $receta->frecuencia) }}" required>
-                                            <input type="text" name="recetas[{{ $index }}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" value="{{ old('recetas.'.$index.'.duracion', $receta->duracion) }}" required>
-                                            <textarea name="recetas[{{ $index }}][notas]" class="hidden">{{ old('recetas.'.$index.'.notas', $receta->notas) }}</textarea>
-                                        </div>
-                                        @if($index === 0)
-                                            <button id="add-receta" type="button" class="bg-blue-500 text-white p-2 rounded ml-2">
-                                                <svg class="w-5 h-5" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a1 1 0 00-1 1v6H5a1 1 0 000 2h6v6a1 1 0 002 0v-6h6a1 1 0 000-2h-6V5a1 1 0 00-1-1z"></path></svg>
-                                            </button>
-                                        @else
-                                            <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
-                                                <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                                            </button>
-                                        @endif
+                                <div class="receta-item flex items-center">
+                                    <div class="grid grid-cols-4 gap-4 flex-1">
+                                        <input type="text" name="recetas[0][medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Medicación" required>
+                                        <input type="number" name="recetas[0][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
+                                        <input type="text" name="recetas[0][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
+                                        <input type="text" name="recetas[0][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
+                                        <textarea name="recetas[0][notas]" class="hidden"></textarea>
                                     </div>
-                                @endforeach
+                                    <button id="add-receta" type="button" class="bg-blue-500 text-white p-2 rounded ml-2">
+                                        <svg class="w-5 h-5" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a1 1 0 00-1 1v6H5a1 1 0 000 2h6v6a1 1 0 002 0v-6h6a1 1 0 000-2h-6V5a1 1 0 00-1-1z"></path></svg>
+                                    </button>
+                                </div>
+                                <!-- Additional Recetas will be added here -->
                             </div>
-                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-2" placeholder="Agregar notas...">{{ old('notas_unica', $consulta->notas_receta) }}</textarea>
+                            <textarea id="notas-unica" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent h-24 resize-none mt-2" placeholder="Agregar notas..."></textarea>
                             <input type="hidden" name="notas_unica" id="hidden-notas-unica">
                         </div>
 
                         <div class="flex flex-wrap -mx-3">
+                            <!-- Productos -->
                             <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
                                 <h3 class="text-lg font-bold mb-4">Productos</h3>
                                 @foreach($productos as $producto)
                                     <div class="mb-2 flex items-center justify-between">
                                         <label class="flex items-center">
-                                            <input type="checkbox" name="productos[]" value="{{ $producto->id }}" data-precio="{{ $producto->precio }}" class="producto-checkbox mr-2" {{ in_array($producto->id, $consulta_productos) ? 'checked' : '' }}>
+                                            <input type="checkbox" name="productos[]" value="{{ $producto->id }}" data-precio="{{ $producto->precio }}" class="producto-checkbox mr-2">
                                             {{ $producto->nombre }} ({{ $producto->precio }} pesos)
                                         </label>
                                         <div class="flex items-center space-x-2">
@@ -190,12 +196,13 @@
                                 @endforeach
                             </div>
                         
+                            <!-- Servicios -->
                             <div class="bg-gray-100 p-6 rounded-lg mb-6 flex-1 mx-3">
                                 <h3 class="text-lg font-bold mb-4">Servicios</h3>
                                 @foreach($servicios as $servicio)
                                     <div class="mb-2 flex items-center justify-between">
                                         <label class="flex items-center">
-                                            <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" data-precio="{{ $servicio->precio }}" class="servicio-checkbox mr-2" {{ in_array($servicio->id, $consulta_servicios) ? 'checked' : '' }}>
+                                            <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}" data-precio="{{ $servicio->precio }}" class="servicio-checkbox mr-2">
                                             {{ $servicio->nombre }} ({{ $servicio->precio }} pesos)
                                         </label>
                                         <div class="flex items-center space-x-2">
@@ -208,20 +215,21 @@
                             </div>
                         </div>
 
+                        <!-- Total a Pagar -->
                         <div class="bg-gray-100 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-bold mb-4">Total a Pagar</h3>
-                            <input type="number" name="totalPagar" id="totalPagar" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="{{ old('totalPagar', $consulta->totalPagar) }}" readonly>
+                            <input type="number" name="totalPagar" id="totalPagar" class="form-input w-full bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" value="70" readonly>
                         </div>
 
-                        <div class="mt-6 flex justify-start">
-                            <button type="submit" class="bg-green-500 text-white p-4 rounded mr-2">Guardar Cambios</button>
-                            <a href="{{ route('consultas.index') }}" class="bg-gray-500 text-white p-4 rounded">Regresar</a>
+                        <div class="mt-6">
+                            <button type="submit" class="bg-green-500 text-white p-4 rounded">Guardar Consulta</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- Modal -->
         <div x-show="openModal" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div x-show="openModal" class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -285,12 +293,12 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('signosVitales', () => ({
-                talla: '{{ $consulta->talla }}',
-                temperatura: '{{ $consulta->temperatura }}',
-                saturacion_oxigeno: '{{ $consulta->saturacion_oxigeno }}',
-                frecuencia_cardiaca: '{{ $consulta->frecuencia_cardiaca }}',
-                peso: '{{ $consulta->peso }}',
-                tension_arterial: '{{ $consulta->tension_arterial }}'
+                talla: '',
+                temperatura: '',
+                saturacion_oxigeno: '',
+                frecuencia_cardiaca: '',
+                peso: '',
+                tension_arterial: ''
             }));
         });
     </script>
@@ -327,25 +335,6 @@
                 });
             }
 
-            function inicializarNotas() {
-                const notasFields = document.querySelectorAll('textarea[name^="recetas"][name$="[notas]"]');
-                let todasIguales = true;
-                let primeraNota = null;
-
-                notasFields.forEach(field => {
-                    if (primeraNota === null) {
-                        primeraNota = field.value;
-                    } else if (field.value !== primeraNota) {
-                        todasIguales = false;
-                    }
-                });
-
-                if (todasIguales && primeraNota !== null) {
-                    notasUnicaInput.value = primeraNota;
-                    hiddenNotasUnicaInput.value = primeraNota;
-                }
-            }
-
             productoCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', actualizarTotal);
             });
@@ -355,14 +344,13 @@
 
             notasUnicaInput.addEventListener('input', actualizarNotas);
 
-            inicializarNotas(); // Inicializa el campo de notas única
             actualizarTotal(); // Para calcular el total inicial si ya hay productos o servicios seleccionados
+            actualizarNotas(); // Para actualizar las notas iniciales si ya hay algún texto
         });
 
         document.getElementById('add-receta').addEventListener('click', function () {
             const container = document.getElementById('recetas-container');
             const index = container.children.length;
-            const notasUnicaValue = document.getElementById('notas-unica').value;
             const newItem = document.createElement('div');
             newItem.classList.add('receta-item', 'flex', 'items-center', 'mb-2');
             newItem.innerHTML = `
@@ -371,13 +359,16 @@
                     <input type="number" name="recetas[${index}][cantidad_medicacion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Cantidad" required>
                     <input type="text" name="recetas[${index}][frecuencia]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Frecuencia" required>
                     <input type="text" name="recetas[${index}][duracion]" class="form-input col-span-1 bg-gray-50 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Duración" required>
-                    <textarea name="recetas[${index}][notas]" class="hidden">${notasUnicaValue}</textarea>
+                    <textarea name="recetas[${index}][notas]" class="hidden"></textarea>
                 </div>
                 <button type="button" class="remove-receta bg-red-500 text-white p-2 rounded ml-2">
                     <svg class="w-4 h-4" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             `;
             container.appendChild(newItem);
+
+            // Update notes for the newly added medication
+            actualizarNotas();
         });
 
         document.addEventListener('click', function (event) {
@@ -403,27 +394,5 @@
                 }
             }
         });
-
-        function terminarConsulta(id) {
-            if (confirm('¿Está seguro de que desea terminar la consulta?')) {
-                fetch(`/consultas/${id}/terminate`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ status: 'finalizada' })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Consulta terminada exitosamente.');
-                        window.location.href = '{{ route('consultas.index') }}';
-                    } else {
-                        alert('Hubo un error al terminar la consulta.');
-                    }
-                });
-            }
-        }
     </script>
 </x-app-layout>

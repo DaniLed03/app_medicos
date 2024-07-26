@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('citai_id')->constrained('citas')->cascadeOnDelete();
+            $table->foreignId('citai_id')->nullable()->constrained('citas')->cascadeOnDelete();
+            $table->foreignId('pacienteid')->constrained('pacientes')->cascadeOnDelete(); // Added field
             $table->timestamp('fechaHora')->useCurrent();
             $table->string('talla')->nullable();
             $table->string('temperatura')->nullable();

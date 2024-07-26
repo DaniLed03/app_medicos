@@ -29,10 +29,10 @@
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center">
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
-                                {{ substr($consulta->cita->paciente->nombres, 0, 1) }}{{ substr($consulta->cita->paciente->apepat, 0, 1) }}
+                                {{ substr($consulta->paciente->nombres, 0, 1) }}{{ substr($consulta->paciente->apepat, 0, 1) }}
                             </div>
                             <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
-                                {{ $consulta->cita->paciente->nombres }} {{ $consulta->cita->paciente->apepat }} {{ $consulta->cita->paciente->apemat }}
+                                {{ $consulta->paciente->nombres }} {{ $consulta->paciente->apepat }} {{ $consulta->paciente->apemat }}
                             </h2>
                         </div>
                         <div class="flex items-center space-x-4 bg-[#2D7498] border rounded-lg p-4 text-white">
@@ -40,25 +40,25 @@
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4Zm12 12V5H7v11h10Zm-5 1a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z" clip-rule="evenodd"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->sexo }}</span>
+                                <span class="ml-1">{{ $consulta->paciente->sexo }}</span>
                             </div>
                             <div class="flex items-center">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->fechanac }}</span>
+                                <span class="ml-1">{{ $consulta->paciente->fechanac }}</span>
                             </div>
                             <div class="flex items-center">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M20 7h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C10.4 2.842 8.949 2 7.5 2A3.5 3.5 0 0 0 4 5.5c.003.52.123 1.033.351 1.5H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a2 2 0 0 0-2-2Zm-9.942 0H7.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM13 14h-2v8h2v-8Zm-4 0H4v6a2 2 0 0 0 2 2h3v-8Zm6 0v8h3a2 2 0 0 0 2-2v-6h-5Z"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->telefono }}</span>
+                                <span class="ml-1">{{ $consulta->paciente->telefono }}</span>
                             </div>
                             <div class="flex items-center">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M5.024 3.783A1 1 0 0 1 6 3h12a1 1 0 0 1 .976.783L20.802 12h-4.244a1.99 1.99 0 0 0-1.824 1.205 2.978 2.978 0 0 1-5.468 0A1.991 1.991 0 0 0 7.442 12H3.198l1.826-8.217ZM3 14v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-4.43a4.978 4.978 0 0 1-9.14 0H3Z" clip-rule="evenodd"/>
                                 </svg>
-                                <span class="ml-1">{{ $consulta->cita->paciente->correo }}</span>
+                                <span class="ml-1">{{ $consulta->paciente->correo }}</span>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                     <form method="POST" action="{{ route('consultas.update', $consulta->id) }}">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="citai_id" value="{{ $consulta->citai_id }}">
+                        <input type="hidden" name="paciente_id" value="{{ $consulta->paciente_id }}">
                         <input type="hidden" name="usuariomedicoid" value="{{ $consulta->usuariomedicoid }}">
                         <input type="hidden" name="status" value="en curso">
 

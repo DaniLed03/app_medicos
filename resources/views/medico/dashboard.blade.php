@@ -72,6 +72,7 @@
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
                                             </form>
+                                            <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -104,45 +105,34 @@
                     <div class="mt-2">
                         <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
                             @csrf
-                            <!-- Número de Expediente -->
-                            <div class="mt-4 md:col-span-1 text-right">
-                                <x-input-label for="no_exp" :value="__('No. Expediente')" />
-                                <div class="w-1/2 inline-block text-left">
-                                    <x-text-input id="no_exp" class="block mt-1 w-full" type="text" name="no_exp" :value="old('no_exp')" required readonly />
-                                    <x-input-error :messages="$errors->get('no_exp')" class="mt-2" />
-                                </div>
+                            <!-- Nombres -->
+                            <div class="mt-4">
+                                <x-input-label for="nombres" :value="__('Nombres')" />
+                                <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
+                                <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
                             </div>
-                        
-                            <div class="grid grid-cols-1 gap-4">
-                                <!-- Nombres -->
-                                <div class="mt-4">
-                                    <x-input-label for="nombres" :value="__('Nombres')" />
-                                    <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
-                                    <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
-                                </div>
-                        
-                                <!-- Apellido Paterno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                    <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                                </div>
-                        
-                                <!-- Apellido Materno -->
-                                <div class="mt-4">
-                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                    <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                                </div>
-                        
-                                <!-- Fecha de Nacimiento -->
-                                <div class="mt-4">
-                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                    <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
-                                </div>
+                            
+                            <!-- Apellido Paterno -->
+                            <div class="mt-4">
+                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
+                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
                             </div>
-                        
+                            
+                            <!-- Apellido Materno -->
+                            <div class="mt-4">
+                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
+                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                            </div>
+                            
+                            <!-- Fecha de Nacimiento -->
+                            <div class="mt-4">
+                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
+                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Teléfono -->
                                 <div class="mt-4">
@@ -150,7 +140,7 @@
                                     <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
-                        
+                            
                                 <!-- Sexo -->
                                 <div class="mt-4 md:col-span-1">
                                     <x-input-label for="sexo" :value="__('Sexo')" />
@@ -165,7 +155,7 @@
                                     <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                 </div>
                             </div>
-                        
+
                             <!-- Campos ocultos -->
                             <input type="hidden" name="hora" value="null">
                             <input type="hidden" name="lugar_naci" value="null">
@@ -181,7 +171,7 @@
                             <input type="hidden" name="telefono2" value="null">
                             <input type="hidden" name="correo" value="null">
                             <input type="hidden" name="curp" value="null">
-                        
+                            
                             <div class="flex items-center justify-end mt-4">
                                 <x-primary-button class="ml-4">
                                     {{ __('Registrar Usuario') }}
@@ -232,14 +222,7 @@
         });
 
         document.getElementById('openModal').addEventListener('click', function() {
-            // Genera un nuevo número de expediente incrementado
-            const lastId = {{ $pacientes->last()->id ?? 0 }};
-            const nextNoExp = lastId + 1;
-
-            // Asigna el número de expediente al campo correspondiente
-            document.getElementById('no_exp').value = nextNoExp;
-
-            // Muestra el modal
+            // Muestra el modal sin necesidad de asignar manualmente el número de expediente
             document.getElementById('modal').classList.remove('hidden');
         });
 

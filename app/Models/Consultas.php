@@ -11,6 +11,7 @@ class Consultas extends Model
 
     protected $fillable = [
         'citai_id',
+        'pacienteid',
         'fechaHora',
         'talla',
         'temperatura',
@@ -69,5 +70,9 @@ class Consultas extends Model
     {
         return $this->belongsTo(User::class, 'usuariomedicoid');
     }
-}
 
+    public function paciente()
+    {
+        return $this->belongsTo(Paciente::class, 'pacienteid');
+    }
+}

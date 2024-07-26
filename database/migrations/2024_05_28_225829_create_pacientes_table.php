@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();
-            $table->string('no_exp')->unique();
+            $table->unsignedBigInteger('no_exp'); // Remove unique constraint from here
             $table->string('nombres');
             $table->string('apepat');
             $table->string('apemat');
@@ -37,11 +37,13 @@ return new class extends Migration
             $table->string('RFC')->nullable();
             $table->string('Regimen_fiscal')->nullable();
             $table->string('CFDI')->nullable();
-            $table->foreignId('medico_id')->constrained('users');
+            $table->unsignedBigInteger('medico_id'); // Define medico_id only once
             $table->timestamps();
+
+            $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['medico_id', 'no_exp']); // Composite unique key
         });
     }
-
 
     public function down(): void
     {

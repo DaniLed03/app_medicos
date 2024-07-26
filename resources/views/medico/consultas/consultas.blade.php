@@ -54,7 +54,7 @@
                                 @forelse($consultas as $consulta)
                                     <tr>
                                         <td class="px-6 py-4">{{ $consulta->fechaHora->format('d M, Y') }}</td>
-                                        <td class="px-6 py-4">{{ $consulta->cita->paciente->nombres }} {{ $consulta->cita->paciente->apepat }} {{ $consulta->cita->paciente->apemat }}</td>
+                                        <td class="px-6 py-4">{{ $consulta->paciente->nombres }} {{ $consulta->paciente->apepat }} {{ $consulta->paciente->apemat }}</td>
                                         <td class="px-6 py-4">{{ $consulta->usuarioMedico->full_name }}</td>
                                         <td class="px-6 py-4">${{ number_format($consulta->totalPagar, 2) }}</td>
                                         <td class="px-6 py-4">
@@ -80,6 +80,9 @@
                                         </td>
                                     </tr>
                                 @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4">No se encontraron consultas.</td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>

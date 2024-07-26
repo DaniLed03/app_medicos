@@ -82,7 +82,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/consultas/agregar/{citaId}', [ConsultaController::class, 'create'])->name('consultas.create');
     Route::get('consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
     Route::put('consultas/{id}/terminate', [ConsultaController::class, 'terminate'])->name('consultas.terminate');
-
+    Route::get('/consultas/crear-sin-cita/{pacienteId}', [ConsultaController::class, 'createWithoutCita'])->name('consultas.createWithoutCita');
+    Route::post('/consultas/crear-sin-cita', [ConsultaController::class, 'storeWithoutCita'])->name('consultas.storeWithoutCita');
+    
     // Rutas de enfermeras
     Route::get('/enfermeras', [MedicoController::class, 'mostrarEnfermeras'])->name('enfermeras');
     Route::get('/enfermeras/create', [MedicoController::class, 'crearEnfermera'])->name('enfermeras.create');

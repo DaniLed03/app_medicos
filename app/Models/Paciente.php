@@ -39,7 +39,6 @@ class Paciente extends Model
         'CFDI',
         'medico_id'
     ];
-    
 
     public function citas()
     {
@@ -51,3 +50,4 @@ class Paciente extends Model
         return $this->belongsTo(User::class, 'medico_id');
     }    
 }
+
