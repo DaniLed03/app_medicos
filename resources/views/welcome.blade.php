@@ -246,6 +246,25 @@
     .bg-secondary:hover {
         background-color: #33AD9B;
     }
+
+    @media (max-width: 768px) {
+        .flex {
+            flex-direction: column;
+        }
+        .md\:flex-1 {
+            width: 100%;
+        }
+        .md\:w-1\/2 {
+            width: 100%;
+            text-align: center;
+        }
+        .md\:text-center {
+            text-align: center;
+        }
+        .mr-12 {
+            margin-right: 0;
+        }
+    }
 </style>
 
 <script>

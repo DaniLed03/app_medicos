@@ -30,12 +30,12 @@ class ConsultaController extends Controller
     {
         $request->validate([
             'citai_id' => 'required|exists:citas,id',
-            'talla' => 'nullable|string',
-            'temperatura' => 'nullable|string',
-            'saturacion_oxigeno' => 'nullable|string',
-            'frecuencia_cardiaca' => 'nullable|string',
-            'peso' => 'nullable|string',
-            'tension_arterial' => 'nullable|string',
+            'hidden_talla' => 'nullable|string',
+            'hidden_temperatura' => 'nullable|string',
+            'hidden_saturacion_oxigeno' => 'nullable|string',
+            'hidden_frecuencia_cardiaca' => 'nullable|string',
+            'hidden_peso' => 'nullable|string',
+            'hidden_tension_arterial' => 'nullable|string',
             'motivoConsulta' => 'required|string',
             'notas_padecimiento' => 'nullable|string',
             'interrogatorio_por_aparatos' => 'nullable|string',
@@ -62,6 +62,12 @@ class ConsultaController extends Controller
         // Creación de la consulta
         $consultaData = $request->all();
         $consultaData['pacienteid'] = $pacienteId; // Asignar el pacienteid desde la cita
+        $consultaData['talla'] = $request->hidden_talla;
+        $consultaData['temperatura'] = $request->hidden_temperatura;
+        $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
+        $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
+        $consultaData['peso'] = $request->hidden_peso;
+        $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consulta = Consultas::create($consultaData);
 
         // Adjuntar productos y servicios
@@ -82,8 +88,6 @@ class ConsultaController extends Controller
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
 
-
-    // Método para crear consulta sin cita
     public function createWithoutCita($pacienteId)
     {
         $paciente = Paciente::findOrFail($pacienteId);
@@ -98,12 +102,12 @@ class ConsultaController extends Controller
     {
         $request->validate([
             'pacienteid' => 'required|exists:pacientes,id',
-            'talla' => 'nullable|string',
-            'temperatura' => 'nullable|string',
-            'saturacion_oxigeno' => 'nullable|string',
-            'frecuencia_cardiaca' => 'nullable|string',
-            'peso' => 'nullable|string',
-            'tension_arterial' => 'nullable|string',
+            'hidden_talla' => 'nullable|string',
+            'hidden_temperatura' => 'nullable|string',
+            'hidden_saturacion_oxigeno' => 'nullable|string',
+            'hidden_frecuencia_cardiaca' => 'nullable|string',
+            'hidden_peso' => 'nullable|string',
+            'hidden_tension_arterial' => 'nullable|string',
             'motivoConsulta' => 'required|string',
             'notas_padecimiento' => 'nullable|string',
             'interrogatorio_por_aparatos' => 'nullable|string',
@@ -123,12 +127,17 @@ class ConsultaController extends Controller
             'recetas.*.notas' => 'nullable|string'
         ]);
 
-        // Create the consulta record
+        // Creación de la consulta
         $consultaData = $request->all();
-        $consultaData['pacienteid'] = $request->pacienteid;
+        $consultaData['talla'] = $request->hidden_talla;
+        $consultaData['temperatura'] = $request->hidden_temperatura;
+        $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
+        $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
+        $consultaData['peso'] = $request->hidden_peso;
+        $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consulta = Consultas::create($consultaData);
 
-        // Attach products and services
+        // Adjuntar productos y servicios
         if ($request->has('productos')) {
             $consulta->productos()->attach($request->productos);
         }
@@ -136,7 +145,7 @@ class ConsultaController extends Controller
             $consulta->servicios()->attach($request->servicios);
         }
 
-        // Save recipes
+        // Guardar recetas
         if ($request->has('recetas')) {
             foreach ($request->recetas as $receta) {
                 $consulta->recetas()->create($receta);
@@ -145,6 +154,7 @@ class ConsultaController extends Controller
 
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
+
 
 
     public function index(Request $request)
