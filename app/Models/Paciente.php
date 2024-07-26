@@ -36,7 +36,8 @@ class Paciente extends Model
         'Direccion_fact',
         'RFC',
         'Regimen_fiscal',
-        'CFDI'
+        'CFDI',
+        'medico_id'
     ];
     
 
@@ -44,4 +45,9 @@ class Paciente extends Model
     {
         return $this->hasMany(Citas::class, 'pacienteid');
     }
+
+    public function medico()
+    {
+        return $this->belongsTo(User::class, 'medico_id');
+    }    
 }

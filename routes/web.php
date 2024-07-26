@@ -39,7 +39,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
     Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
 
-
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
     Route::post('/medico/productos/agregarProducto', [MedicoController::class, 'storeProductos'])->name('productos.store');
@@ -48,16 +47,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/productos', [MedicoController::class, 'mostrarProductos'])->name('productos');
     Route::get('/productos/{id}/editar', [MedicoController::class, 'editarProducto'])->name('productos.editar');
 
-
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
-    Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
-    Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
     Route::get('/medico/citas/editar/{id}', [MedicoController::class, 'editarCita'])->name('citas.editar');
     Route::delete('/medico/citas/eliminar/{id}', [MedicoController::class, 'eliminarCita'])->name('citas.eliminar');
     Route::get('/horas-disponibles', [MedicoController::class, 'horasDisponibles'])->name('horas.disponibles');
     Route::delete('/medico/citas/borrar/{id}', [MedicoController::class, 'borrarCita'])->name('citas.borrar');
     Route::patch('/medico/citas/editar/{id}', [MedicoController::class, 'updateCita'])->name('citas.update');
+    Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
+    Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
 
     // Rutas de Médicos
     Route::get('/medico/medicos', [MedicoController::class, 'mostrarMedicos'])->name('medicos');

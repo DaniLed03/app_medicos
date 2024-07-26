@@ -37,6 +37,7 @@ return new class extends Migration
             $table->string('RFC')->nullable();
             $table->string('Regimen_fiscal')->nullable();
             $table->string('CFDI')->nullable();
+            $table->foreignId('medico_id')->constrained('users');
             $table->timestamps();
         });
     }

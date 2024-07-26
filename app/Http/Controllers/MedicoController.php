@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Citas;
 use App\Models\Servicio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MedicoController extends Controller
 {
@@ -41,9 +42,10 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
             'activo' => 'si',
+            'medico_id' => Auth::id(), // Set the medico_id to the logged-in user
         ]);
 
-        return redirect()->route('medico.dashboard')->with('status');
+        return redirect()->route('medico.dashboard')->with('status', 'Paciente creado con éxito');
     }
 
     public function storePacientesDesdeModal(Request $request)
@@ -72,6 +74,12 @@ class MedicoController extends Controller
             }
         }
 
+        // Añade un valor temporal para el campo no_exp
+        $validatedData['no_exp'] = 'temp-' . uniqid();
+
+        // Añadir el medico_id del doctor autenticado
+        $validatedData['medico_id'] = Auth::id();
+
         // Guarda el paciente sin el número de expediente
         $paciente = Paciente::create($validatedData);
 
@@ -82,12 +90,13 @@ class MedicoController extends Controller
         return redirect()->route('citas')->with('status', 'Paciente agregado exitosamente')->with('paciente_id', $paciente->id);
     }
 
-
     // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
     {
-        $query = Paciente::where('activo', 'si');
+        $medicoId = Auth::id();
         
+        $query = Paciente::where('activo', 'si')->where('medico_id', $medicoId);
+
         if ($request->has('name') && $request->name != '') {
             $query->where('nombres', 'like', '%' . $request->name . '%');
         }
@@ -106,10 +115,10 @@ class MedicoController extends Controller
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($id)
     {
-        $paciente = Paciente::findOrFail($id);
+        $medicoId = Auth::id();
+        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
         return view('medico.pacientes.editarPaciente', compact('paciente'));
     }
-
 
     public function updatePaciente(Request $request, $id)
     {
@@ -156,11 +165,11 @@ class MedicoController extends Controller
         return redirect()->route('pacientes.editar', ['id' => $id, 'tab' => $tab])->with('status', 'Paciente actualizado correctamente');
     }
 
-
     // Marca a un paciente como inactivo (eliminado)
     public function eliminarPaciente($id)
     {
-        $paciente = Paciente::findOrFail($id);
+        $medicoId = Auth::id();
+        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
         $paciente->update(['activo' => 'no']);
 
         return redirect()->route('medico.dashboard')->with('status', 'Paciente eliminado correctamente');
@@ -239,17 +248,18 @@ class MedicoController extends Controller
     // Muestra todas las citas activas
     public function mostrarCitas()
     {
+        $medicoId = Auth::id();
         $citas = Citas::select('citas.*', 'pacientes.nombres', 'pacientes.apepat', 'pacientes.apemat')
                         ->join('pacientes', 'citas.pacienteid', '=', 'pacientes.id')
                         ->where('citas.activo', 'si')
+                        ->where('citas.medicoid', $medicoId)
                         ->get();
-
-        $pacientes = Paciente::where('activo', 'si')->get();
-        $usuarios = User::where('activo', 'si')->get();
-
-        return view('medico.citas.citas', compact('citas', 'pacientes', 'usuarios'));
+    
+        $pacientes = Paciente::where('activo', 'si')->where('medico_id', $medicoId)->get();
+    
+        return view('medico.citas.citas', compact('citas', 'pacientes'));
     }
-
+    
     // Guarda una nueva cita
     public function storeCitas(Request $request)
     {
@@ -259,7 +269,7 @@ class MedicoController extends Controller
             'hora' => 'required|date_format:H:i',
             'pacienteid' => 'required|exists:pacientes,id',
             'usuariomedicoid' => 'required|exists:users,id',
-            'motivo_consulta' => 'nullable|string|max:255' // Nuevo campo
+            'motivo_consulta' => 'nullable|string|max:255' // Asegúrate de que el campo esté aquí
         ]);
 
         // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
@@ -278,7 +288,7 @@ class MedicoController extends Controller
             'hora' => $request->hora,
             'pacienteid' => $request->pacienteid,
             'medicoid' => $request->usuariomedicoid,
-            'motivo_consulta' => $request->motivo_consulta // Nuevo campo
+            'motivo_consulta' => $request->motivo_consulta // Asegúrate de que el campo esté aquí
         ]);
 
         // Redirecciona a la vista de citas con un mensaje de éxito
@@ -288,18 +298,18 @@ class MedicoController extends Controller
     // Muestra el formulario para agregar una nueva cita
     public function crearCita()
     {
-        $pacientes = Paciente::where('activo', 'si')->get();
-        $usuarios = User::where('activo', 'si')->get();
-        return view('medico.citas.agregarCita', compact('pacientes', 'usuarios'));
+        $medicoId = Auth::id();
+        $pacientes = Paciente::where('activo', 'si')->where('medico_id', $medicoId)->get();
+        return view('medico.citas.agregarCita', compact('pacientes'));
     }
 
     // Muestra el formulario de edición de una cita específica
     public function editarCita($id)
     {
-        $cita = Citas::findOrFail($id);
-        $pacientes = Paciente::where('activo', 'si')->get();
-        $usuarios = User::where('activo', 'si')->get();
-        return view('medico.citas.editarCita', compact('cita', 'pacientes', 'usuarios'));
+        $medicoId = Auth::id();
+        $cita = Citas::where('id', $id)->where('medicoid', $medicoId)->firstOrFail();
+        $pacientes = Paciente::where('activo', 'si')->where('medico_id', $medicoId)->get();
+        return view('medico.citas.editarCita', compact('cita', 'pacientes'));
     }
 
     // Actualiza la información de una cita específica
@@ -322,7 +332,7 @@ class MedicoController extends Controller
             'motivo_consulta' => $request->motivo_consulta
         ]);
 
-        return redirect()->route('citas')->with('status');
+        return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
     }
 
     // Marca una cita como inactiva (eliminada)
@@ -331,7 +341,7 @@ class MedicoController extends Controller
         $cita = Citas::findOrFail($id);
         $cita->update(['activo' => 'no']);
 
-        return redirect()->route('citas')->with('status');
+        return redirect()->route('citas')->with('status', 'Cita eliminada correctamente');
     }
 
     // Elimina una cita de la base de datos
@@ -340,7 +350,7 @@ class MedicoController extends Controller
         $cita = Citas::findOrFail($id);
         $cita->delete();
 
-        return redirect()->route('citas')->with('status');
+        return redirect()->route('citas')->with('status', 'Cita borrada correctamente');
     }
 
     public function obtenerHorasDisponibles(Request $request)
@@ -420,7 +430,6 @@ class MedicoController extends Controller
         return redirect()->route('medicos')->with('status', 'Médico registrado correctamente');
     }
 
-
     // Muestra el formulario para agregar un nuevo médico
     public function crearMedico()
     {
@@ -465,7 +474,6 @@ class MedicoController extends Controller
         // Redirecciona a la vista de médicos con un mensaje de éxito
         return redirect()->route('medicos')->with('status', 'Médico actualizado correctamente');
     }
-
 
     // Marca a un médico como inactivo (eliminado)
     public function eliminarMedico($id)
@@ -593,7 +601,6 @@ class MedicoController extends Controller
         return redirect()->route('enfermeras')->with('status', 'Enfermera registrada correctamente');
     }
 
-
     // Muestra el formulario para agregar una nueva enfermera
     public function crearEnfermera()
     {
@@ -662,9 +669,8 @@ class MedicoController extends Controller
         $porcentajeMujeres = $totalSecretarias > 0 ? ($totalMujeres / $totalSecretarias) * 100 : 0;
         $porcentajeHombres = $totalSecretarias > 0 ? ($totalHombres / $totalSecretarias) * 100 : 0;
 
-        return view('medico.secretaria.secretarias', compact('secretarias', 'totalSecretarias', 'porcentajeMujeres', 'porcentajeHombres'));
+        return view('medico.Secretaria.secretarias', compact('secretarias', 'totalSecretarias', 'porcentajeMujeres', 'porcentajeHombres'));
     }
-
 
     // Guarda una nueva secretaria
     public function storeSecretarias(Request $request)
@@ -752,6 +758,3 @@ class MedicoController extends Controller
         return redirect()->route('secretarias')->with('status', 'Secretaria eliminada correctamente');
     }
 }
-
-
-

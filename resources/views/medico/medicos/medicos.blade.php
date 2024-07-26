@@ -179,14 +179,23 @@
             button.addEventListener('click', function(event) {
                 event.preventDefault();
                 const id = this.getAttribute('data-id');
-                fetch(`/medicos/${id}/edit`)
-                    .then(response => response.text())
+                fetch(`/medico/medicos/editar/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
                     .then(html => {
                         document.getElementById('formEditarMedico').innerHTML = html;
                         document.getElementById('modalEditar').classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
                     });
             });
         });
+
 
         document.getElementById('closeModalEditar').addEventListener('click', function() {
             document.getElementById('modalEditar').classList.add('hidden');

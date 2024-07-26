@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->hasMany(Citas::class, 'usuariomedicoid');
     }
 
+    public function pacientes()
+    {
+        return $this->hasMany(Paciente::class, 'medico_id');
+    }
+
     public function getFullNameAttribute()
     {
         return "Dr. {$this->nombres} {$this->apepat} {$this->apemat}";

@@ -40,7 +40,7 @@
                 </div>
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white hover-bg-custom custom-button" id="user-menu-button" aria-expanded="false">
-                        <span class="text-white hidden md:block mr-2">{{ Auth::user()->nombres }} {{ Auth::user()->apepat }} {{ Auth::user()->apemat }} @ {{ Auth::user()->telefono }}</span>
+                        <span class="text-white hidden md:block mr-2">{{ Auth::user()->nombres }} {{ Auth::user()->apepat }} {{ Auth::user()->apemat }}</span>
                         <img class="h-8 w-8 rounded-full" src="{{ asset('images/user-photo.jpg') }}" alt="">
                         <svg class="w-4 h-4 ml-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

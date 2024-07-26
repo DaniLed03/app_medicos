@@ -10,12 +10,7 @@ class Citas extends Model
     use HasFactory;
 
     protected $fillable = [
-        'fecha',
-        'hora',
-        'activo',
-        'motivo_consulta', // Nuevo campo
-        'pacienteid',
-        'medicoid'
+        'fecha', 'hora', 'pacienteid', 'medicoid', 'motivo_consulta', 'activo'
     ];
 
     public function paciente()

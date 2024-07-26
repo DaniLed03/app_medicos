@@ -13,7 +13,7 @@
                             <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
                                 {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}
                             </h2>
-                        </div>                       
+                        </div>
 
                         <!-- Número de Expediente -->
                         <div class="text-right">
@@ -122,7 +122,7 @@
                                             <x-input-error :messages="$errors->get('hora')" class="mt-2" />
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                                         <!-- Peso (kg) -->
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="pesoEditar" :value="__('Peso (kg)')" />
@@ -156,6 +156,13 @@
                                             <x-input-label for="hospitalEditar" :value="__('Hospital')" />
                                             <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital }}" disabled />
                                             <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Correo -->
+                                        <div class="mt-4">
+                                            <x-input-label for="correo" :value="__('Correo')" />
+                                            <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" value="{{ $paciente->correo }}" required autofocus autocomplete="email" disabled />
+                                            <x-input-error :messages="$errors->get('correo')" class="mt-2" />
                                         </div>
                                     </div>
                                     <div class="flex justify-end mt-4">
