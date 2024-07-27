@@ -40,10 +40,10 @@ class ConsultaController extends Controller
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
-            'circunferencia_cabeza' => 'nullable|string', // New field
+            'circunferencia_cabeza' => 'nullable|string', 
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
-            'recetas.*.receta' => 'required|string'
+            'recetas.*.receta' => 'required|string',
         ]);
 
         // Obtener el paciente desde la cita
@@ -59,19 +59,22 @@ class ConsultaController extends Controller
         $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
-        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza; // New field
+        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
         $consulta = Consultas::create($consultaData);
 
         // Guardar recetas
         if ($request->has('recetas')) {
-            foreach ($request->recetas as $receta) {
-                $consulta->recetas()->create($receta);
+            foreach ($request->recetas as $recetaData) {
+                ConsultaReceta::create([
+                    'consulta_id' => $consulta->id,
+                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
+                    'receta' => $recetaData['receta']
+                ]);
             }
         }
 
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
-
 
     public function createWithoutCita($pacienteId)
     {
@@ -100,6 +103,7 @@ class ConsultaController extends Controller
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
+            'circunferencia_cabeza' => 'nullable|string', 
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
             'recetas.*.receta' => 'required|string'
@@ -113,19 +117,22 @@ class ConsultaController extends Controller
         $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
-        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza; // New field
+        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
         $consulta = Consultas::create($consultaData);
 
         // Guardar recetas
         if ($request->has('recetas')) {
-            foreach ($request->recetas as $receta) {
-                $consulta->recetas()->create($receta);
+            foreach ($request->recetas as $recetaData) {
+                ConsultaReceta::create([
+                    'consulta_id' => $consulta->id,
+                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
+                    'receta' => $recetaData['receta']
+                ]);
             }
         }
 
         return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
     }
-
 
     public function index(Request $request)
     {
@@ -212,14 +219,17 @@ class ConsultaController extends Controller
 
         $consulta->recetas()->delete();
         if ($request->has('recetas')) {
-            foreach ($request->recetas as $receta) {
-                $consulta->recetas()->create($receta);
+            foreach ($request->recetas as $recetaData) {
+                ConsultaReceta::create([
+                    'consulta_id' => $consulta->id,
+                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
+                    'receta' => $recetaData['receta']
+                ]);
             }
         }
 
         return redirect()->route('consultas.index')->with('status', 'Consulta actualizada correctamente');
     }
-
 
     public function terminate($id)
     {

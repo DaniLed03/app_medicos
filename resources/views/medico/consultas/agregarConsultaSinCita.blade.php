@@ -1,188 +1,309 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Consulta Sin Cita</title>
-</head>
-<body>
-    <h1>Agregar Consulta Sin Cita</h1>
-
-    <h2>Información del Paciente</h2>
-    <p><strong>Nombre:</strong> {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</p>
-    <p><strong>Edad:</strong> 
-        <?php
-            $fecha_nacimiento = \Carbon\Carbon::parse($paciente->fechanac);
-            $edad = $fecha_nacimiento->diff(\Carbon\Carbon::now());
-            echo $edad->y . ' años, ' . $edad->m . ' meses, ' . $edad->d . ' días';
-        ?>
-    </p>
-    <p><strong>Género:</strong> {{ $paciente->genero }}</p>
-
-    @if ($errors->any())
-        <div>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ route('consultas.storeWithoutCita') }}" method="POST">
-        @csrf
-        <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
-        <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
-
-        <div>
-            <label for="hidden_talla">Talla:</label>
-            <input type="text" id="hidden_talla" name="hidden_talla">
-        </div>
-
-        <div>
-            <label for="hidden_temperatura">Temperatura:</label>
-            <input type="text" id="hidden_temperatura" name="hidden_temperatura">
-        </div>
-
-        <div>
-            <label for="hidden_saturacion_oxigeno">Saturación de Oxígeno:</label>
-            <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno">
-        </div>
-
-        <div>
-            <label for="hidden_frecuencia_cardiaca">Frecuencia Cardíaca:</label>
-            <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca">
-        </div>
-
-        <div>
-            <label for="hidden_peso">Peso:</label>
-            <input type="text" id="hidden_peso" name="hidden_peso">
-        </div>
-
-        <div>
-            <label for="hidden_tension_arterial">Tensión Arterial:</label>
-            <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial">
-        </div>
-
-        <div>
-            <label for="circunferencia_cabeza">Circunferencia de la Cabeza:</label>
-            <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza">
-        </div>
-
-        <div>
-            <label for="motivoConsulta">Motivo de la Consulta:</label>
-            <textarea id="motivoConsulta" name="motivoConsulta"></textarea>
-        </div>
-
-        <div>
-            <label for="notas_padecimiento">Notas del Padecimiento:</label>
-            <textarea id="notas_padecimiento" name="notas_padecimiento"></textarea>
-        </div>
-
-        <div>
-            <label for="interrogatorio_por_aparatos">Interrogatorio por Aparatos:</label>
-            <textarea id="interrogatorio_por_aparatos" name="interrogatorio_por_aparatos"></textarea>
-        </div>
-
-        <div>
-            <label for="examen_fisico">Examen Físico:</label>
-            <textarea id="examen_fisico" name="examen_fisico"></textarea>
-        </div>
-
-        <div>
-            <label for="diagnostico">Diagnóstico:</label>
-            <textarea id="diagnostico" name="diagnostico"></textarea>
-        </div>
-
-        <div>
-            <label for="plan">Plan:</label>
-            <textarea id="plan" name="plan"></textarea>
-        </div>
-
-        <div>
-            <label for="status">Estado:</label>
-            <select id="status" name="status">
-                <option value="en curso">En Curso</option>
-                <option value="finalizada">Finalizada</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="totalPagar">Total a Pagar:</label>
-            <input type="number" id="totalPagar" name="totalPagar">
-        </div>
-
-        <div id="recetas">
-            <h2>Recetas</h2>
-            <div class="receta">
-                <label for="tipo_de_receta">Tipo de Receta:</label>
-                <input type="text" name="recetas[0][tipo_de_receta]">
-
-                <label for="receta">Receta:</label>
-                <textarea name="recetas[0][receta]"></textarea>
+<x-app-layout>
+    <div class="bg-gray-100 min-h-screen flex justify-center items-center">
+        <div class="bg-white shadow-lg rounded-lg p-8 mx-4 my-8 w-full" style="max-width: 100%;">
+            <div class="flex justify-between items-center mb-6 border-b-2 pb-4">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
+                        {{ substr($paciente->nombres, 0, 1) }}{{ substr($paciente->apepat, 0, 1) }}
+                    </div>
+                    <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
+                        {{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}
+                    </h2>
+                </div>
+                <p class="text-lg font-medium">
+                    Edad: 
+                    <?php
+                        $fecha_nacimiento = \Carbon\Carbon::parse($paciente->fechanac);
+                        $edad = $fecha_nacimiento->diff(\Carbon\Carbon::now());
+                        echo $edad->y . ' años ' . $edad->m . ' meses ' . $edad->d . ' días';
+                    ?>
+                </p>
             </div>
-        </div>
 
-        <button type="button" id="addReceta">Agregar Receta</button>
-        <button type="submit">Guardar Consulta</button>
-    </form>
+            @if ($errors->any())
+                <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-    <script>
-        function getUnit(fieldName) {
-            switch (fieldName) {
-                case 'hidden_talla':
-                    return 'm';
-                case 'hidden_temperatura':
-                    return '°C';
-                case 'hidden_saturacion_oxigeno':
-                    return '%';
-                case 'hidden_frecuencia_cardiaca':
-                    return 'bpm';
-                case 'hidden_peso':
-                    return 'kg';
-                case 'hidden_tension_arterial':
-                    return 'mmHg';
-                default:
-                    return '';
-            }
-        }
+            <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
+                @csrf
+                <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
+                <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
+                <input type="hidden" name="status" value="en curso">
+                <input type="hidden" name="notas_padecimiento" value="">
+                <input type="hidden" name="interrogatorio_por_aparatos" value="">
+                <input type="hidden" name="examen_fisico" value="">
+                <input type="hidden" name="plan" value="">
 
-        document.querySelectorAll('input[type="text"]').forEach(input => {
-            input.addEventListener('blur', function () {
-                let unit = getUnit(this.name);
-                if (unit) {
-                    if (!this.value.includes(unit)) {
-                        this.value += ' ' + unit;
+                <div class="mb-6 grid md:grid-cols-3 gap-4">
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="hidden_talla" class="block text-sm font-medium text-gray-700">Talla</label>
+                                <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m">
+                            </div>
+                            <div>
+                                <label for="hidden_temperatura" class="block text-sm font-medium text-gray-700">Temperatura</label>
+                                <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C">
+                            </div>
+                            <div>
+                                <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
+                                <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%">
+                            </div>
+                            <div>
+                                <label for="hidden_frecuencia_cardiaca" class="block text-sm font-medium text-gray-700">Frecuencia Cardíaca</label>
+                                <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm">
+                            </div>
+                            <div>
+                                <label for="hidden_peso" class="block text-sm font-medium text-gray-700">Peso</label>
+                                <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg">
+                            </div>
+                            <div>
+                                <label for="hidden_tension_arterial" class="block text-sm font-medium text-gray-700">Tensión Arterial</label>
+                                <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg">
+                            </div>
+                            <div>
+                                <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Circunferencia de Cabeza</label>
+                                <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
+                        <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;"></textarea>
+                    </div>
+
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <label for="diagnostico" class="block text-sm font-medium text-gray-700">Diagnóstico</label>
+                        <textarea id="diagnostico" name="diagnostico" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <div class="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+                        <h3 class="text-lg font-medium mb-2">Recetas</h3>
+                        <button type="button" id="addReceta" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agregar Receta</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border rounded-lg">
+                            <thead>
+                                <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">No.Receta</th>
+                                    <th class="py-3 px-6 text-left">Tipo de Receta</th>
+                                    <th class="py-3 px-6 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recetas">
+                                <tr id="noRecetasMessage">
+                                    <td colspan="3" class="text-center py-3">No hay recetas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <label for="totalPagar" class="block text-sm font-medium text-gray-700">Total a Pagar</label>
+                        <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-full border rounded-md">
+                    </div>
+                </div>
+
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar Consulta</button>
+            </form>
+
+            <!-- Modal -->
+            <div id="modalReceta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
+                <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
+                    <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
+                    <div class="mb-4">
+                        <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
+                        <input type="text" id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label for="modalRecetaInput" class="block text-sm font-medium text-gray-700">Receta</label>
+                        <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Cancelar</button>
+                        <button id="saveReceta" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Modal -->
+            <div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
+                <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
+                    <h2 class="text-xl font-semibold mb-4">Previsualización de Receta</h2>
+                    <div id="previewContent" class="mb-4"></div>
+                    <div class="flex justify-end">
+                        <button id="closePreview" class="bg-gray-500 text-white px-4 py-2 rounded-md">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summernote CSS & JS -->
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+
+            <script>
+                document.getElementById('addReceta').addEventListener('click', function () {
+                    document.getElementById('modalTipoReceta').value = '';
+                    $('#modalRecetaInput').summernote({
+                        height: 300,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['strikethrough', 'superscript', 'subscript']],
+                            ['fontsize', ['fontsize']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']], // Add list options here
+                            ['height', ['height']]
+                        ]
+                    });
+                    document.getElementById('modalReceta').classList.remove('hidden');
+                    document.getElementById('saveReceta').setAttribute('data-edit-index', '');
+                });
+
+                document.getElementById('closeModal').addEventListener('click', function () {
+                    clearModalFields();
+                });
+
+                function clearModalFields() {
+                    document.getElementById('modalReceta').classList.add('hidden');
+                    $('#modalRecetaInput').summernote('destroy');
+                    document.getElementById('modalTipoReceta').value = '';
+                }
+
+                function saveReceta(clearModal) {
+                    let tipoReceta = document.getElementById('modalTipoReceta').value.trim();
+                    let receta = $('#modalRecetaInput').summernote('code').trim();
+                    let editIndex = document.getElementById('saveReceta').getAttribute('data-edit-index');
+
+                    if (tipoReceta && receta) {
+                        let recetasDiv = document.getElementById('recetas');
+                        let noRecetasMessage = document.getElementById('noRecetasMessage');
+
+                        if (noRecetasMessage) {
+                            noRecetasMessage.remove();
+                        }
+
+                        let newRecetaRow;
+                        if (editIndex === '') {
+                            let newRecetaIndex = recetasDiv.getElementsByClassName('receta').length;
+                            newRecetaRow = document.createElement('tr');
+                            newRecetaRow.classList.add('receta', 'bg-gray-100', 'border-b', 'border-gray-200');
+                            newRecetaRow.setAttribute('data-index', newRecetaIndex);
+
+                            newRecetaRow.innerHTML = `
+                                <td class="py-3 px-6 text-left whitespace-nowrap">${newRecetaIndex + 1}</td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${newRecetaIndex}][tipo_de_receta]" value="${tipoReceta}">${tipoReceta}
+                                </td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${newRecetaIndex}][receta]" value="${encodeURIComponent(receta)}">
+                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
+                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${newRecetaIndex}">Editar</button>
+                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                </td>
+                            `;
+                            recetasDiv.appendChild(newRecetaRow);
+                        } else {
+                            newRecetaRow = document.querySelector(`tr[data-index="${editIndex}"]`);
+                            newRecetaRow.innerHTML = `
+                                <td class="py-3 px-6 text-left whitespace-nowrap">${parseInt(editIndex) + 1}</td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${editIndex}][tipo_de_receta]" value="${tipoReceta}">${tipoReceta}
+                                </td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${editIndex}][receta]" value="${encodeURIComponent(receta)}">
+                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
+                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${editIndex}">Editar</button>
+                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                </td>
+                            `;
+                        }
+
+                        newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
+                            newRecetaRow.remove();
+                            if (recetasDiv.getElementsByClassName('receta').length === 0) {
+                                recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                            }
+                        });
+
+                        newRecetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
+                            const recetaContent = decodeURIComponent(this.dataset.receta);
+                            document.getElementById('previewContent').innerHTML = recetaContent;
+                            document.getElementById('previewModal').classList.remove('hidden');
+                        });
+
+                        newRecetaRow.querySelector('.editar-receta').addEventListener('click', function () {
+                            const recetaIndex = this.dataset.recetaIndex;
+                            const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
+                            const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
+                            
+                            document.getElementById('modalTipoReceta').value = tipoRecetaInput;
+                            $('#modalRecetaInput').summernote({
+                                height: 300,
+                                toolbar: [
+                                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                                    ['fontsize', ['fontsize']],
+                                    ['color', ['color']],
+                                    ['para', ['ul', 'ol', 'paragraph']],
+                                    ['height', ['height']]
+                                ]
+                            }).summernote('code', recetaInput);
+                            document.getElementById('modalReceta').classList.remove('hidden');
+                            document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
+                        });
+
+                        if (clearModal) {
+                            clearModalFields();
+                        }
+                    } else {
+                        alert('Por favor, complete todos los campos.');
                     }
                 }
-            });
-        });
 
-        document.getElementById('addReceta').addEventListener('click', function () {
-            let recetasDiv = document.getElementById('recetas');
-            let newRecetaIndex = recetasDiv.getElementsByClassName('receta').length;
+                document.getElementById('saveReceta').addEventListener('click', function () {
+                    saveReceta(true);
+                });
 
-            let newRecetaDiv = document.createElement('div');
-            newRecetaDiv.classList.add('receta');
+                document.getElementById('closePreview').addEventListener('click', function () {
+                    document.getElementById('previewModal').classList.add('hidden');
+                });
 
-            let tipoDeRecetaLabel = document.createElement('label');
-            tipoDeRecetaLabel.innerText = 'Tipo de Receta:';
-            newRecetaDiv.appendChild(tipoDeRecetaLabel);
+                document.querySelectorAll('.eliminar-receta').forEach(button => {
+                    button.addEventListener('click', function () {
+                        button.closest('tr').remove();
+                        if (document.getElementById('recetas').getElementsByClassName('receta').length === 0) {
+                            document.getElementById('recetas').innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                        }
+                    });
+                });
 
-            let tipoDeRecetaInput = document.createElement('input');
-            tipoDeRecetaInput.type = 'text';
-            tipoDeRecetaInput.name = 'recetas[' + newRecetaIndex + '][tipo_de_receta]';
-            newRecetaDiv.appendChild(tipoDeRecetaInput);
+                document.querySelectorAll('.previsualizar-receta').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const recetaContent = decodeURIComponent(this.dataset.receta);
+                        document.getElementById('previewContent').innerHTML = recetaContent;
+                        document.getElementById('previewModal').classList.remove('hidden');
+                    });
+                });
 
-            let recetaLabel = document.createElement('label');
-            recetaLabel.innerText = 'Receta:';
-            newRecetaDiv.appendChild(recetaLabel);
-
-            let recetaTextarea = document.createElement('textarea');
-            recetaTextarea.name = 'recetas[' + newRecetaIndex + '][receta]';
-            newRecetaDiv.appendChild(recetaTextarea);
-
-            recetasDiv.appendChild(newRecetaDiv);
-        });
-    </script>
-</body>
-</html>
+                document.getElementById('consultasForm').addEventListener('submit', function () {
+                    document.querySelectorAll('.receta input[name*="receta"]').forEach(function (input) {
+                        const recetaIndex = input.name.match(/recetas\[(\d+)\]/)[1];
+                        input.value = decodeURIComponent(input.value);  // Decodifica el contenido antes de enviar
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</x-app-layout>
