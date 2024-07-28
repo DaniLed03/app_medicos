@@ -174,12 +174,6 @@ class ConsultaController extends Controller
     
         return view('medico.consultas.consultas', compact('consultas', 'monthName', 'totalConsultas', 'totalFacturacion'));
     }
-    
-    public function show($id)
-    {
-        $consulta = Consultas::with('cita.paciente', 'usuarioMedico')->findOrFail($id);
-        return view('medico.consultas.show', compact('consulta'));
-    }
 
     public function edit($id)
     {
@@ -191,6 +185,19 @@ class ConsultaController extends Controller
             return view('medico.consultas.editarConsultaSinCita', compact('consulta'));
         }
     }
+
+    public function print($id)
+    {
+        $consulta = Consultas::with('cita.paciente', 'usuarioMedico')->findOrFail($id);
+        return view('medico.consultas.print', compact('consulta'));
+    }
+
+    public function show($id)
+    {
+        $consulta = Consultas::with(['cita.paciente', 'recetas', 'usuarioMedico'])->findOrFail($id);
+        return view('medico.consultas.verConsulta', compact('consulta'));
+    }
+
 
     public function update(Request $request, $id)
     {

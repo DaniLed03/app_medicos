@@ -7,6 +7,7 @@ use App\Models\Productos;
 use App\Models\User;
 use App\Models\Citas;
 use App\Models\Servicio;
+use App\Models\Consultas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -51,6 +52,17 @@ class MedicoController extends Controller
         ]);
 
         return redirect()->route('medico.dashboard')->with('status', 'Paciente creado con éxito');
+    }
+
+    public function showPaciente($id)
+    {
+        $medicoId = Auth::id();
+        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
+        
+        // Obtener las consultas del paciente con el mismo doctor
+        $consultas = Consultas::where('pacienteid', $id)->where('usuariomedicoid', $medicoId)->get();
+
+        return view('medico.pacientes.verPaciente', compact('paciente', 'consultas'));
     }
 
     public function storePacientesDesdeModal(Request $request)
@@ -118,8 +130,13 @@ class MedicoController extends Controller
     {
         $medicoId = Auth::id();
         $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
-        return view('medico.pacientes.editarPaciente', compact('paciente'));
-    }    
+        
+        // Obtener las consultas del paciente con el mismo doctor
+        $consultas = Consultas::where('pacienteid', $id)->where('usuariomedicoid', $medicoId)->get();
+
+        return view('medico.pacientes.editarPaciente', compact('paciente', 'consultas'));
+    }
+ 
 
     public function updatePaciente(Request $request, $id)
     {

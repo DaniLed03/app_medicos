@@ -303,6 +303,25 @@
                         input.value = decodeURIComponent(input.value);  // Decodifica el contenido antes de enviar
                     });
                 });
+
+                // Add unit validation on blur event for vital signs fields
+                const vitalSignsFields = {
+                    'hidden_talla': 'm',
+                    'hidden_temperatura': '°C',
+                    'hidden_saturacion_oxigeno': '%',
+                    'hidden_frecuencia_cardiaca': 'bpm',
+                    'hidden_peso': 'kg',
+                    'hidden_tension_arterial': 'mmHg',
+                    'circunferencia_cabeza': 'cm'
+                };
+
+                for (const [fieldId, unit] of Object.entries(vitalSignsFields)) {
+                    document.getElementById(fieldId).addEventListener('blur', function () {
+                        if (this.value && !this.value.endsWith(unit)) {
+                            this.value += ` ${unit}`;
+                        }
+                    });
+                }
             </script>
         </div>
     </div>

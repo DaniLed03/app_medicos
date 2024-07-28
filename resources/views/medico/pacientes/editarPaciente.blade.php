@@ -37,6 +37,9 @@
                         <li class="mr-1">
                             <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Datos de Facturación</a>
                         </li>
+                        <li class="mr-1">
+                            <a class="tab-link" href="#historial" onclick="openTab(event, 'historial')">Historial</a>
+                        </li>
                     </ul>
 
                     <!-- Tab Content -->
@@ -354,6 +357,38 @@
                             </div>
                         </form>
                     </div>
+
+                    <div id="historial" class="tab-content hidden mt-3">
+                        <!-- Historial de Consultas -->
+                        <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
+                            <h3 class="text-lg font-semibold mb-4">Historial de Consultas</h3>
+                            <div class="overflow-x-auto">
+                                <table id="historialTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden display nowrap">
+                                    <thead class="bg-[#2D7498] text-white">
+                                        <tr>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Motivo</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Doctor</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-700">
+                                        @foreach($consultas as $consulta)
+                                            <tr>
+                                                <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d M, Y h:i A') }}</td>
+                                                <td class="text-left py-3 px-4">{{ $consulta->motivoConsulta }}</td>
+                                                <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
+                                                <td class="text-left py-3 px-4">
+                                                    <a href="{{ route('consultas.show', $consulta->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
+                                                    <a href="{{ route('consultas.print', $consulta->id) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Imprimir</a>
+                                                </td>                                                
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -362,6 +397,14 @@
     <!-- Summernote CSS & JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+
+    <!-- DataTables CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Ensure jQuery is included -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         .tab-link {
@@ -380,6 +423,11 @@
 
         .tab-link:hover {
             font-weight: bold;
+        }
+
+        .dataTables_wrapper .dataTables_scrollBody {
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
     </style>
 
@@ -466,6 +514,44 @@
             const urlParams = new URLSearchParams(window.location.search);
             const tab = urlParams.get('tab') || 'datos';
             openTab({currentTarget: document.querySelector(`[href="#${tab}"]`)}, tab);
+
+            $('#historialTable').DataTable({
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay consultas registradas",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "lengthMenu": "Mostrar _MENU_ entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                "paging": true,
+                "searching": true,
+                "info": true,
+                "scrollX": false,
+                "autoWidth": true,
+                "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+                "columnDefs": [
+                    {
+                        "targets": 0,
+                        "width": "20%"
+                    },
+                    {
+                        "targets": 3,
+                        "width": "20%",
+                        "orderable": false
+                    }
+                ]
+            });
         });
     </script>
 </x-app-layout>

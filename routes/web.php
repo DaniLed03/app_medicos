@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/pacientes', [MedicoController::class, 'mostrarPacientes'])->name('pacientes.index');
     Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
     Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
+    Route::get('/pacientes/{id}', [MedicoController::class, 'showPaciente'])->name('pacientes.show');
 
     // Rutas de Productos
     Route::get('/medico/productos/agregar', [MedicoController::class, 'crearProducto'])->name('productos.agregar');
@@ -73,7 +74,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/medico/servicios/eliminar/{id}', [MedicoController::class, 'eliminarServicio'])->name('servicios.eliminar');
     Route::get('/servicios/{id}/editar', [MedicoController::class, 'editarServicio'])->name('servicios.editar');
 
-
     // Rutas de Consultas
     Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');
     Route::post('/consultas/agregar', [ConsultaController::class, 'store'])->name('consultas.store');
@@ -84,7 +84,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('consultas/{id}/terminate', [ConsultaController::class, 'terminate'])->name('consultas.terminate');
     Route::get('/consultas/crear-sin-cita/{pacienteId}', [ConsultaController::class, 'createWithoutCita'])->name('consultas.createWithoutCita');
     Route::post('/consultas/crear-sin-cita', [ConsultaController::class, 'storeWithoutCita'])->name('consultas.storeWithoutCita');
-    
+    Route::get('consultas/{consulta}/print', [ConsultaController::class, 'print'])->name('consultas.print');
+    Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
+
     // Rutas de enfermeras
     Route::get('/enfermeras', [MedicoController::class, 'mostrarEnfermeras'])->name('enfermeras');
     Route::get('/enfermeras/create', [MedicoController::class, 'crearEnfermera'])->name('enfermeras.create');
