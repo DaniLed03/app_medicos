@@ -6,13 +6,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Clase User que representa a un usuario en el sistema.
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
         'nombres',    // Nombres del usuario
@@ -20,7 +21,6 @@ class User extends Authenticatable
         'apemat',     // Apellido materno del usuario
         'fechanac',   // Fecha de nacimiento del usuario
         'telefono',   // Teléfono del usuario
-        'rol',        // Rol del usuario (ej. admin, doctor, paciente)
         'sexo',
         'activo',     // Estado del usuario (activo o inactivo)
         'email',      // Correo electrónico del usuario

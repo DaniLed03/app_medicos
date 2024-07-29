@@ -35,8 +35,7 @@ class RegisteredUserController extends Controller
             'apemat' => ['required', 'string', 'max:100'],
             'fechanac' => ['required', 'date'],
             'telefono' => ['required', 'string', 'max:20'],
-            'rol' => ['required', 'in:medico,secretaria,enfermera'],
-            'sexo' => ['required', 'in:masculino,femenino'], // Nueva validación
+            'sexo' => ['required', 'in:masculino,femenino'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -47,8 +46,7 @@ class RegisteredUserController extends Controller
             'apemat' => $request->apemat,
             'fechanac' => $request->fechanac,
             'telefono' => $request->telefono,
-            'rol' => $request->rol,
-            'sexo' => $request->sexo, // Nuevo campo
+            'sexo' => $request->sexo,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

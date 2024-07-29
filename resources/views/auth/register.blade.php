@@ -1,5 +1,3 @@
-register.blade.php
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,19 +78,6 @@ register.blade.php
                                 <input type="number" id="telefono" name="telefono" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Teléfono" required value="{{ old('telefono') }}" />
                             </div>
                             @error('telefono')
-                                <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="flex flex-col pt-4">
-                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
-                                <select id="rol" name="rol" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
-                                    <option value="medico" {{ old('rol') == 'medico' ? 'selected' : '' }}>Médico</option>
-                                    <option value="secretaria" {{ old('rol') == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
-                                    <option value="enfermera" {{ old('rol') == 'enfermera' ? 'selected' : '' }}>Enfermera</option>
-                                </select>
-                            </div>
-                            @error('rol')
                                 <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
                             @enderror
                         </div>

@@ -63,10 +63,8 @@
                 @include('layouts.navigationSecretaria')
             @elseif (Auth::user()->rol == 'medico')
                 @include('layouts.navigationMedico')
-            @endif
-        @else
-            @if (request()->route()->getName() != 'welcome')
-                @include('layouts.navigationMedico')
+            @else
+                @include('layouts.navigationAdmin')
             @endif
         @endauth
 

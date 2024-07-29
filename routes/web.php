@@ -4,6 +4,10 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\MedicoController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\AsignarController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Ruta de la página de bienvenida
@@ -20,6 +24,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    
+    Route::get('/usuarios', [AsignarController::class, 'index'])->name('users.index');
+    Route::get('/usuarios/{id}/edit', [AsignarController::class, 'edit'])->name('users.edit');
+    Route::patch('/usuarios/{id}', [AsignarController::class, 'update'])->name('users.update');
+    Route::post('/usuarios', [AsignarController::class, 'store'])->name('users.store');
+    Route::delete('/{id}', [AsignarController::class, 'destroy'])->name('users.destroy');
+
+    // Rutas para gestionar roles
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::patch('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Rutas para gestionar permisos
+    Route::get('/permisos', [PermissionController::class, 'index'])->name('permisos.index');
+    Route::post('/permisos', [PermissionController::class, 'store'])->name('permisos.store');
+    Route::delete('/permisos/{permission}', [PermissionController::class, 'destroy'])->name('permisos.destroy');
     
     // Rutas del perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -401,7 +401,7 @@ class MedicoController extends Controller
     // Muestra todos los médicos activos
     public function mostrarMedicos()
     {
-        $medicos = User::where('rol', 'medico')->where('activo', 'si')->get();
+        $medicos = User::role('medico')->where('activo', 'si')->get();
         $totalMedicos = $medicos->count();
         $totalMujeres = $medicos->where('sexo', 'femenino')->count();
         $totalHombres = $medicos->where('sexo', 'masculino')->count();
@@ -428,7 +428,7 @@ class MedicoController extends Controller
         ]);
 
         // Creación del médico con cifrado de la contraseña
-        User::create([
+        $user = User::create([
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
@@ -436,9 +436,10 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => 'medico',
             'sexo' => $request->sexo, // Nuevo campo
         ]);
+
+        $user->assignRole('medico');
 
         // Redirecciona a la vista de médicos con un mensaje de éxito
         return redirect()->route('medicos')->with('status', 'Médico registrado correctamente');
@@ -572,7 +573,7 @@ class MedicoController extends Controller
     // Muestra todas las enfermeras activas
     public function mostrarEnfermeras()
     {
-        $enfermeras = User::where('rol', 'enfermera')->where('activo', 'si')->get();
+        $enfermeras = User::role('enfermera')->where('activo', 'si')->get();
         $totalEnfermeras = $enfermeras->count();
         $totalMujeres = $enfermeras->where('sexo', 'femenino')->count();
         $totalHombres = $enfermeras->where('sexo', 'masculino')->count();
@@ -599,7 +600,7 @@ class MedicoController extends Controller
         ]);
 
         // Creación de la enfermera con cifrado de la contraseña
-        User::create([
+        $user = User::create([
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
@@ -607,9 +608,10 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => 'enfermera',
             'sexo' => $request->sexo, // Nuevo campo
         ]);
+
+        $user->assignRole('enfermera');
 
         // Redirecciona a la vista de enfermeras con un mensaje de éxito
         return redirect()->route('enfermeras')->with('status', 'Enfermera registrada correctamente');
@@ -675,7 +677,7 @@ class MedicoController extends Controller
     // Muestra todas las secretarias activas
     public function mostrarSecretarias()
     {
-        $secretarias = User::where('rol', 'secretaria')->where('activo', 'si')->get();
+        $secretarias = User::role('secretaria')->where('activo', 'si')->get();
         $totalSecretarias = $secretarias->count();
         $totalMujeres = $secretarias->where('sexo', 'femenino')->count();
         $totalHombres = $secretarias->where('sexo', 'masculino')->count();
@@ -702,7 +704,7 @@ class MedicoController extends Controller
         ]);
 
         // Creación de la secretaria con cifrado de la contraseña
-        User::create([
+        $user = User::create([
             'nombres' => $request->nombres,
             'apepat' => $request->apepat,
             'apemat' => $request->apemat,
@@ -710,9 +712,10 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => 'secretaria',
             'sexo' => $request->sexo,
         ]);
+
+        $user->assignRole('secretaria');
 
         // Redirecciona a la vista de secretarias con un mensaje de éxito
         return redirect()->route('secretarias')->with('status', 'Secretaria registrada correctamente');
