@@ -24,14 +24,14 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="pacienteid" class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+            <label for="persona_id" class="block text-sm font-medium text-gray-700 mb-1">Persona</label>
             <div class="flex items-center">
-                <select name="pacienteid" id="paciente" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    @foreach($pacientes as $paciente)
-                        <option value="{{ $paciente->id }}">{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</option>
+                <select name="persona_id" id="persona" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                    @foreach($personas as $persona)
+                        <option value="{{ $persona->id }}">{{ $persona->nombres }} {{ $persona->apepat }} {{ $persona->apemat }}</option>
                     @endforeach
                 </select>
-                <button type="button" class="ml-2 bg-button-color text-white p-2 rounded-md" @click="isPacienteModalOpen = true">+</button>
+                <button type="button" class="ml-2 bg-button-color text-white p-2 rounded-md" @click="isPersonaModalOpen = true">+</button>
             </div>
         </div>
         <div class="form-group" hidden>
@@ -48,6 +48,7 @@
         </div>
     </form>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

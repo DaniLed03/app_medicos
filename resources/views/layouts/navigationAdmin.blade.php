@@ -44,13 +44,13 @@
                         @role('Administrador')
                             ADMINISTRADOR
                         @endrole
-                        @role('medico')
+                        @role('Medico')
                             MÉDICO
                         @endrole
-                        @role('enfermera')
+                        @role('Enfermera')
                             ENFERMERA
                         @endrole
-                        @role('secretaria')
+                        @role('Secretaria')
                             SECRETARIA
                         @endrole
                     </span>
@@ -144,26 +144,11 @@
                     @can('Vista Pacientes')
                         <a href="{{ route('medico.dashboard') }}" class="block text-white {{ request()->routeIs('medico.dashboard') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Pacientes</a>
                     @endcan
-                    @can('Vista Medicos')
-                        <a href="{{ route('medicos') }}" class="block text-white {{ request()->routeIs('medicos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Médicos</a>
-                    @endcan
-                    @can('Vista Enfermeras')
-                        <a href="{{ route('enfermeras') }}" class="block text-white {{ request()->routeIs('enfermeras') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Enfermeras</a>
-                    @endcan
-                    @can('Vista Secretarias')
-                        <a href="{{ route('secretarias') }}" class="block text-white {{ request()->routeIs('secretarias') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Secretarias</a>
-                    @endcan
                     @can('Vista Citas')
                         <a href="{{ route('citas') }}" class="block text-white {{ request()->routeIs('citas') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Citas</a>
                     @endcan
                     @can('Vista Consultas')
                         <a href="{{ route('consultas.index') }}" class="block text-white {{ request()->routeIs('consultas.index') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Consultas</a>
-                    @endcan
-                    @can('Vista Servicios')
-                        <a href="{{ route('servicios') }}" class="block text-white {{ request()->routeIs('servicios') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Servicios</a>
-                    @endcan
-                    @can('Vista Productos')
-                        <a href="{{ route('productos') }}" class="block text-white {{ request()->routeIs('productos') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Productos</a>
                     @endcan
                     @can('Vista Roles')
                         <a href="{{ route('roles.index') }}" class="block text-white {{ request()->routeIs('roles.index') ? 'bg-[#33AD9B]' : '' }} hover:bg-[#33AD9B] hover:text-white px-3 py-2 rounded-md text-base font-medium">Roles</a>

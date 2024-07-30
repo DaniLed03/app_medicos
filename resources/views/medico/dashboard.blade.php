@@ -84,6 +84,17 @@
         </div>
     </div>
 
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                title: 'Error!',
+                text: "{{ session('error') }}",
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
+
     <!-- Modal Agregar -->
     <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen">
@@ -103,7 +114,7 @@
                     </div>
                     <div class="border-t border-gray-200 mt-4"></div>
                     <div class="mt-2">
-                        <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
+                        <form method="POST" action="{{ route('pacientes.storeDesdeModal') }}" id="addPacienteForm">
                             @csrf
                             <!-- Nombres -->
                             <div class="mt-4">
@@ -189,6 +200,7 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
     $(document).ready(function() {
@@ -229,6 +241,16 @@
         document.getElementById('closeModal').addEventListener('click', function() {
             document.getElementById('modal').classList.add('hidden');
         });
+
+        @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "{{ session('error') }}",
+            });
+        </script>
+        @endif
 
         document.querySelectorAll('.edit-button').forEach(button => {
             button.addEventListener('click', function(event) {

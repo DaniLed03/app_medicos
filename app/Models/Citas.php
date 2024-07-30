@@ -10,12 +10,12 @@ class Citas extends Model
     use HasFactory;
 
     protected $fillable = [
-        'fecha', 'hora', 'pacienteid', 'medicoid', 'motivo_consulta', 'activo'
+        'fecha', 'hora', 'persona_id', 'medicoid', 'motivo_consulta', 'activo'
     ];
 
-    public function paciente()
+    public function persona()
     {
-        return $this->belongsTo(Paciente::class, 'pacienteid');
+        return $this->belongsTo(Persona::class, 'persona_id');
     }
 
     public function medico()
@@ -26,5 +26,10 @@ class Citas extends Model
     public function consultas()
     {
         return $this->hasMany(Consultas::class, 'citai_id');
+    }
+
+    public function paciente()
+    {
+        return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 }

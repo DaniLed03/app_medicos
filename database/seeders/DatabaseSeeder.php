@@ -36,7 +36,7 @@ class UsersTableSeeder extends Seeder
                 'sexo' => 'masculino',
                 'activo' => 'si',
                 'email' => '2130147@upv.edu.mx',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('D4n13l2003'),
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -50,6 +50,9 @@ class RolesTableSeeder extends Seeder
     {
         DB::table('roles')->insert([
             ['id' => 1, 'name' => 'Administrador', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'name' => 'Medico', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 3, 'name' => 'Enfermera', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 4, 'name' => 'Secretaria', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
@@ -94,9 +97,6 @@ class ModelHasRolesTableSeeder extends Seeder
     {
         DB::table('model_has_roles')->insert([
             ['role_id' => 1, 'model_type' => 'App\Models\User', 'model_id' => 1],
-            ['role_id' => 2, 'model_type' => 'App\Models\User', 'model_id' => 2],
-            ['role_id' => 3, 'model_type' => 'App\Models\User', 'model_id' => 3],
-            ['role_id' => 4, 'model_type' => 'App\Models\User', 'model_id' => 4],
         ]);
     }
 }

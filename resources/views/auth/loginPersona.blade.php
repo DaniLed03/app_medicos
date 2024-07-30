@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login Persona</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .gradient-text {
@@ -23,19 +23,19 @@
                 </p>
                 <p class="mt-6 text-center font-medium md:text-left">Inicia sesión en tu cuenta a continuación.</p>
       
-                <form method="POST" action="{{ route('login') }}" class="flex flex-col items-stretch pt-3 md:pt-8">
+                <form method="POST" action="{{ route('persona.login') }}" class="flex flex-col items-stretch pt-3 md:pt-8">
                     @csrf
                     <div class="flex flex-col pt-4">
                         <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
-                            <input type="email" id="login-email" name="email" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Correo electrónico" required />
+                            <input type="email" id="correo" name="correo" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Correo electrónico" required />
                         </div>
-                        @error('email')
+                        @error('correo')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="mb-4 flex flex-col pt-4">
                         <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
-                            <input type="password" id="login-password" name="password" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Contraseña" />
+                            <input type="password" id="password" name="password" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Contraseña" required />
                         </div>
                         @error('password')
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>

@@ -107,8 +107,15 @@ return [
     'uuid' => 'El :attribute debe ser un UUID válido.',
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'email' => [
+            'required' => 'El campo correo electrónico es obligatorio.',
+            'email' => 'El correo electrónico debe ser una dirección válida.',
+            'failed' => 'Estas credenciales no coinciden con nuestros registros.',
+        ],
+        'password' => [
+            'required' => 'El campo contraseña es obligatorio.',
+            'string' => 'La contraseña debe ser una cadena de caracteres.',
+            'password_not_required' => 'La contraseña no es requerida para este usuario.',
         ],
     ],
 
@@ -121,6 +128,8 @@ return [
         'rol' => 'rol',
         'email' => 'correo electrónico',
         'password' => 'contraseña',
+        'password_confirmation' => 'confirmación de contraseña',
+        'current_password' => 'contraseña actual',
         'password_confirmation' => 'confirmación de contraseña',
     ],
 ];

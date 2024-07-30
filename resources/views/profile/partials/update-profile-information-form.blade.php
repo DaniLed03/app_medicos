@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+            {{ __('Información del Perfil') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Actualiza la información del perfil y la dirección de correo electrónico de tu cuenta.") }}
         </p>
     </header>
 
@@ -19,71 +19,52 @@
 
         <div>
             <x-input-label for="nombres" :value="__('Nombres')" />
-            <x-text-input id="nombres" name="nombres" type="text" class="mt-1 block w-full" :value="old('nombres', $user->nombres)" required autofocus autocomplete="nombres" />
+            <x-text-input id="nombres" name="nombres" type="text" class="mt-1 block w-full" :value="old('nombres', $user->nombres)" autofocus autocomplete="nombres" />
             <x-input-error class="mt-2" :messages="$errors->get('nombres')" />
         </div>
 
         <div>
             <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-            <x-text-input id="apepat" name="apepat" type="text" class="mt-1 block w-full" :value="old('apepat', $user->apepat)" required autocomplete="apepat" />
+            <x-text-input id="apepat" name="apepat" type="text" class="mt-1 block w-full" :value="old('apepat', $user->apepat)" autocomplete="apepat" />
             <x-input-error class="mt-2" :messages="$errors->get('apepat')" />
         </div>
 
         <div>
             <x-input-label for="apemat" :value="__('Apellido Materno')" />
-            <x-text-input id="apemat" name="apemat" type="text" class="mt-1 block w-full" :value="old('apemat', $user->apemat)" required autocomplete="apemat" />
+            <x-text-input id="apemat" name="apemat" type="text" class="mt-1 block w-full" :value="old('apemat', $user->apemat)" autocomplete="apemat" />
             <x-input-error class="mt-2" :messages="$errors->get('apemat')" />
         </div>
 
         <div>
             <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-            <x-text-input id="fechanac" name="fechanac" type="date" class="mt-1 block w-full" :value="old('fechanac', $user->fechanac)" required autocomplete="bday" />
+            <x-text-input id="fechanac" name="fechanac" type="date" class="mt-1 block w-full" :value="old('fechanac', $user->fechanac)" autocomplete="bday" />
             <x-input-error class="mt-2" :messages="$errors->get('fechanac')" />
         </div>
 
         <div>
             <x-input-label for="telefono" :value="__('Teléfono')" />
-            <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $user->telefono)" required autocomplete="tel" />
+            <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $user->telefono)" autocomplete="tel" />
             <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
         </div>
 
         <div>
-            <x-input-label for="rol" :value="__('Rol')" />
-            <select id="rol" name="rol" class="mt-1 block w-full" required>
-                <option value="medico" {{ old('rol', $user->rol) == 'medico' ? 'selected' : '' }}>Médico</option>
-                <option value="secretaria" {{ old('rol', $user->rol) == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
-                <option value="colaborador" {{ old('rol', $user->rol) == 'colaborador' ? 'selected' : '' }}>Colaborador</option>
-            </select>
-            <x-input-error class="mt-2" :messages="$errors->get('rol')" />
-        </div>
-
-        <div>
-            <x-input-label for="activo" :value="__('Activo')" />
-            <select id="activo" name="activo" class="mt-1 block w-full" required>
-                <option value="si" {{ old('activo', $user->activo) == 'si' ? 'selected' : '' }}>Sí</option>
-                <option value="no" {{ old('activo', $user->activo) == 'no' ? 'selected' : '' }}>No</option>
-            </select>
-            <x-input-error class="mt-2" :messages="$errors->get('activo')" />
-        </div>
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" :value="__('Correo Electrónico')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
                     <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
+                        {{ __('Tu dirección de correo electrónico no está verificada.') }}
 
                         <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
+                            {{ __('Haz clic aquí para reenviar el correo de verificación.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
+                            {{ __('Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.') }}
                         </p>
                     @endif
                 </div>
@@ -91,7 +72,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('Guardar') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -100,7 +81,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                >{{ __('Guardado.') }}</p>
             @endif
         </div>
     </form>

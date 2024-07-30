@@ -15,11 +15,14 @@ return new class extends Migration
             $table->string('apemat', 100);
             $table->date('fechanac');
             $table->string('telefono', 20);
-            $table->enum('sexo', ['masculino', 'femenino']); 
+            $table->enum('sexo', ['masculino', 'femenino']);
             $table->enum('activo', ['si', 'no'])->default('si');
             $table->string('email')->unique();
             $table->string('password');
+            $table->unsignedBigInteger('medico_id')->nullable();
             $table->timestamps();
+
+            $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

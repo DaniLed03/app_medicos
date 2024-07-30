@@ -13,15 +13,15 @@
                                             Cita
                                         </div>
                                         <div class="p-4">
-                                            <!-- Datos del Paciente -->
+                                            <!-- Datos de la Persona -->
                                             <div class="flex items-center mb-6">
                                                 <!-- Icono con iniciales -->
                                                 <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
-                                                    {{ substr($cita->paciente->nombres, 0, 1) }}{{ substr($cita->paciente->apepat, 0, 1) }}
+                                                    {{ substr($cita->persona->nombres, 0, 1) }}{{ substr($cita->persona->apepat, 0, 1) }}
                                                 </div>
-                                                <!-- Nombre del paciente -->
+                                                <!-- Nombre de la persona -->
                                                 <h2 class="text-3xl font-bold text-left ml-4" style="color: black;">
-                                                    {{ $cita->paciente->nombres }} {{ $cita->paciente->apepat }} {{ $cita->paciente->apemat }}
+                                                    {{ $cita->persona->nombres }} {{ $cita->persona->apepat }} {{ $cita->persona->apemat }}
                                                 </h2>
                                             </div>
 
@@ -47,7 +47,7 @@
                                                     </div>
                                                 </div>
 
-                                                <input type="hidden" name="pacienteid" value="{{ $cita->pacienteid }}">
+                                                <input type="hidden" name="persona_id" value="{{ $cita->persona_id }}">
 
                                                 <div class="form-group">
                                                     <label for="usuariomedico" class="block text-sm font-medium text-gray-700">Usuario Médico</label>
@@ -60,7 +60,6 @@
                                                 </div>
                                                 <div class="flex justify-end">
                                                     <button type="button" class="bg-blue-500 text-white p-2 rounded-md mr-2" onclick="confirmUpdate()">Actualizar Cita</button>
-                                                    <a href="{{ route('consultas.create', ['citaId' => $cita->id]) }}" class="bg-green-500 text-white p-2 rounded-md mr-2">Añadir Consulta</a>
                                                     <button type="button" class="bg-red-500 text-white p-2 rounded-md" onclick="confirmDelete()">Borrar Cita</button>
                                                 </div>
                                             </form>

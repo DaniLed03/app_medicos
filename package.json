@@ -25,6 +25,7 @@
         "ckeditor5-premium-features": "^42.0.1",
         "datatables.net": "^2.0.8",
         "datatables.net-dt": "^2.0.8",
+        "froala-editor": "^4.2.1",
         "sweetalert2": "^11.12.2"
     }
 }

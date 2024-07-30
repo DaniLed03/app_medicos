@@ -3,6 +3,31 @@
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <div class="flex justify-center items-center mb-4 space-x-2">
+                        <button id="firstConsultation" class="bg-gray-300 text-black px-4 py-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                            </svg>
+                        </button>
+                        <button id="prevConsultation" class="bg-gray-300 text-black px-4 py-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-compact-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M9.224 1.553a.5.5 0 0 1 .223.67L6.56 8l2.888 5.776a.5.5 0 1 1-.894.448l-3-6a.5.5 0 0 1 0-.448l3-6a.5.5 0 0 1 .67-.223"/>
+                            </svg>
+                        </button>
+                        <h3 id="consultationDate" class="text-xl font-medium">Fecha de Consulta: </h3>
+                        <button id="nextConsultation" class="bg-gray-300 text-black px-4 py-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-compact-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671"/>
+                            </svg>
+                        </button>
+                        <button id="lastConsultation" class="bg-gray-300 text-black px-4 py-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708"/>
+                                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708"/>
+                            </svg>
+                        </button>
+                    </div>
                     <div id="consultaModal" class="flex flex-col items-center">
                         <div class="bg-white rounded-lg shadow-lg p-6 w-full">
                             <div class="flex justify-between items-center mb-6 border-b-2 pb-4">
@@ -101,38 +126,28 @@
             const closeModalButton = $('#closeModal');
 
             // Get the consultation data from the URL
-            const consultaData = @json($consulta);
+            let consultaData = @json($consulta);
+            let pacienteData = @json($paciente);
             
             // Populate modal with consultation data
-            $('#modalPacienteInitials').text(consultaData.cita.paciente.nombres.charAt(0) + consultaData.cita.paciente.apepat.charAt(0));
-            $('#modalPacienteName').text(`${consultaData.cita.paciente.nombres} ${consultaData.cita.paciente.apepat} ${consultaData.cita.paciente.apemat}`);
-            $('#modalPacienteAge').text(`Edad: ${calculateAge(consultaData.cita.paciente.fechanac)}`);
-            $('#modalTalla').val(consultaData.talla);
-            $('#modalTemperatura').val(consultaData.temperatura);
-            $('#modalSaturacionOxigeno').val(consultaData.saturacion_oxigeno);
-            $('#modalFrecuenciaCardiaca').val(consultaData.frecuencia_cardiaca);
-            $('#modalPeso').val(consultaData.peso);
-            $('#modalTensionArterial').val(consultaData.tension_arterial);
-            $('#modalCircunferenciaCabeza').val(consultaData.circunferencia_cabeza);
-            $('#modalMotivoConsulta').val(consultaData.motivoConsulta);
-            $('#modalDiagnostico').val(consultaData.diagnostico);
-            $('#modalTotalPagar').val(consultaData.totalPagar);
+            populateModal(consultaData, pacienteData);
 
-            // Populate recetas
-            const recetasTbody = $('#modalRecetas');
-            recetasTbody.html('');
-            consultaData.recetas.forEach((receta, index) => {
-                recetasTbody.append(`
-                    <tr>
-                        <td class="py-3 px-6 text-left whitespace-nowrap">${index + 1}</td>
-                        <td class="py-3 px-6 text-left">${receta.tipo_de_receta}</td>
-                        <td class="py-3 px-6 text-left">${receta.receta}</td>
-                    </tr>
-                `);
+            // Navigation buttons functionality
+            $('#firstConsultation').on('click', function() {
+                navigateConsultation('first');
+            });
+            $('#prevConsultation').on('click', function() {
+                navigateConsultation('prev');
+            });
+            $('#nextConsultation').on('click', function() {
+                navigateConsultation('next');
+            });
+            $('#lastConsultation').on('click', function() {
+                navigateConsultation('last');
             });
 
             closeModalButton.on('click', function() {
-                window.location.href = "{{ route('pacientes.show', $consulta->cita->paciente->id) }}";
+                window.location.href = "{{ route('pacientes.show', $paciente->id) }}";
             });
 
             function calculateAge(fecha_nacimiento) {
@@ -144,6 +159,59 @@
                     age--;
                 }
                 return `${age} años, ${Math.abs(monthDifference)} meses, ${Math.abs(today.getDate() - birthDate.getDate())} días`;
+            }
+
+            function navigateConsultation(direction) {
+                $.ajax({
+                    url: "{{ route('consultations.navigate') }}",
+                    type: 'GET',
+                    data: {
+                        direction: direction,
+                        currentConsultationId: consultaData.id
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            consultaData = response.consulta;
+                            pacienteData = response.paciente;
+                            // Update the modal with the new consultation data
+                            populateModal(consultaData, pacienteData);
+                        }
+                    },
+                    error: function() {
+                        alert('Error navigating consultations');
+                    }
+                });
+            }
+
+            function populateModal(consultaData, pacienteData) {
+                $('#modalPacienteInitials').text(pacienteData.nombres.charAt(0) + pacienteData.apepat.charAt(0));
+                $('#modalPacienteName').text(`${pacienteData.nombres} ${pacienteData.apepat} ${pacienteData.apemat}`);
+                $('#modalPacienteAge').text(`Edad: ${calculateAge(pacienteData.fechanac)}`);
+                $('#modalTalla').val(consultaData.talla);
+                $('#modalTemperatura').val(consultaData.temperatura);
+                $('#modalSaturacionOxigeno').val(consultaData.saturacion_oxigeno);
+                $('#modalFrecuenciaCardiaca').val(consultaData.frecuencia_cardiaca);
+                $('#modalPeso').val(consultaData.peso);
+                $('#modalTensionArterial').val(consultaData.tension_arterial);
+                $('#modalCircunferenciaCabeza').val(consultaData.circunferencia_cabeza);
+                $('#modalMotivoConsulta').val(consultaData.motivoConsulta);
+                $('#modalDiagnostico').val(consultaData.diagnostico);
+                $('#modalTotalPagar').val(consultaData.totalPagar);
+
+                const recetasTbody = $('#modalRecetas');
+                recetasTbody.html('');
+                consultaData.recetas.forEach((receta, index) => {
+                    recetasTbody.append(`
+                        <tr>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">${index + 1}</td>
+                            <td class="py-3 px-6 text-left">${receta.tipo_de_receta}</td>
+                            <td class="py-3 px-6 text-left">${receta.receta}</td>
+                        </tr>
+                    `);
+                });
+
+                const consultaDate = new Date(consultaData.fechaHora);
+                $('#consultationDate').text(`Fecha de Consulta: ${consultaDate.toLocaleDateString()}`);
             }
         });
     </script>    

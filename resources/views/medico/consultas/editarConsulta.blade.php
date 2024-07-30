@@ -163,15 +163,20 @@
                 </div>
             </div>
 
-            <!-- Summernote CSS & JS -->
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+            <!-- Froala CSS & JS -->
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/css/froala_editor.min.css" rel="stylesheet" type="text/css" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/js/froala_editor.min.js"></script>
+            <!-- Plugins Froala -->
+            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/align.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/colors.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_family.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_size.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/lists.min.js"></script>
 
             <script>
                 function clearModalFields() {
                     document.getElementById('modalTipoReceta').value = '';
-                    $('#modalRecetaInput').summernote('destroy');
-                    $('#modalRecetaInput').val('');
+                    FroalaEditor('#modalRecetaInput').destroy();
                     document.getElementById('modalReceta').classList.add('hidden');
                 }
 
@@ -182,17 +187,16 @@
                 }
 
                 document.getElementById('addReceta').addEventListener('click', function () {
-                    clearModalFields();
-                    $('#modalRecetaInput').summernote({
+                    document.getElementById('modalTipoReceta').value = '';
+                    new FroalaEditor('#modalRecetaInput', {
                         height: 300,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['font', ['strikethrough', 'superscript', 'subscript']],
-                            ['fontsize', ['fontsize']],
-                            ['color', ['color']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['height', ['height']]
-                        ]
+                        toolbarButtons: [
+                            'bold', 'italic', 'underline', 'clear',
+                            'strikeThrough', 'superscript', 'subscript',
+                            'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'paragraphFormat',
+                            'fontFamily'
+                        ],
+                        pluginsEnabled: ['align', 'colors', 'fontFamily', 'fontSize', 'lists']
                     });
                     document.getElementById('modalReceta').classList.remove('hidden');
                     document.getElementById('saveReceta').setAttribute('data-edit-index', '');
@@ -204,7 +208,7 @@
 
                 function saveReceta(clearModal) {
                     let tipoReceta = document.getElementById('modalTipoReceta').value.trim();
-                    let receta = $('#modalRecetaInput').summernote('code').trim();
+                    let receta = FroalaEditor('#modalRecetaInput').html.get().trim();
                     let editIndex = document.getElementById('saveReceta').getAttribute('data-edit-index');
 
                     if (tipoReceta && receta) {
@@ -270,17 +274,16 @@
                             const recetaInput = decodeHtml(decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value));
                             
                             document.getElementById('modalTipoReceta').value = tipoRecetaInput;
-                            $('#modalRecetaInput').summernote({
+                            new FroalaEditor('#modalRecetaInput', {
                                 height: 300,
-                                toolbar: [
-                                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                                    ['fontsize', ['fontsize']],
-                                    ['color', ['color']],
-                                    ['para', ['ul', 'ol', 'paragraph']],
-                                    ['height', ['height']]
-                                ]
-                            }).summernote('code', recetaInput);
+                                toolbarButtons: [
+                                    'bold', 'italic', 'underline', 'clear',
+                                    'strikeThrough', 'superscript', 'subscript',
+                                    'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'paragraphFormat',
+                                    'fontFamily'
+                                ],
+                                pluginsEnabled: ['align', 'colors', 'fontFamily', 'fontSize', 'lists']
+                            }).html.set(recetaInput);
                             document.getElementById('modalReceta').classList.remove('hidden');
                             document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
                         });
@@ -325,17 +328,16 @@
                         const recetaInput = decodeHtml(decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value));
 
                         document.getElementById('modalTipoReceta').value = tipoRecetaInput;
-                        $('#modalRecetaInput').summernote({
+                        new FroalaEditor('#modalRecetaInput', {
                             height: 300,
-                            toolbar: [
-                                ['style', ['bold', 'italic', 'underline', 'clear']],
-                                ['font', ['strikethrough', 'superscript', 'subscript']],
-                                ['fontsize', ['fontsize']],
-                                ['color', ['color']],
-                                ['para', ['ul', 'ol', 'paragraph']],
-                                ['height', ['height']]
-                            ]
-                        }).summernote('code', recetaInput);
+                            toolbarButtons: [
+                                'bold', 'italic', 'underline', 'clear',
+                                'strikeThrough', 'superscript', 'subscript',
+                                'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'paragraphFormat',
+                                'fontFamily'
+                            ],
+                            pluginsEnabled: ['align', 'colors', 'fontFamily', 'fontSize', 'lists']
+                        }).html.set(recetaInput);
                         document.getElementById('modalReceta').classList.remove('hidden');
                         document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
                     });

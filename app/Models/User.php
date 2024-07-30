@@ -8,9 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-/**
- * Clase User que representa a un usuario en el sistema.
- */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
@@ -24,7 +21,8 @@ class User extends Authenticatable
         'sexo',
         'activo',     // Estado del usuario (activo o inactivo)
         'email',      // Correo electrónico del usuario
-        'password',   // Contraseña del usuario
+        'medico_id',  // ID del médico asociado
+        'password',   // Añadir campo de contraseña a los fillables
     ];
 
     protected $hidden = [
@@ -32,13 +30,10 @@ class User extends Authenticatable
         'remember_token',   // Ocultar el token de recordar sesión
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime', // Convertir a datetime
-            'password' => 'hashed',           // Guardar la contraseña como hash
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime', // Convertir a datetime
+        'password' => 'hashed',           // Guardar la contraseña como hash
+    ];
 
     public function citas()
     {
@@ -48,6 +43,11 @@ class User extends Authenticatable
     public function pacientes()
     {
         return $this->hasMany(Paciente::class, 'medico_id');
+    }
+
+    public function medico()
+    {
+        return $this->belongsTo(User::class, 'medico_id');
     }
 
     public function getFullNameAttribute()

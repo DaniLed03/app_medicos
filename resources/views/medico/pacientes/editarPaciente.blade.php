@@ -368,6 +368,8 @@
                                         <tr>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Motivo</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Diagnóstico</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Recetas</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Doctor</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
                                         </tr>
@@ -377,6 +379,12 @@
                                             <tr>
                                                 <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d M, Y h:i A') }}</td>
                                                 <td class="text-left py-3 px-4">{{ $consulta->motivoConsulta }}</td>
+                                                <td class="text-left py-3 px-4">{{ $consulta->diagnostico }}</td>
+                                                <td class="text-left py-3 px-4">
+                                                    @foreach($consulta->recetas as $receta)
+                                                        {!! $receta->receta !!}<br>
+                                                    @endforeach
+                                                </td>
                                                 <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
                                                 <td class="text-left py-3 px-4">
                                                     <a href="{{ route('consultas.show', $consulta->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
@@ -394,9 +402,15 @@
         </div>
     </div>
 
-    <!-- Summernote CSS & JS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.js"></script>
+    <!-- Froala CSS & JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/css/froala_editor.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/js/froala_editor.min.js"></script>
+    <!-- Plugins Froala -->
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/align.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/colors.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_family.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_size.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/lists.min.js"></script>
 
     <!-- DataTables CSS & JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
@@ -451,15 +465,9 @@
                 antecedentesEditar.value = antecedentesContent.innerHTML;
                 antecedentesContent.classList.add('hidden');
                 antecedentesEditar.classList.remove('hidden');
-                $('#antecedentesEditar').summernote({
+                new FroalaEditor('#antecedentesEditar', {
                     height: 450,
-                    toolbar: [
-                        ['style', ['bold', 'underline']],
-                        ['font', ['strikethrough']],
-                        ['fontname', ['fontname']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']]
-                    ]
+                    toolbarButtons: ['bold', 'italic', 'underline', 'strikeThrough', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'backgroundColor', 'fontFamily', 'fontSize', 'color', 'inlineStyle', 'paragraphStyle', 'clearFormatting', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'emoticons', 'specialCharacters', 'insertHtml', 'fullscreen', 'spellChecker', 'help', 'html']
                 });
             }
         }
@@ -478,7 +486,8 @@
             }
 
             if (sectionId === 'antecedentes') {
-                $('#antecedentesEditar').summernote('destroy');
+                const froalaEditor = FroalaEditor('#antecedentesEditar');
+                froalaEditor.destroy();
                 const antecedentesContent = document.getElementById('antecedentesContent');
                 const antecedentesEditar = document.getElementById('antecedentesEditar');
                 antecedentesContent.innerHTML = antecedentesEditar.value;
@@ -488,9 +497,9 @@
         }
 
         function submitForm(formId) {
-            const antecedentes = $('#antecedentesEditar');
+            const antecedentes = FroalaEditor('#antecedentesEditar');
             if (antecedentes.length) {
-                antecedentes.val(antecedentes.summernote('code'));
+                antecedentes.value = antecedentes.html.get();
             }
             document.getElementById(formId).submit();
         }
@@ -543,11 +552,27 @@
                 "columnDefs": [
                     {
                         "targets": 0,
+                        "width": "15%"
+                    },
+                    {
+                        "targets": 1,
+                        "width": "20%"
+                    },
+                    {
+                        "targets": 2,
                         "width": "20%"
                     },
                     {
                         "targets": 3,
-                        "width": "20%",
+                        "width": "20%"
+                    },
+                    {
+                        "targets": 4,
+                        "width": "15%"
+                    },
+                    {
+                        "targets": 5,
+                        "width": "10%",
                         "orderable": false
                     }
                 ]

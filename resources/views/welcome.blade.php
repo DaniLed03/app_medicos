@@ -110,7 +110,8 @@
                         </div>
                     </div>
                     <div class="mt-8 flex space-x-4">
-                        <a href="{{ route('register') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark ml-4">Crear cuenta ¡gratis!</a>
+                        <a href="{{ route('register') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark">Crear cuenta ¡gratis!</a>
+                        <a href="{{ route('persona.login') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark">Iniciar Sesión Persona</a>
                     </div>
                 </div>
                 <div class="md:w-1/2">

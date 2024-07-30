@@ -96,9 +96,18 @@
 
                         <div class="flex flex-col pt-4">
                             <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
-                                <input type="email" id="email" name="email" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Correo Electrónico" required value="{{ old('email') }}" />
+                                <input type="text" id="curp" name="curp" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="CURP" required value="{{ old('curp') }}" />
                             </div>
-                            @error('email')
+                            @error('curp')
+                                <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <input type="email" id="correo" name="correo" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Correo Electrónico" required value="{{ old('correo') }}" />
+                            </div>
+                            @error('correo')
                                 <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
                             @enderror
                         </div>
@@ -117,6 +126,20 @@
                                 <input type="password" id="password_confirmation" name="password_confirmation" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Confirmar Contraseña" required />
                             </div>
                             @error('password_confirmation')
+                                <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="flex flex-col pt-4">
+                            <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
+                                <select id="medico_id" name="medico_id" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
+                                    <option value="">Selecciona un Médico</option>
+                                    @foreach($medicos as $medico)
+                                        <option value="{{ $medico->id }}" {{ old('medico_id') == $medico->id ? 'selected' : '' }}>{{ $medico->nombres }} {{ $medico->apepat }} {{ $medico->apemat }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('medico_id')
                                 <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
                             @enderror
                         </div>

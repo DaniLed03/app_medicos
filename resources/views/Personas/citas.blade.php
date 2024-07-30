@@ -1,12 +1,5 @@
 <x-app-layout>
-    <div class="py-12" x-data="{ isModalOpen: false, isPersonaModalOpen: false }" x-init="
-        @if (session('persona_id'))
-            isModalOpen = true;
-            setTimeout(() => {
-                document.getElementById('persona').value = '{{ session('persona_id') }}';
-            }, 100);
-        @endif
-    ">
+    <div class="py-12" x-data="{ isModalOpen: false }">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -22,9 +15,6 @@
                                     <div class="bg-white shadow overflow-hidden rounded-lg h-full">
                                         <div class="flex items-center justify-between px-4 py-2 font-bold text-white" style="background-color: #2D7498;">
                                             Hoy
-                                            <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                                {{ __('Agregar Cita') }}
-                                            </button>
                                         </div>
                                         <div class="p-4 overflow-y-auto max-h-screen no-scrollbar">
                                             @foreach($citas as $cita)
@@ -59,21 +49,8 @@
                 </div>
             </div>
         </div>
-
-        <!-- Modal Agregar Cita -->
-        <div x-show="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isModalOpen = false"></div>
-            @include('medico.citas.agregarCita')
-        </div>
-
-        <!-- Modal Agregar Persona -->
-        <div x-show="isPersonaModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isPersonaModalOpen = false"></div>
-            @include('medico.citas.agregarPersona')
-        </div>
     </div>
 </x-app-layout>
-
 
 <style>
     .bg-primary {
@@ -226,57 +203,5 @@
         });
 
         calendar.render();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const fechaInput = document.getElementById('fecha');
-        const horaSelect = document.getElementById('hora');
-
-        fechaInput.addEventListener('change', function() {
-            const horaOptions = horaSelect.options;
-
-            while (horaOptions.length > 0) { 
-                horaOptions.remove(0);
-            }
-
-            for (let i = 10; i <= 23; i++) {
-                const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                const option = document.createElement('option');
-                option.value = hour;
-                option.textContent = hour;
-                horaSelect.appendChild(option);
-            }
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        @if(session('paciente_id'))
-            document.getElementById('paciente').value = "{{ session('paciente_id') }}";
-            isModalOpen = true; // Abre el modal automáticamente
-        @endif
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const fechaInputs = document.querySelectorAll('#fecha, #editFecha');
-        const horaSelects = document.querySelectorAll('#hora, #editHora');
-
-        fechaInputs.forEach(fechaInput => {
-            fechaInput.addEventListener('change', function() {
-                horaSelects.forEach(horaSelect => {
-                    while (horaSelect.options.length > 0) { 
-                        horaSelect.options.remove(0);
-                    }
-                    for (let i = 10; i <= 23; i++) {
-                        const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                        const option = document.createElement('option');
-                        option.value = hour;
-                        option.textContent = hour;
-                        horaSelect.appendChild(option);
-                    }
-                });
-            });
-        });
     });
 </script>

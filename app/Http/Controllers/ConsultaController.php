@@ -137,42 +137,41 @@ class ConsultaController extends Controller
     public function index(Request $request)
     {
         $medicoId = Auth::id(); // Get the ID of the logged-in doctor
-        $query = Consultas::with(['cita.paciente', 'usuarioMedico'])
-            ->where('usuariomedicoid', $medicoId); // Filter by the doctor's ID
-    
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $startDate = Carbon::parse($request->start_date);
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-            $query->whereBetween('fechaHora', [$startDate, $endDate]);
+        $today = Carbon::today();
+
+        // Fetch consultations for today with pagination
+        $consultas = Citas::where('medicoid', $medicoId)
+            ->where('activo', 'si')
+            ->where('fecha', $today)
+            ->where('hora', '>=', now()->format('H:i:s'))
+            ->with('persona') // Include the relationship with the person
+            ->paginate(10);
+
+        return view('medico.consultas.consultas', compact('consultas'));
+    }
+
+    public function verificarPaciente(Request $request, $citaId)
+    {
+        $cita = Citas::with('persona')->findOrFail($citaId);
+        $correo = $cita->persona->correo;
+        $curp = $cita->persona->curp;
+
+        $paciente = Paciente::where('correo', $correo)->orWhere('curp', $curp)->first();
+
+        if ($paciente) {
+            return redirect()->route('consultas.create', $citaId);
         } else {
-            $currentMonth = now()->month;
-            $currentYear = now()->year;
-            $query->whereMonth('fechaHora', $currentMonth)->whereYear('fechaHora', $currentYear);
+            return redirect()->route('pacientes.completarRegistro', ['citaId' => $citaId])
+                ->with('datosPersona', [
+                    'nombres' => $cita->persona->nombres,
+                    'apepat' => $cita->persona->apepat,
+                    'apemat' => $cita->persona->apemat,
+                    'fechanac' => $cita->persona->fechanac,
+                    'correo' => $correo,
+                    'curp' => $curp,
+                    'telefono' => $cita->persona->telefono,
+                ]);
         }
-    
-        if ($request->has('name')) {
-            $name = $request->name;
-            $query->whereHas('cita.paciente', function ($query) use ($name) {
-                $query->where('nombres', 'like', "%{$name}%")
-                    ->orWhere('apepat', 'like', "%{$name}%")
-                    ->orWhere('apemat', 'like', "%{$name}%");
-            });
-        }
-    
-        $consultas = $query->paginate(10);
-    
-        $months = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-        ];
-        $monthName = $months[now()->month];
-        $totalConsultas = $consultas->total();
-        
-        $consultasCollection = collect($consultas->items());
-        $totalFacturacion = $consultasCollection->sum('totalPagar');
-    
-        return view('medico.consultas.consultas', compact('consultas', 'monthName', 'totalConsultas', 'totalFacturacion'));
     }
 
     public function edit($id)
@@ -186,18 +185,33 @@ class ConsultaController extends Controller
         }
     }
 
-    public function print($id)
-    {
-        $consulta = Consultas::with('cita.paciente', 'usuarioMedico')->findOrFail($id);
-        return view('medico.consultas.print', compact('consulta'));
-    }
-
     public function show($id)
     {
-        $consulta = Consultas::with(['cita.paciente', 'recetas', 'usuarioMedico'])->findOrFail($id);
-        return view('medico.consultas.verConsulta', compact('consulta'));
+        $consulta = Consultas::with(['recetas', 'usuarioMedico', 'cita.paciente'])
+            ->findOrFail($id);
+
+        if ($consulta->cita) {
+            $paciente = $consulta->cita->paciente;
+        } else {
+            $paciente = Paciente::findOrFail($consulta->pacienteid);
+        }
+
+        return view('medico.consultas.verConsulta', compact('consulta', 'paciente'));
     }
 
+    public function print($id)
+    {
+        $consulta = Consultas::with(['recetas', 'usuarioMedico', 'cita.paciente'])
+            ->findOrFail($id);
+
+        if ($consulta->cita) {
+            $paciente = $consulta->cita->paciente;
+        } else {
+            $paciente = Paciente::findOrFail($consulta->pacienteid);
+        }
+
+        return view('medico.consultas.print', compact('consulta', 'paciente'));
+    }
 
     public function update(Request $request, $id)
     {
@@ -245,5 +259,41 @@ class ConsultaController extends Controller
         $consulta->save();
 
         return response()->json(['success' => true]);
+    }
+
+    public function navigate(Request $request)
+    {
+        $direction = $request->input('direction');
+        $currentConsultationId = $request->input('currentConsultationId');
+
+        $currentConsultation = Consultas::findOrFail($currentConsultationId);
+        $medicoId = Auth::id(); // Get the ID of the logged-in doctor
+
+        if ($direction == 'first') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)->orderBy('id', 'asc')->first();
+        } elseif ($direction == 'prev') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)->where('id', '<', $currentConsultationId)->orderBy('id', 'desc')->first();
+        } elseif ($direction == 'next') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)->where('id', '>', $currentConsultationId)->orderBy('id', 'asc')->first();
+        } elseif ($direction == 'last') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)->orderBy('id', 'desc')->first();
+        }
+
+        if ($consulta) {
+            $consulta->load('recetas'); // Ensure recetas are loaded
+            if ($consulta->cita) {
+                $paciente = $consulta->cita->paciente;
+            } else {
+                $paciente = Paciente::findOrFail($consulta->pacienteid);
+            }
+
+            return response()->json([
+                'success' => true,
+                'consulta' => $consulta,
+                'paciente' => $paciente
+            ]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 }
