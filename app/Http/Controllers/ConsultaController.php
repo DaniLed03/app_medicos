@@ -6,6 +6,7 @@ use App\Models\Consultas;
 use App\Models\Paciente;
 use App\Models\User;
 use App\Models\Citas;
+use App\Models\Persona;
 use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -110,7 +111,7 @@ class ConsultaController extends Controller
         ]);
 
         // Creación de la consulta
-        $consultaData = $request->except('recetas'); // Exclude recetas from consultaData
+        $consultaData = $request->except('recetas'); 
         $consultaData['talla'] = $request->hidden_talla;
         $consultaData['temperatura'] = $request->hidden_temperatura;
         $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
@@ -118,8 +119,30 @@ class ConsultaController extends Controller
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
-        $consultaData['status'] = 'finalizada'; // Cambia el estado a 'finalizada'
+        $consultaData['status'] = 'finalizada'; 
         $consulta = Consultas::create($consultaData);
+
+        // Obtener el correo y la CURP del paciente
+        $paciente = Paciente::find($request->pacienteid);
+        $email = $paciente->email;
+        $curp = $paciente->curp;
+
+        // Buscar persona que coincida con el paciente usando email y curp
+        $persona = Persona::where('correo', $email)
+                        ->orWhere('curp', $curp) // Ajustar si 'curp' existe en la tabla Pacientes
+                        ->first();
+
+        // Actualizar el estado de la cita si la persona coincide
+        if ($persona) {
+            $cita = Citas::where('persona_id', $persona->id)
+                        ->where('status', '!=', 'finalizada') // Asegurarse de que no esté ya finalizada
+                        ->first();
+
+            if ($cita) {
+                $cita->status = 'finalizada';
+                $cita->save();
+            }
+        }
 
         // Guardar recetas
         if ($request->has('recetas')) {
@@ -133,8 +156,9 @@ class ConsultaController extends Controller
         }
 
         // Redirigir a la vista de detalles de la consulta
-        return redirect()->route('consultas.show', $consulta->id)->with('success', 'Consulta creada y finalizada exitosamente.');
+        return redirect()->route('consultas.index')->with('success', 'Consulta finalizada exitosamente.');
     }
+
 
 
     public function index(Request $request)
@@ -187,7 +211,6 @@ class ConsultaController extends Controller
 
         }
     }
-
 
     public function edit($id)
     {
@@ -311,4 +334,14 @@ class ConsultaController extends Controller
             return response()->json(['success' => false]);
         }
     }
+
+    public function iniciarConsulta($id)
+    {
+        $cita = Citas::findOrFail($id);
+        $cita->status = 'En proceso';
+        $cita->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

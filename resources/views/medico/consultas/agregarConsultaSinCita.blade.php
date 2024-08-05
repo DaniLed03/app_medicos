@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar Consulta</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Terminar Consulta</button>
             </form>
 
             <!-- Modal -->
@@ -149,29 +149,23 @@
                 </div>
             </div>
 
-            <!-- Froala CSS & JS -->
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/css/froala_editor.min.css" rel="stylesheet" type="text/css" />
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.1/js/froala_editor.min.js"></script>
-            <!-- Plugins Froala -->
-            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/align.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/colors.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_family.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/font_size.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/lists.min.js"></script>
+            <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
             <script>
+                // Inicializar CKEditor para los campos especificados y eliminar el chequeo de versión
+                CKEDITOR.replace('motivoConsulta', {
+                    versionCheck: false
+                });
+                CKEDITOR.replace('diagnostico', {
+                    versionCheck: false
+                });
+                CKEDITOR.replace('modalRecetaInput', {
+                    versionCheck: false
+                });
+
                 document.getElementById('addReceta').addEventListener('click', function () {
                     document.getElementById('modalTipoReceta').value = '';
-                    new FroalaEditor('#modalRecetaInput', {
-                        height: 300,
-                        toolbarButtons: [
-                            'bold', 'italic', 'underline', 'clear',
-                            'strikeThrough', 'superscript', 'subscript',
-                            'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'paragraphFormat',
-                            'fontFamily'
-                        ],
-                        pluginsEnabled: ['align', 'colors', 'fontFamily', 'fontSize', 'lists']
-                    });
+                    CKEDITOR.instances['modalRecetaInput'].setData('');
                     document.getElementById('modalReceta').classList.remove('hidden');
                     document.getElementById('saveReceta').setAttribute('data-edit-index', '');
                 });
@@ -182,15 +176,13 @@
 
                 function clearModalFields() {
                     document.getElementById('modalReceta').classList.add('hidden');
-                    if (FroalaEditor('#modalRecetaInput')) {
-                        FroalaEditor('#modalRecetaInput').destroy();
-                    }
                     document.getElementById('modalTipoReceta').value = '';
+                    CKEDITOR.instances['modalRecetaInput'].setData('');
                 }
 
                 function saveReceta(clearModal) {
                     let tipoReceta = document.getElementById('modalTipoReceta').value.trim();
-                    let receta = FroalaEditor('#modalRecetaInput').html.get().trim();
+                    let receta = CKEDITOR.instances['modalRecetaInput'].getData().trim();
                     let editIndex = document.getElementById('saveReceta').getAttribute('data-edit-index');
 
                     if (tipoReceta && receta) {
@@ -256,16 +248,7 @@
                             const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
                             
                             document.getElementById('modalTipoReceta').value = tipoRecetaInput;
-                            new FroalaEditor('#modalRecetaInput', {
-                                height: 300,
-                                toolbarButtons: [
-                                    'bold', 'italic', 'underline', 'clear',
-                                    'strikeThrough', 'superscript', 'subscript',
-                                    'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'undo', 'redo', 'paragraphFormat',
-                                    'fontFamily'
-                                ],
-                                pluginsEnabled: ['align', 'colors', 'fontFamily', 'fontSize', 'lists']
-                            }).html.set(recetaInput);
+                            CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
                             document.getElementById('modalReceta').classList.remove('hidden');
                             document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
                         });

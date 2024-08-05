@@ -91,7 +91,8 @@
         }
 
         // Set the min date to today
-        fechaInput.min = new Date().toISOString().split("T")[0];
+        fechaInput.min = new Date().toLocaleDateString('en-CA');
+
     });
 
     // Mostrar alerta de SweetAlert2 si hay mensajes de éxito

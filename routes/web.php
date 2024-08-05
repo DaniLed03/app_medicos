@@ -94,6 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('consultas/{consulta}/print', [ConsultaController::class, 'print'])->name('consultas.print');
     Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
     Route::get('/consultations/navigate', [ConsultaController::class, 'navigate'])->name('consultations.navigate');
+    Route::post('/consultas/{id}/iniciar', [ConsultaController::class, 'iniciarConsulta'])->name('consultas.iniciar');
 
     // Rutas de Usuarios
     Route::post('/personas/storeDesdeModal', [PersonaController::class, 'storeDesdeModal'])->name('personas.storeDesdeModal');

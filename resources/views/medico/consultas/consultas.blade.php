@@ -60,10 +60,18 @@
                                         <td class="px-6 py-4">{{ $cita->hora }}</td>
                                         <td class="px-6 py-4">{{ $cita->persona->nombres }} {{ $cita->persona->apepat }} {{ $cita->persona->apemat }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full">Por comenzar</span>
+                                            <span class="status-label bg-blue-200 text-blue-800 px-2 py-1 rounded-full">{{ $cita->status }}</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <a href="{{ route('consultas.verificarPaciente', $cita->id) }}" class="text-blue-500 hover:text-blue-700">Iniciar consulta</a>
+                                            @if($cita->status === 'Por comenzar')
+                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $cita->id }}">Iniciar consulta</a>
+                                            @elseif($cita->status === 'En proceso')
+                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $cita->id }}">Continuar consulta</a>
+                                            @elseif($cita->status === 'Finalizada')
+                                                <span class="text-green-500">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -87,6 +95,7 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <script>
     $(document).ready(function() {
@@ -120,28 +129,6 @@
         });
     });
 
-    function terminarConsulta(event, id) {
-        event.preventDefault();
-        if (confirm('¿Está seguro de que desea terminar la consulta?')) {
-            fetch(`/consultas/${id}/terminate`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Consulta terminada exitosamente.');
-                    window.location.reload();
-                } else {
-                    alert('Hubo un error al terminar la consulta.');
-                }
-            });
-        }
-    }
-
     document.getElementById('resetButton').addEventListener('click', function() {
         const today = new Date();
         const offset = today.getTimezoneOffset(); // Obtener la diferencia horaria
@@ -152,6 +139,52 @@
         document.getElementById('end_date').value = formattedToday;
         document.getElementById('filterForm').submit();
     });
+
+    const iniciarConsultaButtons = document.querySelectorAll('.iniciar-consulta');
+
+    iniciarConsultaButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const consultaId = this.dataset.id;
+            const estado = this.closest('tr').querySelector('.status-label').textContent.trim();
+
+            if (estado === 'En proceso') {
+                // Redirigir directamente si el estado es "En proceso"
+                window.location.href = `/consultas/verificarPaciente/${consultaId}`;
+            } else {
+                Swal.fire({
+                    title: '¿Desea comenzar con la consulta?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No',
+                    icon: 'warning'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/consultas/${consultaId}/iniciar`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data); // <-- Agrega esta línea para depuración
+                            if (data.success) {
+                                Swal.fire('¡Consulta iniciada!', '', 'success').then(() => {
+                                    window.location.href = `/consultas/verificarPaciente/${consultaId}`;
+                                });
+                            } else {
+                                Swal.fire('Hubo un error', 'No se pudo iniciar la consulta', 'error');
+                            }
+                        });
+
+                    }
+                });
+            }
+        });
+    });
+
 </script>
 
 <style>
