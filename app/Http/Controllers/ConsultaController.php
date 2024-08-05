@@ -103,7 +103,7 @@ class ConsultaController extends Controller
             'status' => 'required|string|in:en curso,finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
-            'circunferencia_cabeza' => 'nullable|string', 
+            'circunferencia_cabeza' => 'nullable|string',
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
             'recetas.*.receta' => 'required|string'
@@ -118,6 +118,7 @@ class ConsultaController extends Controller
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
+        $consultaData['status'] = 'finalizada'; // Cambia el estado a 'finalizada'
         $consulta = Consultas::create($consultaData);
 
         // Guardar recetas
@@ -131,19 +132,24 @@ class ConsultaController extends Controller
             }
         }
 
-        return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
+        // Redirigir a la vista de detalles de la consulta
+        return redirect()->route('consultas.show', $consulta->id)->with('success', 'Consulta creada y finalizada exitosamente.');
     }
+
 
     public function index(Request $request)
     {
         $medicoId = Auth::id(); // Get the ID of the logged-in doctor
         $today = Carbon::today();
 
-        // Fetch consultations for today with pagination
+        // Obtener las fechas de inicio y fin del filtro
+        $startDate = $request->input('start_date', $today->format('Y-m-d'));
+        $endDate = $request->input('end_date', $today->format('Y-m-d'));
+
+        // Fetch consultations within the date range with pagination
         $consultas = Citas::where('medicoid', $medicoId)
             ->where('activo', 'si')
-            ->where('fecha', $today)
-            ->where('hora', '>=', now()->format('H:i:s'))
+            ->whereBetween('fecha', [$startDate, $endDate])
             ->with('persona') // Include the relationship with the person
             ->paginate(10);
 
@@ -159,20 +165,29 @@ class ConsultaController extends Controller
         $paciente = Paciente::where('correo', $correo)->orWhere('curp', $curp)->first();
 
         if ($paciente) {
-            return redirect()->route('consultas.create', $citaId);
+            // Si el paciente existe, redirige a la vista de agregarConsultaSinCita
+            return redirect()->route('consultas.createWithoutCita', $paciente->id);
         } else {
-            return redirect()->route('pacientes.completarRegistro', ['citaId' => $citaId])
-                ->with('datosPersona', [
+            // Mostrar SweetAlert y redirigir
+            session()->flash('alerta', true);
+
+            return view('medico.pacientes.editarPaciente', [
+                'paciente' => new Paciente([
                     'nombres' => $cita->persona->nombres,
                     'apepat' => $cita->persona->apepat,
                     'apemat' => $cita->persona->apemat,
-                    'fechanac' => $cita->persona->fechanac,
+                    'fechanac' => $cita->persona->fechanac->format('Y-m-d'),
                     'correo' => $correo,
                     'curp' => $curp,
+                    'sexo' => $cita->persona->sexo,
                     'telefono' => $cita->persona->telefono,
-                ]);
+                    'no_exp' => Paciente::max('no_exp') ? Paciente::max('no_exp') + 1 : 1,
+                ])
+            ]);
+
         }
     }
+
 
     public function edit($id)
     {

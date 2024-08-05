@@ -114,7 +114,7 @@
                     </div>
                     <div class="border-t border-gray-200 mt-4"></div>
                     <div class="mt-2">
-                        <form method="POST" action="{{ route('pacientes.storeDesdeModal') }}" id="addPacienteForm">
+                        <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
                             @csrf
                             <!-- Nombres -->
                             <div class="mt-4">

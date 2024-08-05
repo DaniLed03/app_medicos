@@ -6,8 +6,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ckeditor/ckeditor": "^4.24",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
+        "realrashid/sweet-alert": "^7.2",
         "spatie/laravel-permission": "^6.9",
         "tinymce/tinymce": "^7.2"
     },
@@ -64,6 +66,12 @@
             "php-http/discovery": true
         }
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://nova.laravel.com"
+        }
+    ],    
     "minimum-stability": "stable",
     "prefer-stable": true
 }

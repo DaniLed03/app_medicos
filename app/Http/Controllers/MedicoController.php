@@ -136,7 +136,7 @@ class MedicoController extends Controller
     }
  
 
-    public function updatePaciente(Request $request, $id)
+    public function updatePaciente(Request $request, $id = null)
     {
         // Validación de los datos recibidos
         $request->validate([
@@ -155,11 +155,11 @@ class MedicoController extends Controller
             'padre' => 'nullable|string|max:255',
             'madre' => 'nullable|string|max:255',
             'direccion' => 'nullable|string|max:255',
-            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,'.$id,
+            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $id,
             'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
             'sexo' => 'nullable|in:masculino,femenino',
-            'curp' => 'nullable|string|max:18|unique:pacientes,curp,'.$id,
+            'curp' => 'nullable|string|max:18|unique:pacientes,curp,' . $id,
             'Nombre_fact' => 'nullable|string|max:255',
             'Direccion_fact' => 'nullable|string|max:255',
             'RFC' => 'nullable|string|max:255',
@@ -167,14 +167,46 @@ class MedicoController extends Controller
             'CFDI' => 'nullable|string|max:255',
         ]);
 
-        // Encuentra el paciente y actualiza sus datos
-        $paciente = Paciente::findOrFail($id);
-        $paciente->update($request->all());
+        // Verifica si el paciente existe
+        $paciente = Paciente::find($id);
 
+        if ($paciente) {
+            // Si el paciente existe, actualiza sus datos
+            $paciente->update($request->all());
+            $mensaje = 'Paciente actualizado correctamente';
+        } else {
+            // Si el paciente es nuevo, genera el siguiente número de expediente
+            $medicoId = Auth::id();
+            $lastPaciente = Paciente::where('medico_id', $medicoId)->orderBy('no_exp', 'desc')->first();
+            $nextNoExp = $lastPaciente ? $lastPaciente->no_exp + 1 : 1;
+
+            // Crear el nuevo paciente manualmente
+            $paciente = new Paciente();
+            $paciente->nombres = $request->nombres;
+            $paciente->apepat = $request->apepat;
+            $paciente->apemat = $request->apemat ?? '';
+            $paciente->fechanac = $request->fechanac ?? null;
+            $paciente->curp = $request->curp ?? '';
+            $paciente->correo = $request->correo ?? '';
+            $paciente->sexo = $request->sexo ?? '';
+            $paciente->direccion = $request->direccion ?? '';
+            $paciente->telefono = $request->telefono ?? '';
+            $paciente->no_exp = $nextNoExp;
+            $paciente->medico_id = $medicoId;
+            $paciente->activo = 'si';
+            // Asignar otros campos si es necesario
+            $paciente->save();
+
+            $mensaje = 'Paciente creado correctamente';
+        }
+
+        // Verifica si el campo antecedentes está presente en la solicitud
+        $tab = $request->has('antecedentes') ? 'antecedentes' : $request->input('tab', 'datos');
+        
         // Redirecciona a la vista de edición de paciente con un mensaje de éxito
-        // Redirect to the correct tab based on the form that was submitted
-        $tab = $request->input('tab', 'datos'); // Get the tab from the request or default to 'datos'
-        return redirect()->route('pacientes.editar', ['id' => $id, 'tab' => $tab])->with('status', 'Paciente actualizado correctamente');    }
+        return redirect()->route('pacientes.editar', ['id' => $paciente->id, 'tab' => $tab])->with('status', $mensaje);
+    }
+
 
 
     // Marca a un paciente como inactivo (eliminado)

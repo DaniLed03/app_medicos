@@ -8,22 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -41,12 +34,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        if (!$user->roles()->exists()) {
+            Auth::logout();
+            Alert::warning('¡Atención!', 'Esta cuenta aún no está activa. Habla con el administrador para activar tu cuenta.');
+            return redirect()->route('login');
+        }
+
         return $this->redirectToRole($user);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
@@ -58,9 +54,6 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 
-    /**
-     * Redirect to different routes based on user role.
-     */
     protected function redirectToRole($user)
     {
         switch ($user->rol) {
@@ -74,5 +67,4 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route('medico.dashboard');
         }
     }
-
 }
