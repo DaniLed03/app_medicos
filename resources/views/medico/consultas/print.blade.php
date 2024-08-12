@@ -58,8 +58,8 @@
         </div>
         <div class="content">
             <p><label>Fecha:</label> {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d M, Y h:i A') }}</p>
-            <p><label>Motivo:</label> {{ $consulta->motivoConsulta }}</p>
-            <p><label>Diagnóstico:</label> {{ $consulta->diagnostico }}</p>
+            <p><label>Motivo:</label> {!! $consulta->motivoConsulta !!}</p>
+            <p><label>Diagnóstico:</label> {!! $consulta->diagnostico !!}</p>
             <p><label>Notas del Padecimiento:</label> {{ $consulta->notas_padecimiento }}</p>
             <p><label>Plan:</label> {{ $consulta->plan }}</p>
 

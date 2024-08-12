@@ -70,6 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
     Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
     Route::get('/pacientes/{id}', [MedicoController::class, 'showPaciente'])->name('pacientes.show');
+    Route::get('/medico/pacientes/{id}/editarPaciente', [MedicoController::class, 'editarPaciente'])->name('medico.pacientes.editarPaciente');
 
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
@@ -80,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/medico/citas/editar/{id}', [MedicoController::class, 'updateCita'])->name('citas.update');
     Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
     Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
+    Route::patch('/citas/{id}/update', [MedicoController::class, 'updateCita'])->name('citas.update');
 
     // Rutas de Consultas
     Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');

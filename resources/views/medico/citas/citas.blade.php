@@ -202,15 +202,39 @@
                     'start' => $cita->fecha . 'T' . $cita->hora,
                     'url' => route('citas.editar', $cita->id),
                     'color' => '#33AD9B',
-                    'textColor' => 'black'
+                    'textColor' => 'black',
+                    'id' => $cita->id // Asegúrate de incluir el ID de la cita
                 ];
             })) !!},
+            editable: true,
             dateClick: function(info) {
                 document.querySelector('[x-data]').__x.$data.isModalOpen = true;
             },
             eventClick: function(info) {
                 window.location.href = info.event.url;
                 info.jsEvent.preventDefault();
+            },
+            eventDrop: function(info) {
+                // Mostrar SweetAlert para confirmar el cambio
+                Swal.fire({
+                    title: '¿Deseas cambiar la fecha de esta cita?',
+                    text: "Se actualizará la fecha de la cita.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cambiar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirigir a la página de edición con la fecha nueva y el ID del evento
+                        const newDate = info.event.start.toISOString().split('T')[0]; // Obtener la nueva fecha
+                        const newTime = info.event.start.toTimeString().split(' ')[0]; // Obtener la nueva hora
+                        window.location.href = `${info.event.url}?newDate=${newDate}&newTime=${newTime}`;
+                    } else {
+                        info.revert(); // Revertir el cambio si se cancela
+                    }
+                });
             },
             dayCellDidMount: function(info) {
                 var today = new Date();
@@ -227,6 +251,7 @@
 
         calendar.render();
     });
+
 
     document.addEventListener('DOMContentLoaded', function() {
         const fechaInput = document.getElementById('fecha');

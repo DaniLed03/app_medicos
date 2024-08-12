@@ -282,15 +282,18 @@ class MedicoController extends Controller
     }
 
     // Muestra el formulario de edición de una cita específica
-    public function editarCita($id)
+    public function editarCita(Request $request, $id)
     {
         $medicoId = Auth::id();
         $cita = Citas::where('id', $id)->where('medicoid', $medicoId)->firstOrFail();
-        // Mostrar todas las personas sin filtrar por activo
         $personas = Persona::where('medico_id', $medicoId)->get();
-        return view('medico.citas.editarCita', compact('cita', 'personas'));
+
+        // Verificar si se recibieron newDate y newTime, y utilizarlos
+        $newDate = $request->input('newDate', $cita->fecha); // Usar la nueva fecha si está presente
+        $newTime = $request->input('newTime', $cita->hora);  // Usar la nueva hora si está presente
+
+        return view('medico.citas.editarCita', compact('cita', 'personas', 'newDate', 'newTime'));
     }
-    
 
     // Actualiza la información de una cita específica
     public function updateCita(Request $request, $id)
@@ -312,7 +315,7 @@ class MedicoController extends Controller
             'motivo_consulta' => $request->motivo_consulta
         ]);
 
-        return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
+        return redirect()->route('citas');
     }
 
     // Marca una cita como inactiva (eliminada)

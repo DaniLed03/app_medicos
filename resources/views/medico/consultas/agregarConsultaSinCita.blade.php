@@ -69,7 +69,7 @@
                                 <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg">
                             </div>
                             <div>
-                                <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Circunferencia de Cabeza</label>
+                                <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Perimetro Cefalico</label>
                                 <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm">
                             </div>
                         </div>
@@ -139,29 +139,67 @@
             </div>
 
             <!-- Preview Modal -->
-            <div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
-                <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
-                    <h2 class="text-xl font-semibold mb-4">Previsualización de Receta</h2>
-                    <div id="previewContent" class="mb-4"></div>
-                    <div class="flex justify-end">
-                        <button id="closePreview" class="bg-gray-500 text-white px-4 py-2 rounded-md">Cerrar</button>
+            <div id="recetaModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">
+                    <div class="flex justify-between items-center mb-4 border-b-2 pb-4">
+                        <h3 id="recetaModalTitle" class="text-xl font-medium">Receta</h3>
+                        <button id="closeRecetaModal" class="text-red-600 font-bold text-lg">&times;</button>
+                    </div>
+                    <div id="recetaModalContent" class="mt-4">
+                        <!-- Aquí se mostrará la receta -->
                     </div>
                 </div>
-            </div>
+            </div>            
 
-            <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+            <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
             <script>
-                // Inicializar CKEditor para los campos especificados y eliminar el chequeo de versión
                 CKEDITOR.replace('motivoConsulta', {
-                    versionCheck: false
+                    versionCheck: false,
+                    enterMode: CKEDITOR.ENTER_P, // Salto de línea con interlineado
+                    shiftEnterMode: CKEDITOR.ENTER_BR, // Salto de línea sin interlineado
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                        { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                        { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                        { name: 'insert', items: ['HorizontalRule'] },
+                        { name: 'document', items: ['Source'] },
+                        { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+                    ]
                 });
+
                 CKEDITOR.replace('diagnostico', {
-                    versionCheck: false
+                    versionCheck: false,
+                    enterMode: CKEDITOR.ENTER_P, // Salto de línea con interlineado
+                    shiftEnterMode: CKEDITOR.ENTER_BR, // Salto de línea sin interlineado
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                        { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                        { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                        { name: 'insert', items: ['HorizontalRule'] },
+                        { name: 'document', items: ['Source'] },
+                        { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+                    ]
                 });
+
                 CKEDITOR.replace('modalRecetaInput', {
-                    versionCheck: false
+                    versionCheck: false,
+                    enterMode: CKEDITOR.ENTER_P, // Salto de línea con interlineado
+                    shiftEnterMode: CKEDITOR.ENTER_BR, // Salto de línea sin interlineado
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                        { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                        { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                        { name: 'insert', items: ['HorizontalRule'] },
+                        { name: 'document', items: ['Source'] },
+                        { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+                    ]
                 });
+
+                CKEDITOR.extraPlugins = "justify"
+                CKEDITOR.extraPlugins = "font"
+                CKEDITOR.extraPlugins = "size"
 
                 document.getElementById('addReceta').addEventListener('click', function () {
                     document.getElementById('modalTipoReceta').value = '';
@@ -229,6 +267,7 @@
                             `;
                         }
 
+                        // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
                         newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
                             newRecetaRow.remove();
                             if (recetasDiv.getElementsByClassName('receta').length === 0) {
@@ -238,8 +277,8 @@
 
                         newRecetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
                             const recetaContent = decodeURIComponent(this.dataset.receta);
-                            document.getElementById('previewContent').innerHTML = recetaContent;
-                            document.getElementById('previewModal').classList.remove('hidden');
+                            document.getElementById('recetaModalContent').innerHTML = recetaContent;
+                            document.getElementById('recetaModal').classList.remove('hidden');
                         });
 
                         newRecetaRow.querySelector('.editar-receta').addEventListener('click', function () {
@@ -265,8 +304,8 @@
                     saveReceta(true);
                 });
 
-                document.getElementById('closePreview').addEventListener('click', function () {
-                    document.getElementById('previewModal').classList.add('hidden');
+                document.getElementById('closeRecetaModal').addEventListener('click', function () {
+                    document.getElementById('recetaModal').classList.add('hidden');
                 });
 
                 document.querySelectorAll('.eliminar-receta').forEach(button => {
@@ -275,14 +314,6 @@
                         if (document.getElementById('recetas').getElementsByClassName('receta').length === 0) {
                             document.getElementById('recetas').innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
                         }
-                    });
-                });
-
-                document.querySelectorAll('.previsualizar-receta').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const recetaContent = decodeURIComponent(this.dataset.receta);
-                        document.getElementById('previewContent').innerHTML = recetaContent;
-                        document.getElementById('previewModal').classList.remove('hidden');
                     });
                 });
 
@@ -312,6 +343,32 @@
                     });
                 }
             </script>
+            <style>
+                #recetaModalContent ul,
+                #recetaModalContent ol {
+                    list-style-type: disc; /* Puntos para listas no ordenadas */
+                    padding-left: 30px;
+                    font-size: 0.9em; /* Reduce el tamaño de la fuente */
+                    line-height: 1.2em; /* Reduce el interlineado */
+                }
+            
+                #recetaModalContent ol {
+                    list-style-type: decimal; /* Números para listas ordenadas */
+                }
+            
+                #recetaModalContent li {
+                    margin-bottom: 0.3em; /* Espaciado reducido entre elementos de lista */
+                }
+
+                #recetaModalContent p {
+                    margin: 1em 0; /* Controla el interlineado cuando se presiona Enter */
+                }
+
+                #recetaModalContent br {
+                    margin: 0; /* No agrega espacio cuando se presiona Shift + Enter */
+                    line-height: 1.2em; /* Opcional: ajusta el interlineado de las líneas */
+                }
+            </style>            
         </div>
     </div>
 </x-app-layout>

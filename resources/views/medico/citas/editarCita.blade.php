@@ -32,7 +32,7 @@
                                                 <div class="form-group flex">
                                                     <div class="mr-2 w-1/2">
                                                         <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                                                        <input type="date" name="fecha" id="fecha" min="{{ now()->toDateString() }}" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ $cita->fecha }}" required>
+                                                        <input type="date" name="fecha" id="fecha" min="{{ now()->toDateString() }}" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ $newDate }}" required>
                                                     </div>
                                                     <div class="ml-2 w-1/2">
                                                         <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
@@ -41,7 +41,7 @@
                                                                 @php
                                                                     $hour = $i < 10 ? '0' . $i . ':00' : $i . ':00';
                                                                 @endphp
-                                                                <option value="{{ $hour }}" {{ $cita->hora == $hour ? 'selected' : '' }}>{{ $hour }}</option>
+                                                                <option value="{{ $hour }}" {{ $newTime == $hour ? 'selected' : '' }}>{{ $hour }}</option>
                                                             @endfor
                                                         </select>
                                                     </div>
@@ -58,10 +58,11 @@
                                                     <label for="motivo_consulta" class="block text-sm font-medium text-gray-700">Motivo de la consulta</label>
                                                     <textarea name="motivo_consulta" id="motivo_consulta" rows="6" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" style="resize: none;">{{ $cita->motivo_consulta }}</textarea>
                                                 </div>
-                                                <div class="flex justify-end">
-                                                    <button type="button" class="bg-blue-500 text-white p-2 rounded-md mr-2" onclick="confirmUpdate()">Actualizar Cita</button>
+                                                                                                <div class="flex justify-end space-x-2 mb-4">
+                                                    <button type="button" class="bg-blue-500 text-white p-2 rounded-md" onclick="confirmUpdate()">Actualizar Cita</button>
                                                     <button type="button" class="bg-red-500 text-white p-2 rounded-md" onclick="confirmDelete()">Borrar Cita</button>
-                                                </div>
+                                                    <a href="{{ route('citas') }}" class="bg-gray-500 text-white p-2 rounded-md">Regresar a la agenda</a>
+                                                </div>                                             
                                             </form>
                                             <form id="delete-cita-form" action="{{ route('citas.borrar', $cita->id) }}" method="POST" style="display:none;">
                                                 @csrf

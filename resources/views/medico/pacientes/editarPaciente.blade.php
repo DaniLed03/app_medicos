@@ -355,17 +355,19 @@
                                         </tr>
                                     </thead>
                                     <tbody class="text-gray-700">
-                                        @if(isset($consultas))
+                                        @if(isset($consultas) && count($consultas) > 0)
                                             @foreach($consultas as $consulta)
                                                 <tr>
                                                     <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d M, Y h:i A') }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $consulta->motivoConsulta }}</td>
-                                                    <td class="text-left py-3 px-4">{{ $consulta->diagnostico }}</td>
-                                                    <td class="text-left py-3 px-4">
-                                                        @foreach($consulta->recetas as $receta)
-                                                            {!! $receta->receta !!}<br>
-                                                        @endforeach
+                                                    <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
+                                                        {!! $consulta->motivoConsulta !!}
+                                                    </td>                                                                                                        
+                                                    <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
+                                                        {!! $consulta->diagnostico !!}
                                                     </td>
+                                                    <td class="text-left py-3 px-4">
+                                                        {{ $consulta->recetas->count() }} {{ Str::plural('Receta', $consulta->recetas->count()) }}
+                                                    </td>                                                                                                       
                                                     <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
                                                     <td class="text-left py-3 px-4">
                                                         <a href="{{ route('consultas.show', $consulta->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
@@ -378,11 +380,11 @@
                                                 <td colspan="6" class="text-center py-3 px-4">No hay consultas registradas.</td>
                                             </tr>
                                         @endif
-                                    </tbody>
+                                    </tbody>                                    
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -397,7 +399,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- CKEditor -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 
     <!-- SweetAlert2 -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -425,12 +427,41 @@
             overflow-x: hidden;
             overflow-y: hidden;
         }
+
+        table.dataTable tbody td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table th, .table td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dataTables_wrapper .dataTables_scrollBody {
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
     </style>
 
     <script>
         CKEDITOR.replace('editor', {
-            versionCheck: false
+            versionCheck: false,
+            toolbar: [
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'styles', items: ['Format', 'Font', 'FontSize', 'Bold', 'Italic', 'Underline'] },
+                { name: 'insert', items: ['HorizontalRule'] },
+                { name: 'document', items: ['Source'] },
+                { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+            ]
         });
+
+        CKEDITOR.extraPlugins = "justify";
+        CKEDITOR.extraPlugins = "font";
+        CKEDITOR.extraPlugins = "size";
 
         function submitForm(formId) {
             document.getElementById(formId).submit();
@@ -459,7 +490,7 @@
             $('#historialTable').DataTable({
                 "language": {
                     "decimal": "",
-                    "emptyTable": "No hay consultas registradas",
+                    "emptyTable": "No hay consultas registradas",  // Mensaje cuando no hay registros
                     "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
                     "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
                     "infoFiltered": "(Filtrado de _MAX_ total entradas)",
@@ -509,8 +540,10 @@
                     }
                 ]
             });
-        }); 
+        });
+
     </script>
+
     @if(session('alerta'))
     <script>
             Swal.fire({

@@ -234,8 +234,12 @@ class ConsultaController extends Controller
             $paciente = Paciente::findOrFail($consulta->pacienteid);
         }
 
-        return view('medico.consultas.verConsulta', compact('consulta', 'paciente'));
+        // Formatear la fecha de la consulta
+        $fechaConsulta = \Carbon\Carbon::parse($consulta->fechaHora)->format('d-m-Y');
+
+        return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta'));
     }
+
 
     public function print($id)
     {
@@ -303,38 +307,50 @@ class ConsultaController extends Controller
     {
         $direction = $request->input('direction');
         $currentConsultationId = $request->input('currentConsultationId');
+        $medicoId = Auth::id(); // ID del médico logueado
 
+        // Obtener el paciente actual desde la consulta actual
         $currentConsultation = Consultas::findOrFail($currentConsultationId);
-        $medicoId = Auth::id(); // Get the ID of the logged-in doctor
+        $pacienteId = $currentConsultation->pacienteid;
 
         if ($direction == 'first') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)->orderBy('id', 'asc')->first();
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
+                ->orderBy('id', 'asc')
+                ->first();
         } elseif ($direction == 'prev') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)->where('id', '<', $currentConsultationId)->orderBy('id', 'desc')->first();
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
+                ->where('id', '<', $currentConsultationId)
+                ->orderBy('id', 'desc')
+                ->first();
         } elseif ($direction == 'next') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)->where('id', '>', $currentConsultationId)->orderBy('id', 'asc')->first();
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
+                ->where('id', '>', $currentConsultationId)
+                ->orderBy('id', 'asc')
+                ->first();
         } elseif ($direction == 'last') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)->orderBy('id', 'desc')->first();
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
+                ->orderBy('id', 'desc')
+                ->first();
         }
 
         if ($consulta) {
-            $consulta->load('recetas'); // Ensure recetas are loaded
-            if ($consulta->cita) {
-                $paciente = $consulta->cita->paciente;
-            } else {
-                $paciente = Paciente::findOrFail($consulta->pacienteid);
-            }
+            $consulta->load('recetas'); // Cargar recetas relacionadas
+            $paciente = $consulta->cita ? $consulta->cita->paciente : Paciente::findOrFail($consulta->pacienteid);
 
             return response()->json([
                 'success' => true,
-                'consulta' => $consulta,
-                'paciente' => $paciente
+                'redirectUrl' => route('consultas.show', $consulta->id)
             ]);
         } else {
             return response()->json(['success' => false]);
         }
     }
 
+    
     public function iniciarConsulta($id)
     {
         $cita = Citas::findOrFail($id);

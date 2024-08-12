@@ -21,6 +21,7 @@
         "@fullcalendar/daygrid": "^6.1.15",
         "@fullcalendar/interaction": "^6.1.15",
         "@fullcalendar/timegrid": "^6.1.15",
+        "ckeditor4": "^4.24.0",
         "ckeditor5": "^42.0.2",
         "ckeditor5-premium-features": "^42.0.2",
         "datatables.net": "^2.0.8",
