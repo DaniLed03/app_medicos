@@ -7,15 +7,26 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AsignarController extends Controller
 {
     public function index()
     {
-        $users = User::with('roles')->get();
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if ($userRoles->contains('Medico')) {
+            $users = User::whereDoesntHave('roles', function($query) {
+                $query->whereIn('name', ['Administrador', 'Medico']);
+            })->with('roles')->get();
+        } else {
+            $users = User::with('roles')->get();
+        }
+
         $totalUsers = $users->count();
 
-        // Calculate the percentages of male and female users
+        // Calcular porcentajes
         $maleUsers = $users->where('sexo', 'masculino')->count();
         $femaleUsers = $users->where('sexo', 'femenino')->count();
         $porcentajeMujeres = $totalUsers > 0 ? ($femaleUsers / $totalUsers) * 100 : 0;
@@ -23,7 +34,6 @@ class AsignarController extends Controller
 
         return view('medico.Usuarios.ListadoUser', compact('users', 'totalUsers', 'porcentajeMujeres', 'porcentajeHombres'));
     }
-
 
     public function store(Request $request)
     {
@@ -35,8 +45,9 @@ class AsignarController extends Controller
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
         ]);
+
+        $defaultPassword = 'ContraseñaPrueba'; // Define aquí la contraseña por defecto
 
         $user = User::create([
             'nombres' => $request->nombres,
@@ -46,11 +57,11 @@ class AsignarController extends Controller
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'activo' => 'si', // Set status to active
+            'password' => Hash::make($defaultPassword),
+            'activo' => 'si', // Establecer el estado como activo
         ]);
 
-        // Assign default role or roles to the user
+        // Asignar el rol por defecto o roles al usuario
         $role = Role::where('name', 'default_role_name')->first();
         if ($role) {
             $user->assignRole($role);
@@ -78,6 +89,16 @@ class AsignarController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Usuario eliminado con éxito.');
+    }
+
+    public function resetPassword($id)
+    {
+        $user = User::findOrFail($id);
+        $defaultPassword = 'ContraseñaPrueba'; // Define aquí la contraseña por defecto que quieres asignar
+        $user->password = Hash::make($defaultPassword);
+        $user->save();
+
+        return redirect()->route('users.index')->with('success', 'Contraseña restablecida con éxito.');
     }
 
 }

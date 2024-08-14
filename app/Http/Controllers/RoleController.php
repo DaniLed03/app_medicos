@@ -6,6 +6,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
@@ -19,13 +20,29 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = Role::all();
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if ($userRoles->contains('Medico')) {
+            $roles = Role::whereNotIn('name', ['Administrador', 'Medico'])->get();
+        } else {
+            $roles = Role::all();
+        }
+
         return view('medico.Usuarios.roles', compact('roles'));
     }
 
     public function store(Request $request)
     {
         $request->validate(['name' => 'required']);
+
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if ($userRoles->contains('Medico') && in_array($request->name, ['Administrador', 'Medico'])) {
+            return redirect()->route('roles.index')->with('error', 'No tienes permiso para crear este rol.');
+        }
+
         Role::create($request->only('name'));
         return redirect()->route('roles.index')->with('success', 'Rol creado con éxito.');
     }

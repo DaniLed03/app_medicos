@@ -82,7 +82,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/citas/agregar', [MedicoController::class, 'crearCita'])->name('citas.agregar');
     Route::post('/medico/citas/agregarCita', [MedicoController::class, 'storeCitas'])->name('citas.store');
     Route::patch('/citas/{id}/update', [MedicoController::class, 'updateCita'])->name('citas.update');
-
+    Route::get('/configurar-horario', [MedicoController::class, 'configurarHorario'])->name('citas.configurarHorario');
+    Route::post('/guardar-horario', [MedicoController::class, 'storeHorario'])->name('horarios.store');
+    Route::get('/horas-disponibles', [MedicoController::class, 'obtenerHorasDisponibles']);
+    Route::post('/horarios/store', [MedicoController::class, 'storeHorario'])->name('horarios.store');
+    Route::delete('/horarios/destroy/{id}', [MedicoController::class, 'destroyHorario'])->name('horarios.destroy');
+    Route::patch('/horarios/update/{id}', [MedicoController::class, 'updateHorario'])->name('horarios.update');
+    
     // Rutas de Consultas
     Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');
     Route::post('/consultas/agregar', [ConsultaController::class, 'store'])->name('consultas.store');
@@ -103,5 +109,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/personas/create', [PersonaController::class, 'create'])->name('personas.create');
     Route::get('/consultas/verificarPaciente/{citaId}', [ConsultaController::class, 'verificarPaciente'])->name('consultas.verificarPaciente');
     Route::get('/pacientes/completar-registro/{citaId}', [MedicoController::class, 'completarRegistroPaciente'])->name('pacientes.completarRegistro');
+    Route::post('/users/{id}/reset-password', [AsignarController::class, 'resetPassword'])->name('users.resetPassword');
 
 });

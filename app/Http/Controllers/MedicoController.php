@@ -9,6 +9,8 @@ use App\Models\Consultas;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\HorariosMedicos;
+use Carbon\Carbon;
 
 class MedicoController extends Controller
 {
@@ -286,13 +288,35 @@ class MedicoController extends Controller
     {
         $medicoId = Auth::id();
         $cita = Citas::where('id', $id)->where('medicoid', $medicoId)->firstOrFail();
-        $personas = Persona::where('medico_id', $medicoId)->get();
+        
+        // Capturar la nueva fecha y hora si existen
+        $fecha = $request->input('newDate', $cita->fecha);
+        $hora = $request->input('newTime', $cita->hora);
 
-        // Verificar si se recibieron newDate y newTime, y utilizarlos
-        $newDate = $request->input('newDate', $cita->fecha); // Usar la nueva fecha si está presente
-        $newTime = $request->input('newTime', $cita->hora);  // Usar la nueva hora si está presente
+        $diaSemana = Carbon::parse($fecha)->locale('es')->dayName;
+        
+        // Filtrar las horas disponibles según la nueva fecha
+        $horario = HorariosMedicos::where('medico_id', $medicoId)
+                                    ->where('dia_semana', $diaSemana)
+                                    ->first();
 
-        return view('medico.citas.editarCita', compact('cita', 'personas', 'newDate', 'newTime'));
+        $horasDisponibles = [];
+        if ($horario && $horario->disponible) {
+            $horasOcupadas = Citas::where('fecha', $fecha)
+                                ->where('medicoid', $medicoId)
+                                ->pluck('hora')
+                                ->toArray();
+
+            $horaActual = Carbon::parse($horario->hora_inicio);
+            while ($horaActual->format('H:i') < $horario->hora_fin) {
+                if (!in_array($horaActual->format('H:i'), $horasOcupadas)) {
+                    $horasDisponibles[] = $horaActual->format('H:i');
+                }
+                $horaActual->addMinutes($horario->duracion_sesion);
+            }
+        }
+
+        return view('medico.citas.editarCita', compact('cita', 'horasDisponibles', 'fecha', 'hora'));
     }
 
     // Actualiza la información de una cita específica
@@ -306,6 +330,17 @@ class MedicoController extends Controller
             'motivo_consulta' => 'nullable|string|max:255'
         ]);
 
+        // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
+        $exists = Citas::where('fecha', $request->fecha)
+                    ->where('hora', $request->hora)
+                    ->where('medicoid', $request->usuariomedicoid)
+                    ->where('id', '!=', $id) // Excluir la cita actual
+                    ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.')->withInput();
+        }
+
         $cita = Citas::findOrFail($id);
         $cita->update([
             'fecha' => $request->fecha,
@@ -315,8 +350,9 @@ class MedicoController extends Controller
             'motivo_consulta' => $request->motivo_consulta
         ]);
 
-        return redirect()->route('citas');
+        return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
     }
+
 
     // Marca una cita como inactiva (eliminada)
     public function eliminarCita($id)
@@ -339,29 +375,133 @@ class MedicoController extends Controller
     public function obtenerHorasDisponibles(Request $request)
     {
         $fecha = $request->fecha;
-        $horasOcupadas = Citas::where('fecha', $fecha)->pluck('hora')->toArray();
-        $horasDisponibles = [];
+        $medicoid = $request->medicoid;
 
-        // Generar horas enteras disponibles
-        for ($i = 0; $i < 24; $i++) {
-            $hora = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00:00';
-            if (!in_array($hora, $horasOcupadas)) {
-                $horasDisponibles[] = $hora;
-            }
+        // Determinar el día de la semana para la fecha dada
+        $diaSemana = Carbon::parse($fecha)->locale('es')->dayName;
+
+        // Buscar primero si hay un horario específico para la fecha
+        $horario = HorariosMedicos::where('medico_id', $medicoid)
+                                    ->where('fecha', $fecha)
+                                    ->first();
+
+        // Si no hay horario específico para la fecha, buscar por el día de la semana
+        if (!$horario) {
+            $horario = HorariosMedicos::where('medico_id', $medicoid)
+                                        ->where('dia_semana', $diaSemana)
+                                        ->first();
         }
 
-        return response()->json($horasDisponibles);
+        if ($horario && $horario->disponible) {
+            $horasOcupadas = Citas::where('fecha', $fecha)
+                                ->where('medicoid', $medicoid)
+                                ->pluck('hora')
+                                ->toArray();
+
+            $horasDisponibles = [];
+            $horaActual = Carbon::parse($horario->hora_inicio);
+
+            while ($horaActual->format('H:i') < $horario->hora_fin) {
+                if (!in_array($horaActual->format('H:i'), $horasOcupadas)) {
+                    $horasDisponibles[] = $horaActual->format('H:i');
+                }
+                $horaActual->addMinutes($horario->duracion_sesion);
+            }
+
+            return response()->json($horasDisponibles);
+        } else {
+            return response()->json([]);
+        }
     }
 
-    public function horasDisponibles(Request $request)
+    public function storeHorario(Request $request)
     {
-        $fecha = $request->input('fecha');
-        $medicoid = $request->input('medicoid');
-        $citas = Citas::where('fecha', $fecha)
-                    ->where('medicoid', $medicoid)
-                    ->pluck('hora')
-                    ->toArray();
-        return response()->json($citas);
+        $request->validate([
+            'fecha' => 'nullable|date',
+            'dia_semana' => 'nullable|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
+            'hora_inicio' => 'required|date_format:H:i',
+            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
+            'duracion_sesion' => 'required|integer|min:1',
+            'disponible' => 'required|boolean',
+        ]);
+
+        if ($request->dia_semana) {
+            // Si se seleccionó un día de la semana, crea un horario recurrente para ese día
+            HorariosMedicos::updateOrCreate(
+                [
+                    'medico_id' => Auth::id(),
+                    'dia_semana' => $request->dia_semana
+                ],
+                [
+                    'hora_inicio' => $request->hora_inicio,
+                    'hora_fin' => $request->hora_fin,
+                    'duracion_sesion' => $request->duracion_sesion,
+                    'disponible' => $request->disponible
+                ]
+            );
+        } else if ($request->fecha) {
+            // Si se seleccionó una fecha específica, crea un horario para esa fecha
+            HorariosMedicos::create([
+                'medico_id' => Auth::id(),
+                'fecha' => $request->fecha,
+                'hora_inicio' => $request->hora_inicio,
+                'hora_fin' => $request->hora_fin,
+                'duracion_sesion' => $request->duracion_sesion,
+                'disponible' => $request->disponible
+            ]);
+        }
+
+        return redirect()->route('citas.configurarHorario')->with('status', 'Horario guardado exitosamente.');
     }
-    
+
+
+    public function configurarHorario()
+    {
+        $medicoId = Auth::id();
+
+        // Obtener horarios configurados para los días de la semana
+        $horariosSemana = HorariosMedicos::where('medico_id', $medicoId)
+                                        ->whereNotNull('dia_semana')
+                                        ->get();
+
+        // Obtener horarios configurados para fechas específicas
+        $horariosFechas = HorariosMedicos::where('medico_id', $medicoId)
+                                        ->whereNotNull('fecha')
+                                        ->get();
+
+        return view('medico.citas.configurarHorario', compact('horariosSemana', 'horariosFechas'));
+    }
+
+    public function updateHorario(Request $request, $id)
+    {
+        $request->validate([
+            'fecha' => 'nullable|date',
+            'dia_semana' => 'nullable|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
+            'hora_inicio' => 'required|date_format:H:i',
+            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
+            'duracion_sesion' => 'required|integer|min:1',
+            'disponible' => 'required|boolean',
+        ]);
+
+        $horario = HorariosMedicos::findOrFail($id);
+        $horario->update([
+            'fecha' => $request->fecha,
+            'dia_semana' => $request->dia_semana,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'duracion_sesion' => $request->duracion_sesion,
+            'disponible' => $request->disponible,
+        ]);
+
+        return redirect()->route('citas.configurarHorario')->with('status', 'Horario actualizado exitosamente.');
+    }
+
+    public function destroyHorario($id)
+    {
+        $horario = HorariosMedicos::findOrFail($id);
+        $horario->delete();
+
+        return redirect()->route('citas.configurarHorario')->with('status', 'Horario eliminado exitosamente.');
+    }
+
 }

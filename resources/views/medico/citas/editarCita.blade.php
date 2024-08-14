@@ -32,17 +32,14 @@
                                                 <div class="form-group flex">
                                                     <div class="mr-2 w-1/2">
                                                         <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                                                        <input type="date" name="fecha" id="fecha" min="{{ now()->toDateString() }}" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ $newDate }}" required>
+                                                        <input type="date" name="fecha" id="fecha" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ $fecha }}" max="{{ $fecha }}" required>
                                                     </div>
                                                     <div class="ml-2 w-1/2">
                                                         <label for="hora" class="block text-sm font-medium text-gray-700">Hora</label>
                                                         <select name="hora" id="hora" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                                                            @for ($i = 10; $i <= 23; $i++)
-                                                                @php
-                                                                    $hour = $i < 10 ? '0' . $i . ':00' : $i . ':00';
-                                                                @endphp
-                                                                <option value="{{ $hour }}" {{ $newTime == $hour ? 'selected' : '' }}>{{ $hour }}</option>
-                                                            @endfor
+                                                            @foreach ($horasDisponibles as $horaDisponible)
+                                                                <option value="{{ $horaDisponible }}" {{ $horaDisponible == $hora ? 'selected' : '' }}>{{ $horaDisponible }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -80,6 +77,17 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('error'))
+                Swal.fire({
+                    title: "Error",
+                    text: "{{ session('error') }}",
+                    icon: "error",
+                    confirmButtonColor: "#3085d6",
+                });
+            @endif
+        });
+
         function confirmUpdate() {
             Swal.fire({
                 title: "¿Estás seguro?",
@@ -93,11 +101,6 @@
                 if (result.isConfirmed) {
                     // Asegúrate de que este ID corresponde al formulario de actualización
                     document.getElementById('update-cita-form').submit();
-                    Swal.fire({
-                        title: "¡Cita Actualizada!",
-                        text: "La cita ha sido actualizada.",
-                        icon: "success"
-                    });
                 }
             });
         }
@@ -137,33 +140,37 @@
                 fetch(`/horas-disponibles?fecha=${fecha}&medicoid=${medicoid}`)
                     .then(response => response.json())
                     .then(data => {
-                        const horaOptions = horaSelect.options;
-                        while (horaOptions.length > 0) {
-                            horaOptions.remove(0);
+                        // Limpia las opciones actuales del select de horas
+                        while (horaSelect.options.length > 0) {
+                            horaSelect.remove(0);
                         }
 
-                        for (let i = 10; i <= 23; i++) {
-                            const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                            if (!data.includes(hour)) {
-                                const option = document.createElement('option');
-                                option.value = hour;
-                                option.textContent = hour;
-                                horaSelect.appendChild(option);
-                            }
-                        }
+                        // Genera las opciones de horas disponibles
+                        data.forEach(hour => {
+                            const option = document.createElement('option');
+                            option.value = hour;
+                            option.textContent = hour;
+                            horaSelect.appendChild(option);
+                        });
 
-                        horaSelect.value = '{{ $cita->hora }}';
+                        // Establece la hora seleccionada previamente si está disponible
+                        if (data.includes('{{ $cita->hora }}')) {
+                            horaSelect.value = '{{ $cita->hora }}';
+                        } else if(horaSelect.options.length > 0){
+                            horaSelect.value = horaSelect.options[0].value;
+                        }
                     });
             }
 
             fechaInput.addEventListener('change', fetchHorasDisponibles);
             usuarioMedicoInput.addEventListener('change', fetchHorasDisponibles);
 
-            // Initialize options
+            // Inicializa las opciones al cargar la página
             fetchHorasDisponibles();
 
-            // Set the min date to today
+            // Establece la fecha mínima a hoy
             fechaInput.min = new Date().toISOString().split("T")[0];
         });
+
     </script>
 </x-app-layout>

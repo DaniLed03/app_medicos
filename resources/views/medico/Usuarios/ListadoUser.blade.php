@@ -61,12 +61,18 @@
                                         <td>{{ $user->roles->pluck('name')->join(', ') }}</td>
                                         <td>
                                             <a href="{{ route('users.edit', $user->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline-block">
+                                            @if(!$user->roles->contains('name', 'Administrador'))
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                </form>
+                                            @endif
+                                            <form action="{{ route('users.resetPassword', $user->id) }}" method="POST" class="inline-block reset-password-form">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                <button type="button" class="text-yellow-500 hover:text-yellow-700 ml-4 reset-password-button">Restablecer Contraseña</button>
                                             </form>
-                                        </td>
+                                        </td>                                                                              
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -156,22 +162,6 @@
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Contraseña -->
-                                <div class="mt-4 col-span-1">
-                                    <x-input-label for="password" :value="__('Contraseña')" />
-                                    <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-                                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                                </div>
-                            
-                                <!-- Confirmar Contraseña -->
-                                <div class="mt-4 col-span-1">
-                                    <x-input-label for="password_confirmation" :value="__('Confirmar Contraseña')" />
-                                    <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-                                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-                                </div>
-                            </div>
-
                             <div class="flex items-center justify-end mt-4">
                                 <x-primary-button class="ml-4">
                                     {{ __('Registrar Usuario') }}
@@ -189,7 +179,29 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+    document.querySelectorAll('.reset-password-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.reset-password-form');
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas restablecer la contraseña de este usuario?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, restablecer',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        });
+    });
+</script>
 <script>
     $(document).ready(function() {
         $('#usersTable').DataTable({

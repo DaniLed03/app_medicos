@@ -72,8 +72,7 @@
             @include('medico.citas.agregarPersona')
         </div>
     </div>
-</x-app-layout>
-
+</x-app-layout> 
 
 <style>
     .bg-primary {
@@ -215,10 +214,9 @@
                 info.jsEvent.preventDefault();
             },
             eventDrop: function(info) {
-                // Mostrar SweetAlert para confirmar el cambio
                 Swal.fire({
                     title: '¿Deseas cambiar la fecha de esta cita?',
-                    text: "Se actualizará la fecha de la cita.",
+                    text: "Se actualizará la fecha de la cita con ajustes basados en la nueva selección.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -227,12 +225,18 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Redirigir a la página de edición con la fecha nueva y el ID del evento
-                        const newDate = info.event.start.toISOString().split('T')[0]; // Obtener la nueva fecha
-                        const newTime = info.event.start.toTimeString().split(' ')[0]; // Obtener la nueva hora
-                        window.location.href = `${info.event.url}?newDate=${newDate}&newTime=${newTime}`;
+                        const oldDate = new Date(info.oldEvent.start);
+                        const newDate = new Date(info.event.start);
+                        let adjustedDate;
+
+                        // Formatear la fecha ajustada para enviarla
+                        const formattedDate = newDate.toISOString().split('T')[0];
+                        const newTime = info.event.start.toTimeString().split(' ')[0].substring(0, 5);
+                        
+                        // Redirigir con la fecha ajustada
+                        window.location.href = `${info.event.url}?newDate=${formattedDate}&newTime=${newTime}`;
                     } else {
-                        info.revert(); // Revertir el cambio si se cancela
+                        info.revert();
                     }
                 });
             },
@@ -243,15 +247,12 @@
                     info.el.style.backgroundColor = '#EBF2F4';
                 }
             },
-            slotMinTime: '10:00:00',
-            slotMaxTime: '23:00:00',
             allDaySlot: false,
             height: 'auto'
         });
 
         calendar.render();
     });
-
 
     document.addEventListener('DOMContentLoaded', function() {
         const fechaInput = document.getElementById('fecha');

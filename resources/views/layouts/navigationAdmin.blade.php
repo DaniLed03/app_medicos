@@ -128,8 +128,11 @@
                             @can('Vista Permisos')
                                 <a href="{{ route('permisos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Permisos</a>
                             @endcan
+                            @role('Medico')
+                                <a href="{{ route('citas.configurarHorario') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Configurar Horario</a>
+                            @endrole
                         </div>
-                    </div>
+                    </div>                    
                 </div>
                 <div class="md:hidden">
                     <button @click="open = !open" class="text-white hover:bg-[#1E40AF] hover:text-white px-3 py-2 rounded-md text-sm font-medium">

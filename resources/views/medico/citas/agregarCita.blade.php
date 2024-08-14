@@ -92,22 +92,18 @@
                         horaOptions.remove(0);
                     }
 
-                    for (let i = 10; i <= 23; i++) {
-                        const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                        if (!data.includes(hour)) {
-                            const option = document.createElement('option');
-                            option.value = hour;
-                            option.textContent = hour;
-                            horaSelect.appendChild(option);
-                        }
-                    }
+                    data.forEach(hour => {
+                        const option = document.createElement('option');
+                        option.value = hour;
+                        option.textContent = hour;
+                        horaSelect.appendChild(option);
+                    });
                 });
         }
 
-        // Set the min date to today
         fechaInput.min = new Date().toLocaleDateString('en-CA');
-
     });
+
 
     document.addEventListener('DOMContentLoaded', function() {
         new TomSelect("#persona",{
@@ -119,7 +115,6 @@
         });
     });
 
-    // Mostrar alerta de SweetAlert2 si hay mensajes de éxito
     @if(session('status'))
             Swal.fire({
                 position: 'center',
@@ -130,7 +125,6 @@
             });
     @endif
 
-    // Mostrar alerta de SweetAlert2 si hay mensajes de error
     @if($errors->any())
             Swal.fire({
                 icon: 'error',
@@ -138,5 +132,4 @@
                 html: '<ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
             });
     @endif
-
 </script>
