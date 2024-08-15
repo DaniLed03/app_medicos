@@ -23,7 +23,8 @@ class RoleController extends Controller
         $currentUser = Auth::user();
         $userRoles = $currentUser->roles->pluck('name');
 
-        if ($userRoles->contains('Medico')) {
+        if (!$userRoles->contains('Administrador')) {
+            // Si no es Administrador, excluir los roles 'Administrador' y 'Medico'
             $roles = Role::whereNotIn('name', ['Administrador', 'Medico'])->get();
         } else {
             $roles = Role::all();
@@ -39,7 +40,7 @@ class RoleController extends Controller
         $currentUser = Auth::user();
         $userRoles = $currentUser->roles->pluck('name');
 
-        if ($userRoles->contains('Medico') && in_array($request->name, ['Administrador', 'Medico'])) {
+        if (!$userRoles->contains('Administrador') && in_array($request->name, ['Administrador', 'Medico'])) {
             return redirect()->route('roles.index')->with('error', 'No tienes permiso para crear este rol.');
         }
 
@@ -55,9 +56,21 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $permissions = Permission::all();
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if ($userRoles->contains('Administrador')) {
+            // Si es Administrador, mostrar todos los permisos
+            $permissions = Permission::all();
+        } else {
+            // Si no es Administrador, excluir el permiso 'Vista Permisos'
+            $permissions = Permission::where('name', '!=', 'Vista Permisos')->get();
+        }
+
         return view('medico.Usuarios.rolePermission', compact('role', 'permissions'));
     }
+
+
 
     public function update(Request $request, Role $role)
     {
@@ -66,6 +79,13 @@ class RoleController extends Controller
             'permissions' => 'array'
         ]);
 
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if (!$userRoles->contains('Administrador') && in_array($role->name, ['Administrador', 'Medico'])) {
+            return redirect()->route('roles.index')->with('error', 'No tienes permiso para actualizar este rol.');
+        }
+
         $role->update($request->only('name'));
 
         // Sync permissions
@@ -73,4 +93,5 @@ class RoleController extends Controller
 
         return redirect()->route('roles.edit', $role)->with('success', 'Rol actualizado con éxito.');
     }
+
 }

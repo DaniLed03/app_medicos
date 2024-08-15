@@ -27,16 +27,20 @@ class MedicoController extends Controller
         return view('medico.pacientes.completarRegistroPaciente', compact('citaId', 'datosPersona'));
     }
 
-
     // Guarda un nuevo paciente
     public function storePacientes(Request $request)
     {
-        $medicoId = Auth::id();
+        // Obtener el ID del usuario autenticado
+        $currentUserId = Auth::id();
 
-        // Obtener el último número de expediente del médico autenticado y generar el siguiente
+        // Obtener el ID del médico que creó al usuario autenticado (si existe)
+        $medicoId = Auth::user()->medico_id ? Auth::user()->medico_id : $currentUserId;
+
+        // Obtener el último número de expediente del médico correspondiente y generar el siguiente
         $lastPaciente = Paciente::where('medico_id', $medicoId)->orderBy('no_exp', 'desc')->first();
         $nextNoExp = $lastPaciente ? $lastPaciente->no_exp + 1 : 1;
 
+        // Validación de los datos del paciente
         $request->validate([
             'nombres' => 'required|string|max:255',
             'apepat' => 'required|string|max:255',
@@ -46,6 +50,7 @@ class MedicoController extends Controller
             'sexo' => 'required|in:masculino,femenino',
         ]);
 
+        // Crear el nuevo paciente con el medico_id correcto
         Paciente::create([
             'no_exp' => $nextNoExp,
             'nombres' => $request->nombres,
@@ -55,9 +60,10 @@ class MedicoController extends Controller
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
             'activo' => 'si',
-            'medico_id' => $medicoId,
+            'medico_id' => $medicoId, // Usar el ID del médico original
         ]);
 
+        // Redirigir con un mensaje de éxito
         return redirect()->route('medico.dashboard')->with('status', 'Paciente creado con éxito');
     }
 
@@ -106,24 +112,33 @@ class MedicoController extends Controller
     // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
     {
-        $medicoId = Auth::id();
-        
-        $query = Paciente::where('activo', 'si')->where('medico_id', $medicoId);
+        $medicoId = Auth::id(); // Obtener el ID del médico autenticado
+
+        // Obtener el ID del médico que agregó el usuario autenticado
+        $agregadoPorMedicoId = Auth::user()->medico_id;
+
+        // Filtrar los pacientes por el ID del médico autenticado o el médico que agregó al usuario
+        $query = Paciente::where('activo', 'si')
+                    ->where(function($q) use ($medicoId, $agregadoPorMedicoId) {
+                        $q->where('medico_id', $medicoId)
+                        ->orWhere('medico_id', $agregadoPorMedicoId);
+                    });
 
         if ($request->has('name') && $request->name != '') {
             $query->where('nombres', 'like', '%' . $request->name . '%');
         }
-        
-        $pacientes = Paciente::all();
+
+        $pacientes = $query->get(); // Ejecutar la consulta y obtener los pacientes
         $totalPacientes = $pacientes->count();
         $totalMujeres = $pacientes->where('sexo', 'femenino')->count();
         $totalHombres = $pacientes->where('sexo', 'masculino')->count();
-        
+
         $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
         $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
 
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
+
 
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($id)
@@ -226,14 +241,16 @@ class MedicoController extends Controller
     // Muestra todas las citas activas
     public function mostrarCitas()
     {
-        $medicoId = Auth::id();
+        $currentUser = Auth::user();
+        $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
+
         $citas = Citas::select('citas.*', 'personas.nombres', 'personas.apepat', 'personas.apemat')
                         ->join('personas', 'citas.persona_id', '=', 'personas.id')
                         ->where('citas.activo', 'si')
                         ->where('citas.medicoid', $medicoId)
                         ->get();
         
-        // Mostrar todas las personas sin filtrar por activo
+        // Obtener las personas asociadas al médico
         $personas = Persona::where('medico_id', $medicoId)->get();
         
         return view('medico.citas.citas', compact('citas', 'personas'));
@@ -375,26 +392,27 @@ class MedicoController extends Controller
     public function obtenerHorasDisponibles(Request $request)
     {
         $fecha = $request->fecha;
-        $medicoid = $request->medicoid;
+        $currentUser = Auth::user();
+        $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
         // Determinar el día de la semana para la fecha dada
         $diaSemana = Carbon::parse($fecha)->locale('es')->dayName;
 
         // Buscar primero si hay un horario específico para la fecha
-        $horario = HorariosMedicos::where('medico_id', $medicoid)
+        $horario = HorariosMedicos::where('medico_id', $medicoId)
                                     ->where('fecha', $fecha)
                                     ->first();
 
         // Si no hay horario específico para la fecha, buscar por el día de la semana
         if (!$horario) {
-            $horario = HorariosMedicos::where('medico_id', $medicoid)
+            $horario = HorariosMedicos::where('medico_id', $medicoId)
                                         ->where('dia_semana', $diaSemana)
                                         ->first();
         }
 
         if ($horario && $horario->disponible) {
             $horasOcupadas = Citas::where('fecha', $fecha)
-                                ->where('medicoid', $medicoid)
+                                ->where('medicoid', $medicoId)
                                 ->pluck('hora')
                                 ->toArray();
 
@@ -413,6 +431,7 @@ class MedicoController extends Controller
             return response()->json([]);
         }
     }
+
 
     public function storeHorario(Request $request)
     {

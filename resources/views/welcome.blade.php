@@ -1,10 +1,29 @@
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedeHealth</title>
+    <link rel="icon" href="{{ asset('images/LedeHealth.ico') }}" type="image/x-icon">
+</head>
+
 <x-app-layout>
     <div class="bg-white overflow-hidden">
+        
         <!-- Navbar Section -->
         <div class="text-white py-2 fixed top-0 left-0 right-0 z-10" style="background-color: #2D7498;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <div class="text-lg font-bold">LedeHealth</div>
-                <div class="flex space-x-4">
+                <!-- Título alineado a la izquierda -->
+                <div class="text-lg font-bold text-left">LedeHealth</div>
+                <!-- Botón de Hamburguesa alineado a la derecha -->
+                <div class="block md:hidden text-right">
+                    <button id="menu-toggle" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Opciones de Menú -->
+                <div id="nav-content" class="hidden md:flex space-x-4">
                     <a href="#nosotros" class="text-white hover:underline">Nosotros</a>
                     <a href="#por-que-ledehealth" class="text-white hover:underline">¿Por qué LedeHealth?</a>
                     <a href="#funcionalidades" class="text-white hover:underline">Funcionalidades</a>
@@ -60,11 +79,11 @@
                 <h2 class="text-3xl font-bold text-center text-gray-900">Nosotros</h2>
                 <div class="mt-8 flex flex-col md:flex-row items-center md:space-x-8">
                     <div class="md:w-1/2">
-                        <img src="{{ asset('images/team.jpg') }}" alt="Nuestro equipo" class="rounded-lg shadow-lg">
+                        <img src="{{ asset('images/team.webp') }}" alt="Nuestro equipo" class="rounded-lg shadow-lg w-55 h-auto">
                     </div>
                     <div class="md:w-1/2 mt-8 md:mt-0">
-                        <p class="text-lg text-gray-600">En LedeHealth, nos dedicamos a proporcionar soluciones tecnológicas de vanguardia para el sector salud. Nuestro equipo está compuesto por profesionales apasionados y experimentados que trabajan incansablemente para ofrecer productos y servicios que mejoren la calidad de vida de los pacientes y optimicen la gestión médica.</p>
-                        <p class="mt-4 text-lg text-gray-600">Desde nuestra fundación, hemos crecido y evolucionado, siempre con el objetivo de estar a la vanguardia en tecnología de la salud. Creemos en la innovación constante y en la mejora continua de nuestros productos para satisfacer las necesidades cambiantes de nuestros clientes.</p>
+                        <p class="text-2xl text-gray-600 text-justify">En LedeHealth, nos dedicamos a proporcionar soluciones tecnológicas de vanguardia para el sector salud. Nuestro equipo está compuesto por profesionales apasionados y experimentados que trabajan incansablemente para ofrecer productos y servicios que mejoren la calidad de vida de los pacientes y optimicen la gestión médica.</p>
+                        <p class="mt-4 text-2xl text-gray-600 text-justify">Desde nuestra fundación, hemos crecido y evolucionado, siempre con el objetivo de estar a la vanguardia en tecnología de la salud. Creemos en la innovación constante y en la mejora continua de nuestros productos para satisfacer las necesidades cambiantes de nuestros clientes.</p>
                     </div>
                 </div>
             </div>
@@ -81,9 +100,9 @@
                                 <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Tu tiempo es importante</h3>
-                            <p class="mt-2 text-gray-600">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold text-gray-900 text-center">Tu tiempo es importante</h3>
+                            <p class="mt-2 text-gray-600 text-center">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
@@ -92,9 +111,9 @@
                                 <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Producto construido para ti</h3>
-                            <p class="mt-2 text-gray-600">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold text-gray-900 text-center">Producto construido para ti</h3>
+                            <p class="mt-2 text-gray-600 text-center">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
@@ -104,12 +123,12 @@
                                 <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z"/>
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Software en la nube</h3>
-                            <p class="mt-2 text-gray-600">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold text-gray-900 text-center">Software en la nube</h3>
+                            <p class="mt-2 text-gray-600 text-center">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
                         </div>
                     </div>
-                    <div class="mt-8 flex space-x-4">
+                    <div class="mt-8 flex justify-between space-x-4">
                         <a href="{{ route('register') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark">Crear cuenta ¡gratis!</a>
                         <a href="{{ route('persona.login') }}" class="bg-register-button text-white font-bold py-3 px-6 rounded-full hover:bg-secondary-dark">Iniciar Sesión Persona</a>
                     </div>
@@ -119,6 +138,8 @@
                 </div>
             </div>
         </div>
+
+
 
         <!-- Functionalities Section -->
         <div id="funcionalidades" class="bg-gray-50 py-12">
@@ -249,36 +270,85 @@
     }
 
     @media (max-width: 768px) {
+        #nav-content {
+            display: none;
+            flex-direction: column;
+            text-align: center;
+            background-color: #2D7498;
+        }
+
+        #nav-content.active {
+            display: flex;
+        }
+
         .flex {
             flex-direction: column;
         }
+
         .md\:flex-1 {
             width: 100%;
         }
+
         .md\:w-1\/2 {
             width: 100%;
             text-align: center;
         }
-        .md\:text-center {
-            text-align: center;
-        }
+
         .mr-12 {
             margin-right: 0;
         }
+        
+        .space-x-4 > * {
+            margin-right: 10px;
+        }
+        .space-x-4 > *:last-child {
+            margin-right: 0;
+        }
+
+        /* Alineación de íconos y texto en el centro */
+        .flex.items-start.space-x-4 {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .inline-block.bg-feature-circle {
+            margin-bottom: 10px;
+        }
+        .text-left {
+            text-align: center;
+        }
+
+        /* Botones uno al lado del otro */
+        .mt-8.flex.justify-between.space-x-4 a {
+            width: 48%;
+            text-align: center;
+        }
+        .mt-8.flex.justify-between.space-x-4 {
+            flex-direction: row;
+            justify-content: space-between;
+        }
     }
+
+    @media (max-width: 768px) {
+        .text-lg.font-bold.text-left {
+            flex: 1;
+            text-align: left;
+        }
+        .block.md\:hidden.text-right {
+            flex: 1;
+            text-align: right;
+        }
+    }
+
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const nav = document.querySelector('.bg-primary');
-        const navOffsetTop = nav.offsetTop;
+        const menuToggle = document.getElementById('menu-toggle');
+        const navContent = document.getElementById('nav-content');
 
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > navOffsetTop) {
-                nav.classList.add('sticky');
-            } else {
-                nav.classList.remove('sticky');
-            }
+        menuToggle.addEventListener('click', function() {
+            navContent.classList.toggle('active');
         });
     });
 </script>

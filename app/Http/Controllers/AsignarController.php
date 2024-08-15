@@ -15,11 +15,10 @@ class AsignarController extends Controller
     {
         $currentUser = Auth::user();
         $userRoles = $currentUser->roles->pluck('name');
+        $currentUserId = Auth::id(); // Obtén el ID del usuario autenticado
 
         if ($userRoles->contains('Medico')) {
-            $users = User::whereDoesntHave('roles', function($query) {
-                $query->whereIn('name', ['Administrador', 'Medico']);
-            })->with('roles')->get();
+            $users = User::where('medico_id', $currentUserId)->with('roles')->get();
         } else {
             $users = User::with('roles')->get();
         }
@@ -35,6 +34,7 @@ class AsignarController extends Controller
         return view('medico.Usuarios.ListadoUser', compact('users', 'totalUsers', 'porcentajeMujeres', 'porcentajeHombres'));
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
@@ -48,6 +48,11 @@ class AsignarController extends Controller
         ]);
 
         $defaultPassword = 'ContraseñaPrueba'; // Define aquí la contraseña por defecto
+        $currentUser = Auth::user(); // Obtener el usuario autenticado
+        $userRoles = $currentUser->roles->pluck('name'); // Obtener los roles del usuario autenticado
+
+        // Asignar el `medico_id` solo si el usuario autenticado no es administrador
+        $medicoId = $userRoles->contains('Administrador') ? null : $currentUser->id;
 
         $user = User::create([
             'nombres' => $request->nombres,
@@ -59,6 +64,7 @@ class AsignarController extends Controller
             'email' => $request->email,
             'password' => Hash::make($defaultPassword),
             'activo' => 'si', // Establecer el estado como activo
+            'medico_id' => $medicoId, // Asigna el ID del médico si no es administrador
         ]);
 
         // Asignar el rol por defecto o roles al usuario
@@ -70,12 +76,24 @@ class AsignarController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuario creado con éxito.');
     }
 
+
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        $roles = Role::all();
+        $currentUser = Auth::user();
+        $userRoles = $currentUser->roles->pluck('name');
+
+        if ($userRoles->contains('Medico')) {
+            // Excluir los roles 'Administrador' y 'Medico' si el usuario autenticado es 'Medico'
+            $roles = Role::whereNotIn('name', ['Administrador', 'Medico'])->get();
+        } else {
+            // Mostrar todos los roles para otros usuarios
+            $roles = Role::all();
+        }
+
         return view('medico.Usuarios.userRol', compact('user', 'roles'));
     }
+
 
     public function update(Request $request, $id)
     {

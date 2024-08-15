@@ -9,6 +9,7 @@
                         </div>
                     @endif
 
+                    @role('Administrador')
                     <h1 class="text-2xl font-bold text-gray-900 uppercase mb-4">Agregar Permiso</h1>
                     <form action="{{ route('permisos.store') }}" method="POST" class="mb-6">
                         @csrf
@@ -17,6 +18,7 @@
                             <button type="submit" class="ml-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Agregar Permiso</button>
                         </div>
                     </form>
+                    @endrole
 
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
                         <table id="permissionsTable" class="display nowrap min-w-full" style="width:100%">
@@ -25,9 +27,11 @@
                                     <th class="px-6 py-3 bg-header-color text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Nombre
                                     </th>
+                                    @role('Administrador')
                                     <th class="px-6 py-3 bg-header-color text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Acciones
                                     </th>
+                                    @endrole
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -36,6 +40,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {{ $permission->name }}
                                         </td>
+                                        @role('Administrador')
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
                                             <form action="{{ route('permisos.destroy', $permission->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este permiso?');" class="inline-block">
                                                 @csrf
@@ -43,6 +48,7 @@
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
                                             </form>
                                         </td>
+                                        @endrole
                                     </tr>
                                 @endforeach
                             </tbody>

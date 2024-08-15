@@ -34,12 +34,12 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if (!$user->roles()->exists()) {
+        if ($user->roles->isEmpty()) {
             Auth::logout();
             Alert::warning('¡Atención!', 'Esta cuenta aún no está activa. Habla con el administrador para activar tu cuenta.');
             return redirect()->route('login');
         }
-
+        
         return $this->redirectToRole($user);
     }
 

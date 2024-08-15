@@ -42,7 +42,7 @@ class User extends Authenticatable
 
     public function pacientes()
     {
-        return $this->hasMany(Paciente::class, 'medico_id');
+        return $this->hasManyThrough(Paciente::class, User::class, 'medico_id', 'medico_id', 'id', 'id');
     }
 
     public function medico()
