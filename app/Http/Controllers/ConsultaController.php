@@ -11,72 +11,10 @@ use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\Venta;
 
 class ConsultaController extends Controller
 {
-    public function create($citaId)
-    {
-        $cita = Citas::with('paciente')->findOrFail($citaId);
-        $medico = Auth::user();
-
-        return view('medico.consultas.agregarConsulta', compact('cita', 'medico'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'citai_id' => 'required|exists:citas,id',
-            'hidden_talla' => 'nullable|string',
-            'hidden_temperatura' => 'nullable|string',
-            'hidden_saturacion_oxigeno' => 'nullable|string',
-            'hidden_frecuencia_cardiaca' => 'nullable|string',
-            'hidden_peso' => 'nullable|string',
-            'hidden_tension_arterial' => 'nullable|string',
-            'motivoConsulta' => 'required|string',
-            'notas_padecimiento' => 'nullable|string',
-            'interrogatorio_por_aparatos' => 'nullable|string',
-            'examen_fisico' => 'nullable|string',
-            'diagnostico' => 'required|string',
-            'plan' => 'nullable|string',
-            'status' => 'required|string|in:en curso,finalizada',
-            'totalPagar' => 'required|numeric',
-            'usuariomedicoid' => 'required|exists:users,id',
-            'circunferencia_cabeza' => 'nullable|string', 
-            'recetas' => 'array',
-            'recetas.*.tipo_de_receta' => 'required|string',
-            'recetas.*.receta' => 'required|string',
-        ]);
-
-        // Obtener el paciente desde la cita
-        $cita = Citas::findOrFail($request->citai_id);
-        $pacienteId = $cita->pacienteid;
-
-        // Creación de la consulta
-        $consultaData = $request->except('recetas'); // Exclude recetas from consultaData
-        $consultaData['pacienteid'] = $pacienteId;
-        $consultaData['talla'] = $request->hidden_talla;
-        $consultaData['temperatura'] = $request->hidden_temperatura;
-        $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
-        $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
-        $consultaData['peso'] = $request->hidden_peso;
-        $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
-        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
-        $consulta = Consultas::create($consultaData);
-
-        // Guardar recetas
-        if ($request->has('recetas')) {
-            foreach ($request->recetas as $recetaData) {
-                ConsultaReceta::create([
-                    'consulta_id' => $consulta->id,
-                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
-                    'receta' => $recetaData['receta']
-                ]);
-            }
-        }
-
-        return redirect()->route('consultas.index')->with('success', 'Consulta creada exitosamente.');
-    }
-
     public function createWithoutCita($pacienteId)
     {
         $paciente = Paciente::findOrFail($pacienteId);
@@ -101,7 +39,7 @@ class ConsultaController extends Controller
             'examen_fisico' => 'nullable|string',
             'diagnostico' => 'required|string',
             'plan' => 'nullable|string',
-            'status' => 'required|string|in:en curso,finalizada',
+            'status' => 'required|string|in:en curso,Finalizada',
             'totalPagar' => 'required|numeric',
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
@@ -119,7 +57,7 @@ class ConsultaController extends Controller
         $consultaData['peso'] = $request->hidden_peso;
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
-        $consultaData['status'] = 'finalizada'; 
+        $consultaData['status'] = 'Finalizada'; 
         $consulta = Consultas::create($consultaData);
 
         // Obtener el correo y la CURP del paciente
@@ -135,11 +73,11 @@ class ConsultaController extends Controller
         // Actualizar el estado de la cita si la persona coincide
         if ($persona) {
             $cita = Citas::where('persona_id', $persona->id)
-                        ->where('status', '!=', 'finalizada') // Asegurarse de que no esté ya finalizada
+                        ->where('status', '!=', 'Finalizada') // Asegurarse de que no esté ya finalizada
                         ->first();
 
             if ($cita) {
-                $cita->status = 'finalizada';
+                $cita->status = 'Finalizada';
                 $cita->save();
             }
         }
@@ -155,30 +93,77 @@ class ConsultaController extends Controller
             }
         }
 
+        // Generar la venta
+        $precioConsulta = $consulta->totalPagar;
+        $iva = $precioConsulta * 0.16; // 16% de IVA
+        $total = $precioConsulta + $iva;
+
+        $venta = Venta::create([
+            'consulta_id' => $consulta->id,
+            'precio_consulta' => $precioConsulta,
+            'iva' => $iva,
+            'total' => $total,
+            'paciente_id' => $paciente->id, // Guardar el ID del paciente
+        ]);
+
         // Redirigir a la vista de detalles de la consulta
-        return redirect()->route('consultas.index')->with('success', 'Consulta finalizada exitosamente.');
+        return redirect()->route('ventas.show', $venta->id)->with('success', 'Consulta y venta finalizadas exitosamente.');
     }
-
-
 
     public function index(Request $request)
     {
-        $medicoId = Auth::id(); // Get the ID of the logged-in doctor
+        $currentUser = Auth::user();
+        $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
         $today = Carbon::today();
 
         // Obtener las fechas de inicio y fin del filtro
         $startDate = $request->input('start_date', $today->format('Y-m-d'));
         $endDate = $request->input('end_date', $today->format('Y-m-d'));
 
-        // Fetch consultations within the date range with pagination
-        $consultas = Citas::where('medicoid', $medicoId)
+        // Consultas con cita que no están finalizadas
+        $consultasConCita = Citas::where('medicoid', $medicoId)
             ->where('activo', 'si')
+            ->where('status', '!=', 'Finalizada') // Excluir las citas finalizadas
             ->whereBetween('fecha', [$startDate, $endDate])
-            ->with('persona') // Include the relationship with the person
-            ->paginate(10);
+            ->with('persona') // Incluir relación con la persona
+            ->get()
+            ->map(function($cita) {
+                $cita->isCita = true; // Marcar como consulta con cita
+                return $cita;
+            });
 
-        return view('medico.consultas.consultas', compact('consultas'));
+        // Consultas sin cita
+        $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
+            ->whereNull('citai_id') // Filtrar las consultas sin cita asociada
+            ->where('status', 'Finalizada') // Solo mostrar las consultas que ya están finalizadas
+            ->whereBetween('fechaHora', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']) // Asegurarse de que la fecha y hora estén dentro del rango
+            ->get()
+            ->map(function($consulta) {
+                $consulta->isCita = false; // Marcar como consulta sin cita
+                return $consulta;
+            });
+
+        // Concatenar ambas colecciones
+        $consultas = $consultasConCita->concat($consultasSinCita);
+
+        // Ordenar por fecha y hora (opcional)
+        $consultas = $consultas->sortBy(function($consulta) {
+            return $consulta->isCita ? $consulta->fecha . ' ' . $consulta->hora : $consulta->fechaHora;
+        });
+
+        // Paginación manual
+        $perPage = 10;
+        $page = $request->input('page', 1);
+        $paginatedConsultas = $consultas->slice(($page - 1) * $perPage, $perPage)->values();
+
+        return view('medico.consultas.consultas', [
+            'consultas' => new \Illuminate\Pagination\LengthAwarePaginator($paginatedConsultas, $consultas->count(), $perPage, $page, [
+                'path' => $request->url(),
+                'query' => $request->query()
+            ])
+        ]);
     }
+
 
     public function verificarPaciente(Request $request, $citaId)
     {
@@ -270,7 +255,7 @@ class ConsultaController extends Controller
             'examen_fisico' => 'nullable|string',
             'diagnostico' => 'required|string',
             'plan' => 'nullable|string',
-            'status' => 'required|string|in:en curso,finalizada',
+            'status' => 'required|string|in:en curso,Finalizada',
             'totalPagar' => 'required|numeric|min:0',
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
@@ -297,11 +282,12 @@ class ConsultaController extends Controller
     public function terminate($id)
     {
         $consulta = Consultas::findOrFail($id);
-        $consulta->status = 'finalizada';
+        $consulta->status = 'Finalizada';
         $consulta->save();
 
         return response()->json(['success' => true]);
     }
+
 
     public function navigate(Request $request)
     {
@@ -359,5 +345,26 @@ class ConsultaController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function generateVenta($consultaId)
+    {
+        $consulta = Consultas::findOrFail($consultaId);
+        $pacienteId = $consulta->pacienteid; // Asegúrate de que este campo esté correctamente configurado en la tabla consultas
+
+        $precioConsulta = $consulta->totalPagar;
+        $iva = $precioConsulta * 0.16; // 16% de IVA
+        $total = $precioConsulta + $iva;
+
+        $venta = Venta::create([
+            'consulta_id' => $consulta->id,
+            'precio_consulta' => $precioConsulta,
+            'iva' => $iva,
+            'total' => $total,
+            'paciente' => $pacienteId, // Guarda el ID del paciente en la tabla ventas
+        ]);
+
+        return view('medico.ventas.show', compact('venta'));
+    }
+
 
 }

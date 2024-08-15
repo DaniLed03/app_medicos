@@ -36,9 +36,11 @@
                             </div>
                         </div>
                         <div>
-                            <button id="openModal" class="bg-button-color hover:bg-button-hover text-white font py-2 px-4 rounded">
-                                Agregar Paciente
-                            </button>
+                            @can('Agregar Pacientes')
+                                <button id="openModal" class="bg-button-color hover:bg-button-hover text-white font py-2 px-4 rounded">
+                                    Agregar Paciente
+                                </button>
+                            @endcan
                         </div>
                     </div>
                     
@@ -66,13 +68,19 @@
                                         <td>{{ $paciente->telefono }}</td>
                                         <td>{{ $paciente->correo }}</td>
                                         <td>
-                                            <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                            <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
-                                            </form>
-                                            <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
+                                            @can('Editar Paciente')
+                                                <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                            @endcan
+                                            @can('Eliminar Paciente')
+                                                <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                </form>
+                                            @endcan
+                                            @can('Consultar')
+                                                <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach

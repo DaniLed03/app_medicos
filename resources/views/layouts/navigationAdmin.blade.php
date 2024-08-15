@@ -103,14 +103,29 @@
                             @endcan
                         </div>
                     </div>
-                    <div class="relative">
-                        <a href="{{ route('citas') }}" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-event-fill mr-2" viewBox="0 0 16 16">
-                                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2m-3.5-7h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5"/>
+                    @can('Vista Citas')
+                        <div class="relative">
+                            <a href="{{ route('citas') }}" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-event-fill mr-2" viewBox="0 0 16 16">
+                                    <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2m-3.5-7h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Agenda
+                            </a>
+                        </div>
+                    @endcan
+                    <div x-data="{ dropdownOpen: false }" class="relative">
+                        <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase-fill mr-2" viewBox="0 0 16 16">
+                                <path d="M4 .5a.5.5 0 0 0-1 0v1H1.5A1.5 1.5 0 0 0 0 3v1.5h16V3a1.5 1.5 0 0 0-1.5-1.5H13v-1a.5.5 0 0 0-1 0v1H4v-1z"/>
+                                <path d="M0 4.5V11a1.5 1.5 0 0 0 1.5 1.5H2v1.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V12.5h.5A1.5 1.5 0 0 0 16 11V4.5H0z"/>
                             </svg>
-                            Agenda
-                        </a>
-                    </div>
+                            Gestión de Ventas
+                        </button>
+                        <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Ventas</a>
+                            <a href="{{ route('productos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Productos</a>
+                        </div>
+                    </div>  
                     <div x-data="{ dropdownOpen: false }" class="relative">
                         <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill mr-2" viewBox="0 0 16 16">
@@ -132,7 +147,7 @@
                                 <a href="{{ route('citas.configurarHorario') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Configurar Horario</a>
                             @endrole
                         </div>
-                    </div>                    
+                    </div>                
                 </div>
                 <div class="md:hidden">
                     <button @click="open = !open" class="text-white hover:bg-[#1E40AF] hover:text-white px-3 py-2 rounded-md text-sm font-medium">

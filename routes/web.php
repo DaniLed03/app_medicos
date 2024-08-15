@@ -7,11 +7,15 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AsignarController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PersonaAuthController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\EnsurePersonaIsAuthenticated;
+use App\Http\Middleware\EnsureUserIsAuthenticated;
 
 // Ruta de la página de bienvenida
 Route::get('/', function () {
@@ -21,11 +25,6 @@ Route::get('/', function () {
 // Incluir las rutas de autenticación generadas por Laravel Breeze
 require __DIR__.'/auth.php';
 
-Route::get('persona/login', [PersonaAuthController::class, 'showLoginForm'])->name('persona.login');
-Route::post('persona/login', [PersonaAuthController::class, 'login']);
-Route::post('persona/logout', [PersonaAuthController::class, 'logout'])->name('persona.logout');
-
-Route::get('/personas/citas', [PersonaController::class, 'showCitas'])->name('personas.citas');
 
 // Agrupación de rutas que requieren autenticación y verificación de email
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -110,5 +109,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/consultas/verificarPaciente/{citaId}', [ConsultaController::class, 'verificarPaciente'])->name('consultas.verificarPaciente');
     Route::get('/pacientes/completar-registro/{citaId}', [MedicoController::class, 'completarRegistroPaciente'])->name('pacientes.completarRegistro');
     Route::post('/users/{id}/reset-password', [AsignarController::class, 'resetPassword'])->name('users.resetPassword');
+
+    // Rutas para productos
+    Route::resource('productos', ProductoController::class);
+    Route::get('/productos/reporte', [ProductoController::class, 'generateReport'])->name('productos.reporte');
+    Route::get('/productos/{id}', [ProductoController::class, 'show'])->name('productos.show');
+
+    // Rutas para ventas (ya existente)
+    Route::get('ventas/generate/{consulta}', [ConsultaController::class, 'generateVenta'])->name('ventas.generate');
+    Route::post('ventas/store/{venta}', [VentaController::class, 'store'])->name('ventas.store');
+    Route::get('ventas/{venta}', [VentaController::class, 'show'])->name('ventas.show');
+    Route::resource('ventas', VentaController::class);
+    Route::post('/ventas/agregar/{producto}', [VentaController::class, 'agregar'])->name('ventas.agregar');
+    Route::get('ventas/{id}/generate-invoice', [VentaController::class, 'generateInvoice'])->name('ventas.generateInvoice');
+    Route::post('/ventas/{id}/pagar', [VentaController::class, 'pagar'])->name('ventas.pagar');
 
 });

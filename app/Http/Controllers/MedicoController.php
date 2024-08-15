@@ -109,26 +109,22 @@ class MedicoController extends Controller
         return redirect()->route('medico.dashboard')->with('success', 'Paciente registrado exitosamente');
     }
 
-    // Muestra todos los pacientes activos
     public function mostrarPacientes(Request $request)
     {
-        $medicoId = Auth::id(); // Obtener el ID del médico autenticado
+        $currentUser = Auth::user();
+        $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
-        // Obtener el ID del médico que agregó el usuario autenticado
-        $agregadoPorMedicoId = Auth::user()->medico_id;
-
-        // Filtrar los pacientes por el ID del médico autenticado o el médico que agregó al usuario
-        $query = Paciente::where('activo', 'si')
-                    ->where(function($q) use ($medicoId, $agregadoPorMedicoId) {
+        $pacientes = Paciente::where('activo', 'si')
+                    ->where(function($q) use ($medicoId, $currentUser) {
                         $q->where('medico_id', $medicoId)
-                        ->orWhere('medico_id', $agregadoPorMedicoId);
+                        ->orWhere('medico_id', $currentUser->id);
                     });
 
         if ($request->has('name') && $request->name != '') {
-            $query->where('nombres', 'like', '%' . $request->name . '%');
+            $pacientes->where('nombres', 'like', '%' . $request->name . '%');
         }
 
-        $pacientes = $query->get(); // Ejecutar la consulta y obtener los pacientes
+        $pacientes = $pacientes->get();
         $totalPacientes = $pacientes->count();
         $totalMujeres = $pacientes->where('sexo', 'femenino')->count();
         $totalHombres = $pacientes->where('sexo', 'masculino')->count();
@@ -138,6 +134,7 @@ class MedicoController extends Controller
 
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
+
 
 
     // Muestra el formulario de edición de un paciente específico
@@ -247,15 +244,21 @@ class MedicoController extends Controller
         $citas = Citas::select('citas.*', 'personas.nombres', 'personas.apepat', 'personas.apemat')
                         ->join('personas', 'citas.persona_id', '=', 'personas.id')
                         ->where('citas.activo', 'si')
-                        ->where('citas.medicoid', $medicoId)
+                        ->where('citas.status', '!=', 'Finalizada') // Excluir las citas finalizadas
+                        ->where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('citas.medicoid', $medicoId)
+                            ->orWhere('citas.medicoid', $currentUser->id);
+                        })
                         ->get();
         
         // Obtener las personas asociadas al médico
-        $personas = Persona::where('medico_id', $medicoId)->get();
+        $personas = Persona::where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('medico_id', $medicoId)
+                            ->orWhere('medico_id', $currentUser->id);
+                        })->get();
         
         return view('medico.citas.citas', compact('citas', 'personas'));
     }
-
     
     // Guarda una nueva cita
     public function storeCitas(Request $request)
@@ -265,14 +268,16 @@ class MedicoController extends Controller
             'fecha' => 'required|date|after_or_equal:today',
             'hora' => 'required|date_format:H:i',
             'persona_id' => 'required|exists:personas,id',
-            'usuariomedicoid' => 'required|exists:users,id',
             'motivo_consulta' => 'nullable|string|max:255'
         ]);
+
+        // Obtener el ID del médico que creó al usuario autenticado
+        $medicoId = Auth::user()->medico_id ? Auth::user()->medico_id : Auth::id();
 
         // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
         $exists = Citas::where('fecha', $request->fecha)
                     ->where('hora', $request->hora)
-                    ->where('medicoid', $request->usuariomedicoid)
+                    ->where('medicoid', $medicoId)
                     ->exists();
 
         if ($exists) {
@@ -284,13 +289,14 @@ class MedicoController extends Controller
             'fecha' => $request->fecha,
             'hora' => $request->hora,
             'persona_id' => $request->persona_id,
-            'medicoid' => $request->usuariomedicoid,
+            'medicoid' => $medicoId, // Guardar el ID del médico
             'motivo_consulta' => $request->motivo_consulta
         ]);
 
         // Redirecciona a la vista de citas con un mensaje de éxito
         return redirect()->route('citas')->with('status', 'Cita registrada correctamente');
     }
+
 
     // Muestra el formulario para agregar una nueva cita
     public function crearCita()

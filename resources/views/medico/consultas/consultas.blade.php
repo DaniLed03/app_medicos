@@ -54,20 +54,40 @@
 
                             <!-- Table body -->
                             <tbody>
-                                @forelse($consultas as $cita)
+                                @forelse($consultas as $consulta)
                                     <tr>
-                                        <td class="px-6 py-4">{{ $cita->fecha }}</td>
-                                        <td class="px-6 py-4">{{ $cita->hora }}</td>
-                                        <td class="px-6 py-4">{{ $cita->persona->nombres }} {{ $cita->persona->apepat }} {{ $cita->persona->apemat }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="status-label bg-blue-200 text-blue-800 px-2 py-1 rounded-full">{{ $cita->status }}</span>
+                                            @if($consulta->isCita)
+                                                {{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}
+                                            @else
+                                                {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d/m/Y') }}
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4">
-                                            @if($cita->status === 'Por comenzar')
-                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $cita->id }}">Iniciar consulta</a>
-                                            @elseif($cita->status === 'En proceso')
-                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $cita->id }}">Continuar consulta</a>
-                                            @elseif($cita->status === 'Finalizada')
+                                            @if($consulta->isCita)
+                                                {{ \Carbon\Carbon::parse($consulta->hora)->format('H:i') }}
+                                            @else
+                                                {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('H:i') }}
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($consulta->isCita && $consulta->persona)
+                                                {{ $consulta->persona->nombres }} {{ $consulta->persona->apepat }} {{ $consulta->persona->apemat }}
+                                            @elseif(!$consulta->isCita)
+                                                {{ $consulta->paciente->nombres }} {{ $consulta->paciente->apepat }} {{ $consulta->paciente->apemat }}
+                                            @else
+                                                No disponible
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="status-label bg-blue-200 text-blue-800 px-2 py-1 rounded-full">{{ $consulta->status }}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($consulta->status === 'Por comenzar')
+                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $consulta->id }}">Iniciar consulta</a>
+                                            @elseif($consulta->status === 'En proceso')
+                                                <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $consulta->id }}">Continuar consulta</a>
+                                            @elseif($consulta->status === 'Finalizada')
                                                 <span class="text-green-500">
                                                     <i class="fas fa-check-circle"></i>
                                                 </span>

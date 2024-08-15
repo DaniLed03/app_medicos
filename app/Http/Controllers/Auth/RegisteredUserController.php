@@ -61,6 +61,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($persona);
 
-        return redirect(route('login'));
+        // Redirigir a la vista Personas/citas después del registro
+        return redirect()->route('personas.citas');
     }
+
 }

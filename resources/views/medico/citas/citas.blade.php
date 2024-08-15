@@ -22,9 +22,11 @@
                                     <div class="bg-white shadow overflow-hidden rounded-lg h-full">
                                         <div class="flex items-center justify-between px-4 py-2 font-bold text-white" style="background-color: #2D7498;">
                                             Hoy
-                                            <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                                {{ __('Agregar Cita') }}
-                                            </button>
+                                            @can('Agregar Citas')
+                                                <button @click="isModalOpen = true" class="ml-6 rounded-md bg-button-color px-3 py-2 text-sm text-white shadow-sm hover:bg-button-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                                    {{ __('Agregar Cita') }}
+                                                </button>
+                                            @endcan
                                         </div>
                                         <div class="p-4 overflow-y-auto max-h-screen no-scrollbar">
                                             @foreach($citas as $cita)

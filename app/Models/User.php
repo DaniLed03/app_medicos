@@ -35,14 +35,29 @@ class User extends Authenticatable
         'password' => 'hashed',           // Guardar la contraseña como hash
     ];
 
-    public function citas()
-    {
-        return $this->hasMany(Citas::class, 'usuariomedicoid');
-    }
-
     public function pacientes()
     {
         return $this->hasManyThrough(Paciente::class, User::class, 'medico_id', 'medico_id', 'id', 'id');
+    }
+
+    public function consultas()
+    {
+        return $this->hasMany(Consultas::class, 'usuariomedicoid', 'medico_id');
+    }
+
+    public function productos()
+    {
+        return $this->hasMany(Producto::class, 'medico_id', 'medico_id');
+    }
+
+    public function ventas()
+    {
+        return $this->hasManyThrough(Venta::class, Consultas::class, 'usuariomedicoid', 'consulta_id', 'medico_id', 'id');
+    }
+
+    public function citas()
+    {
+        return $this->hasMany(Citas::class, 'medicoid', 'medico_id');
     }
 
     public function medico()
