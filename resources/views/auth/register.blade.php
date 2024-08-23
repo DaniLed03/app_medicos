@@ -36,7 +36,7 @@
 
                 <form method="POST" action="{{ route('register') }}" class="flex flex-col items-stretch pt-3 md:pt-8">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="flex flex-col pt-4">
                             <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
                                 <input type="text" id="nombres" name="nombres" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" placeholder="Nombres" required value="{{ old('nombres') }}" />
@@ -132,7 +132,7 @@
 
                         <div class="flex flex-col pt-4">
                             <div class="relative flex overflow-hidden rounded-md border-2 transition focus-within:border-blue-600">
-                                <select id="medico_id" name="medico_id" class="w-full flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
+                                <select id="medico_id" name="medico_id" class="w-full max-w-lg flex-shrink appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" required>
                                     <option value="">Selecciona un Médico</option>
                                     @foreach($medicos as $medico)
                                         <option value="{{ $medico->id }}" {{ old('medico_id') == $medico->id ? 'selected' : '' }}>{{ $medico->nombres }} {{ $medico->apepat }} {{ $medico->apemat }}</option>
@@ -145,20 +145,20 @@
                         </div>
                     </div>
 
-                    <div class="py-12 text-center">
+                    <div class="py-6 text-center">
                         <p class="text-gray-600">
                             ¿Ya tienes una cuenta?
                             <a href="{{ route('login') }}" class="whitespace-nowrap font-semibold text-gray-900 underline underline-offset-4">Inicia sesión.</a>
                         </p>
                     </div>
-
+                    
                     <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-center text-base font-semibold text-white shadow-md outline-none ring-blue-500 ring-offset-2 transition hover:bg-blue-700 focus:ring-2 md:w-32 mx-auto">Registrarse</button>
                 </form>
             </div>
         </div>
-        <div class="relative hidden h-full w-full select-none bg-gradient-to-br from-green-600 via-blue-500 to-blue-700 md:block md:w-1/2 lg:w-2/5">
+        <div class="relative flex items-center justify-center h-full w-full select-none bg-gradient-to-br from-green-600 via-blue-500 to-blue-700 md:flex md:w-1/2 lg:w-2/5">
             <div class="py-8 px-8 text-white xl:w-[40rem] text-center">
-                <img src="{{ asset('images/Ledehealth.png') }}" alt="LedeHealth Logo" class="mx-auto h-100 mb-4">
+                <img src="{{ asset('images/Ledehealth.png') }}" alt="LedeHealth Logo" class="mx-auto h-auto max-w-full mb-4">
                 <p class="mt-8 font-bold">En nuestro consultorio virtual, podrás gestionar tus citas, consultar resultados de exámenes y recibir asesoramiento médico de manera remota.</p>
             </div>
         </div>

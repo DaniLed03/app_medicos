@@ -1,6 +1,7 @@
 <?php
 
 return [
+    // Mensajes de validación estándar...
     'accepted' => 'El :attribute debe ser aceptado.',
     'active_url' => 'El :attribute no es una URL válida.',
     'after' => 'El :attribute debe ser una fecha posterior a :date.',
@@ -106,6 +107,13 @@ return [
     'url' => 'El formato del :attribute no es válido.',
     'uuid' => 'El :attribute debe ser un UUID válido.',
 
+    // Validaciones personalizadas para archivos de imagen
+    'mimes' => 'El :attribute debe ser un archivo de tipo: :values.',
+    'image' => 'El :attribute debe ser una imagen en formato jpeg, png, o jpg.',
+    'max' => [
+        'file' => 'El :attribute no debe ser mayor que :max kilobytes.',
+    ],
+
     'custom' => [
         'email' => [
             'required' => 'El campo correo electrónico es obligatorio.',
@@ -116,6 +124,10 @@ return [
             'required' => 'El campo contraseña es obligatorio.',
             'string' => 'La contraseña debe ser una cadena de caracteres.',
             'password_not_required' => 'La contraseña no es requerida para este usuario.',
+        ],
+        'foto' => [
+            'mimes' => 'La foto debe ser un archivo de tipo: jpeg, png, jpg.',
+            'max' => 'La foto no debe ser mayor que :max kilobytes.',
         ],
     ],
 
@@ -131,5 +143,6 @@ return [
         'password_confirmation' => 'confirmación de contraseña',
         'current_password' => 'contraseña actual',
         'password_confirmation' => 'confirmación de contraseña',
+        'foto' => 'foto de perfil',
     ],
 ];

@@ -128,14 +128,15 @@
                             <p class="mt-2 text-gray-600 text-center">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
                         </div>
                     </div>
+                    <div class="flex justify-left mt-4">
+                        <a href="{{ route('register') }}" class="text-white font-bold py-2 px-4 rounded-full hover:bg-secondary-dark" style="background-color: #33AD9B;">Registrarse</a>
+                    </div>
                 </div>
                 <div class="md:w-1/2">
                     <img src="{{ asset('images/Hospital.webp') }}" alt="Hospital" class="rounded-lg shadow-lg">
                 </div>
             </div>
         </div>
-
-
 
         <!-- Functionalities Section -->
         <div id="funcionalidades" class="bg-gray-50 py-12">

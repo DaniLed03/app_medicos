@@ -7,9 +7,10 @@ use App\Models\Venta;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade as DomPDF;
-use Barryvdh\DomPDF\PDF;
 use Picqer\Barcode\BarcodeGeneratorHTML;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+
 
 class VentaController extends Controller
 {
@@ -28,6 +29,13 @@ class VentaController extends Controller
         $paciente = $venta->paciente; // Asumiendo que la relación 'paciente' está definida en el modelo Venta
 
         return view('medico.ventas.show', compact('venta', 'productos', 'paciente'));
+    }
+    public function generateVentasPdf()
+    {
+        $ventas = Venta::with('paciente')->get();
+        
+        $pdf = PDF::loadView('medico.ventas.pdf', compact('ventas'));
+        return $pdf->download('Lista_de_Ventas.pdf');
     }
     
     public function index()
@@ -115,7 +123,7 @@ class VentaController extends Controller
         $barcode = $generator->getBarcode($venta->id, $generator::TYPE_CODE_128, 3, 50); // Ajusta la escala y la altura
 
         // Usar la instancia PDF para generar la factura e incluir el código de barras
-        $pdf = $this->pdf->loadView('medico.ventas.invoice', compact('venta', 'paciente', 'barcode'));
+        $pdf = PDF::loadView('medico.ventas.invoice', compact('venta', 'paciente', 'barcode'));
 
         // Definir el nombre del archivo como "NombreDelPaciente_Factura.pdf"
         $fileName = $paciente->Nombre_fact . '_Factura.pdf';

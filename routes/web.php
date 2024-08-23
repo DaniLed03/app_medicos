@@ -16,27 +16,28 @@ use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\EnsurePersonaIsAuthenticated;
 use App\Http\Middleware\EnsureUserIsAuthenticated;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 // Ruta de la página de bienvenida
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 // Incluir las rutas de autenticación generadas por Laravel Breeze
 require __DIR__.'/auth.php';
-
 
 // Agrupación de rutas que requieren autenticación y verificación de email
 Route::middleware(['auth', 'verified'])->group(function () {
     // Ruta del dashboard
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('medico.dashboard'); // Apunta a la vista en resources/views/medico/dashboard.blade.php
     })->name('dashboard');
 
     // Rutas del perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 
     Route::get('/usuarios', [AsignarController::class, 'index'])->name('users.index');
     Route::get('/usuarios/{id}/edit', [AsignarController::class, 'edit'])->name('users.edit');
@@ -70,6 +71,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
     Route::get('/pacientes/{id}', [MedicoController::class, 'showPaciente'])->name('pacientes.show');
     Route::get('/medico/pacientes/{id}/editarPaciente', [MedicoController::class, 'editarPaciente'])->name('medico.pacientes.editarPaciente');
+    Route::get('/medico/pacientes/pdf', [MedicoController::class, 'generatePatientListPdf'])->name('pacientes.pdf');
+    Route::get('/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('dashboard');
+
 
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
@@ -123,5 +127,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/ventas/agregar/{producto}', [VentaController::class, 'agregar'])->name('ventas.agregar');
     Route::get('ventas/{id}/generate-invoice', [VentaController::class, 'generateInvoice'])->name('ventas.generateInvoice');
     Route::post('/ventas/{id}/pagar', [VentaController::class, 'pagar'])->name('ventas.pagar');
+
+    /// nuevo vv
+    Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
+    Route::get('/medico/productos/pdf', [ProductoController::class, 'generateReport'])->name('productos.pdf');
 
 });

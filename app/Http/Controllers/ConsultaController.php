@@ -366,5 +366,19 @@ class ConsultaController extends Controller
         return view('medico.ventas.show', compact('venta'));
     }
 
+    public function consultasPendientesHoy()
+    {
+        $medicoId = Auth::user()->id; // ID del médico autenticado
+        $hoy = Carbon::today(); // Obtener la fecha de hoy
+
+        // Contar las consultas pendientes del día de hoy
+        $consultasPendientes = Citas::where('medicoid', $medicoId)
+            ->whereDate('fecha', $hoy)
+            ->where('status', '!=', 'Finalizada')
+            ->count();
+
+        return $consultasPendientes;
+    }
+
 
 }

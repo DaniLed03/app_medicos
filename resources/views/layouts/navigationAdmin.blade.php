@@ -26,6 +26,28 @@
             margin-right: 20px; /* Margen derecho */
             font-size: 0.875rem; /* Tamaño de fuente reducido */
         }
+        .notification-badge {
+            position: absolute;
+            top: 1px; /* Ajusta la posición vertical */
+            right: -10px; /* Ajusta la posición horizontal */
+            background-color: #FF4136; /* Rojo brillante */
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem; /* Tamaño de fuente reducido */
+            font-weight: bold;
+            line-height: 1; /* Asegura que el texto esté centrado */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 20px;
+            min-height: 20px;
+        }
+        .notification-badge.dropdown {
+            top: 0;
+            right: 0;
+            margin-left: 5px; /* Margen adicional para la posición en el dropdown */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -58,7 +80,9 @@
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white hover-bg-custom custom-button" id="user-menu-button" aria-expanded="false">
                         <span class="text-white hidden md:block mr-2">{{ Auth::user()->nombres }} {{ Auth::user()->apepat }} {{ Auth::user()->apemat }}</span>
-                        <img class="h-8 w-8 rounded-full" src="{{ asset('images/user-photo.jpg') }}" alt="">
+                        <img class="h-8 w-8 rounded-full" 
+                             src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : asset('images/user-photo.jpg') }}" 
+                             alt="Foto de perfil">
                         <svg class="w-4 h-4 ml-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -76,11 +100,11 @@
                                class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Sign out</a>
                         </form>
                     </div>
-                </div>
+                </div>                             
             </div>
         </div>
     </nav>
-    
+
     <!-- Navbar inferior -->
     <nav class="navbar-inferior">
         <div class="max-w-screen-xl mx-auto px-4" x-data="{ open: false }">
@@ -90,19 +114,33 @@
                         <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard2-pulse-fill mr-2" viewBox="0 0 16 16">
                                 <path d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5"/>
-                                <path d="M4.085 1H3.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1h-.585q.084.236.085.5V2a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 2v-.5q.001-.264.085-.5M9.98 5.356 11.372 10h.128a.5.5 0 0 1 0 1H11a.5.5 0 0 1-.479-.356l-.94-3.135-1.092 5.096a.5.5 0 0 1-.968.039L6.383 8.85l-.936 1.873A.5.5 0 0 1 5 11h-.5a.5.5 0 0 1 0-1h.191l1.362-2.724a.5.5 0 0 1 .926.08l.94 3.135 1.092-5.096a.5.5 0 0 1 .968-.039Z"/>
+                                <path d="M4.085 1H3.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1h-.585q.084.236.085.5V2a1.5 1.5 0 0 1-1.5 1.5h-5A.5.5 0 0 1 4 2v-.5q.001-.264.085-.5M9.98 5.356 11.372 10h.128a.5.5 0 0 1 0 1H11a.5.5 0 0 1-.479-.356l-.94-3.135-1.092 5.096a.5.5 0 0 1-.968.039L6.383 8.85l-.936 1.873A.5.5 0 0 1 5 11h-.5a.5.5 0 0 1 0-1h.191l1.362-2.724a.5.5 0 0 1 .926.08l.94 3.135 1.092-5.096a.5.5 0 0 1 .968-.039Z"/>
                             </svg>
                             Expediente Clínico
-                        </button>
+                            <template x-if="!dropdownOpen && {{ $consultasPendientes }} > 0">
+                                <span class="notification-badge">
+                                    {{ $consultasPendientes }}
+                                </span>
+                            </template>
+                        </button>                        
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
                             @can('Vista Pacientes')
                                 <a href="{{ route('medico.dashboard') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Pacientes</a>
                             @endcan
                             @can('Vista Consultas')
-                                <a href="{{ route('consultas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Consultas</a>
+                                <a href="{{ route('consultas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white relative">
+                                    Consultas
+                                    <template x-if="dropdownOpen && {{ $consultasPendientes }} > 0">
+                                        <span class="notification-badge absolute top-1/2 right-3 transform -translate-y-1/2 translate-x-[20%]">
+                                            {{ $consultasPendientes }}
+                                        </span>
+                                    </template>
+                                </a>
                             @endcan
                         </div>
                     </div>
+                    
+                                      
                     @can('Vista Citas')
                         <div class="relative">
                             <a href="{{ route('citas') }}" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
@@ -181,5 +219,6 @@
             </div>
         </div>
     </nav>
+
 </body>
 </html>

@@ -13,6 +13,12 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Botón para descargar ventas en PDF -->
+                        <div>
+                            <a href="{{ route('ventas.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded ml-4">
+                                Descargar Ventas PDF
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Tabla de ventas -->

@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HorariosMedicos;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class MedicoController extends Controller
 {
@@ -26,6 +28,15 @@ class MedicoController extends Controller
         $datosPersona = session('datosPersona');
         return view('medico.pacientes.completarRegistroPaciente', compact('citaId', 'datosPersona'));
     }
+
+    public function generatePatientListPdf()
+    {
+        $pacientes = Paciente::all();
+        $pdf = PDF::loadView('medico.pacientes.pdf', compact('pacientes'));
+        $fileName = 'Lista_de_Pacientes.pdf';
+        return $pdf->download($fileName);
+    }
+    
 
     // Guarda un nuevo paciente
     public function storePacientes(Request $request)

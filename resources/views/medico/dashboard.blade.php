@@ -41,6 +41,9 @@
                                     Agregar Paciente
                                 </button>
                             @endcan
+                            <a href="{{ route('pacientes.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded ml-4">
+                                Descargar PDF
+                            </a>
                         </div>
                     </div>
                     

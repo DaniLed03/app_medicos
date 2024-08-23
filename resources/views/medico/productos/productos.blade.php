@@ -19,9 +19,15 @@
                             </div>
                         </div>
                         <div>
+                            <!-- Botón para agregar producto -->
                             <button id="openAddModal" class="bg-button-color hover:bg-button-hover text-white font py-2 px-4 rounded">
                                 Agregar Producto
                             </button>
+
+                            <!-- Botón para descargar el PDF de productos -->
+                            <a href="{{ route('productos.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded ml-4">
+                                Descargar PDF
+                            </a>
                         </div>
                     </div>
 
@@ -33,7 +39,7 @@
                                     <th>Nombre</th>
                                     <th>Descripción</th>
                                     <th>Inventario</th>
-                                    <th>Precio</th> <!-- Nueva columna para Precio -->
+                                    <th>Precio</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -43,7 +49,7 @@
                                         <td>{{ $producto->nombre }}</td>
                                         <td>{{ $producto->descripcion }}</td>
                                         <td>{{ $producto->inventario }}</td>
-                                        <td>${{ number_format($producto->precio, 2) }}</td> <!-- Mostrar el Precio -->
+                                        <td>${{ number_format($producto->precio, 2) }}</td>
                                         <td>
                                             <button class="edit-button text-blue-500 hover:text-blue-700" data-id="{{ $producto->id }}" data-nombre="{{ $producto->nombre }}" data-descripcion="{{ $producto->descripcion }}" data-inventario="{{ $producto->inventario }}" data-precio="{{ $producto->precio }}">
                                                 Editar

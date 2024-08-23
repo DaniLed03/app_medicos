@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasRoles;
 
@@ -21,6 +21,7 @@ class User extends Authenticatable
         'sexo',
         'activo',     // Estado del usuario (activo o inactivo)
         'email',      // Correo electrónico del usuario
+        'foto', // Asegúrate de que este campo esté aquí
         'medico_id',  // ID del médico asociado
         'password',   // Añadir campo de contraseña a los fillables
     ];

@@ -11,19 +11,21 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('nombres', 100);
-            $table->string('apepat', 100);
-            $table->string('apemat', 100);
-            $table->date('fechanac');
-            $table->string('telefono', 20);
-            $table->enum('sexo', ['masculino', 'femenino']);
+            $table->string('apepat', 100)->nullable();
+            $table->string('apemat', 100)->nullable();
+            $table->date('fechanac')->nullable();
+            $table->string('telefono', 20)->nullable();
+            $table->enum('sexo', ['masculino', 'femenino'])->nullable();
             $table->enum('activo', ['si', 'no'])->default('si');
             $table->string('email')->unique();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->timestamp('email_verified_at')->nullable(); // <- Agrega esta línea
             $table->unsignedBigInteger('medico_id')->nullable();
             $table->timestamps();
-
+        
             $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
         });
+        
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
