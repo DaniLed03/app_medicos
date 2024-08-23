@@ -16,17 +16,9 @@
                                 <!-- Profile picture card-->
                                 <div class="card mb-4 text-center">
                                     <div class="card-header">Foto de Perfil</div>
-                                    <div class="card-body position-relative">
+                                    <div class="card-body">
                                         <!-- Profile picture image-->
                                         <img id="profile-pic-preview" src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/default-profile.png') }}" alt="Foto de perfil" class="img-account-profile rounded-circle mb-2">
-                                        <!-- Overlay for image upload -->
-                                        <div id="upload-overlay" class="upload-overlay" onclick="document.getElementById('foto').click()">
-                                            <div class="overlay-text">Subir nueva imagen</div>
-                                        </div>
-                                        <input type="file" id="foto" name="foto" accept="image/*" class="form-control d-none" onchange="previewImage(event)">
-                                        <x-input-error class="mt-2" :messages="$errors->get('foto')" />
-                                        <!-- Profile picture help block-->
-                                        <div class="small font-italic text-muted mt-2">JPG o PNG no mayor a 2 MB</div>
                                     </div>
                                 </div>
                             </div>
@@ -34,6 +26,15 @@
                                 <form method="post" action="{{ route('profile.update') }}" class="mt-3" enctype="multipart/form-data" id="profile-form">
                                     @csrf
                                     @method('patch')
+                                    
+                                    <!-- Campo de carga de imagen y botón -->
+                                    <div class="mb-3">
+                                        <input type="file" id="foto" name="foto" accept="image/*" class="form-control d-none" onchange="previewImage(event)">
+                                        <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('foto').click()">Subir nueva imagen</button>
+                                        <x-input-error class="mt-2" :messages="$errors->get('foto')" />
+                                        <!-- Profile picture help block-->
+                                        <div class="small font-italic text-muted mt-2">JPG o PNG no mayor a 2 MB</div>
+                                    </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
@@ -117,7 +118,7 @@
                                 <form method="post" action="{{ route('password.update') }}" class="mt-3">
                                     @csrf
                                     @method('put')
-
+                    
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <x-input-label for="current_password" :value="__('Contraseña Actual')" />
@@ -130,7 +131,7 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password')" />
                                         </div>
                                     </div>
-
+                    
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <x-input-label for="new_password_confirmation" :value="__('Confirmar Contraseña')" />
@@ -138,7 +139,7 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password_confirmation')" />
                                         </div>
                                     </div>
-
+                    
                                     <div class="mt-3">
                                         <x-primary-button>{{ __('Actualizar Contraseña') }}</x-primary-button>
                                     </div>
@@ -147,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                 </div>
             </div>
         </div>
@@ -168,30 +169,6 @@
         height: 20rem;
         width: 20rem;
         object-fit: cover;
-        position: relative;
-        border-radius: 50%;
-    }
-    .upload-overlay {
-        position: absolute;
-        top: 4%;
-        left: 4%;
-        height: 84%;
-        width: 92%;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        border-radius: 70%;
-    }
-    .img-account-profile:hover + .upload-overlay, 
-    .upload-overlay:hover {
-        display: flex;
-    }
-    .overlay-text {
-        font-size: 1.25rem;
-        font-weight: 500;
     }
     .card {
         box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
@@ -215,6 +192,67 @@
         margin-left: 1rem;
         margin-right: 1rem;
     }
+
+    .navbar {
+        margin-bottom: 0; /* Elimina cualquier margen inferior del navbar */
+        padding: 0; /* Elimina cualquier padding extra del navbar */
+    }
+
+    .navbar, .card, .card-header {
+        margin-top: 0; /* Asegura que no haya margen superior en el navbar o tarjetas */
+    }
+
+    .navbar {
+        margin-bottom: 0; /* Elimina cualquier margen entre el navbar y otros elementos */
+        box-shadow: none; /* Elimina cualquier sombra que el navbar pueda tener */
+    }
+
+    .dropdown-menu {
+        margin-top: -1px; /* Ajusta el margen superior del dropdown para eliminar la línea gris */
+        border: none; /* Elimina el borde del dropdown si es necesario */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Aplica una sombra más sutil */
+    }
+
+    .card {
+        margin-top: 0; /* Asegúrate de que no haya margen superior */
+        box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    }
+
+    .card-header {
+        margin-top: 0; /* Elimina cualquier margen superior que pueda haber */
+        border-bottom: 1px solid rgba(33, 40, 50, 0.125); /* Si lo necesitas, puedes ajustar este borde */
+    }
+
+    /* Estilo cuando pasas el cursor */
+    .dropdown-menu a:hover {
+        background-color: #17a2b8; /* Color de fondo al pasar el cursor */
+        color: white; /* Color de texto al pasar el cursor */
+    }
+
+    /* Estilo cuando el elemento está activo o seleccionado */
+    .dropdown-menu a.active {
+        background-color: #17a2b8; /* Color de fondo para el elemento activo */
+        color: white; /* Color de texto para el elemento activo */
+    }
+
+    /* Opcional: si estás utilizando Bootstrap, asegúrate de que la clase 'active' se aplique correctamente */
+    .nav-item .dropdown-menu .nav-link.active {
+        background-color: #17a2b8; /* Color de fondo para la opción seleccionada */
+        color: white; /* Color de texto para la opción seleccionada */
+    }
+
+    .dropdown-menu a {
+        color: #333; /* Color de texto normal */
+        padding: 8px 16px;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .dropdown-menu a:hover, .dropdown-menu a.active {
+        background-color: #17a2b8; /* Color de fondo cuando está seleccionado o en hover */
+        color: white; /* Color de texto cuando está seleccionado o en hover */
+    }
 </style>
 
 <script>
@@ -227,7 +265,6 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 </script>
-
 <script>
     // Mostrar mensaje de éxito al actualizar el perfil
     @if (session('status') === 'profile-updated')
