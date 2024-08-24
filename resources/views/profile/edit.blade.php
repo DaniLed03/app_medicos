@@ -118,7 +118,7 @@
                                 <form method="post" action="{{ route('password.update') }}" class="mt-3">
                                     @csrf
                                     @method('put')
-                    
+                                
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <x-input-label for="current_password" :value="__('Contraseña Actual')" />
@@ -131,17 +131,16 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password')" />
                                         </div>
                                     </div>
-                    
+                                
                                     <div class="row mb-3">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <x-input-label for="new_password_confirmation" :value="__('Confirmar Contraseña')" />
                                             <x-text-input id="new_password_confirmation" name="new_password_confirmation" type="password" class="form-control" autocomplete="new-password_confirmation" required />
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password_confirmation')" />
                                         </div>
-                                    </div>
-                    
-                                    <div class="mt-3">
-                                        <x-primary-button>{{ __('Actualizar Contraseña') }}</x-primary-button>
+                                        <div class="col-md-6 d-flex align-items-end">
+                                            <x-primary-button class="w-100 text-center">{{ __('Actualizar Contraseña') }}</x-primary-button>                                        </div>
+                                        </div>
                                     </div>
                                 </form>
                                 <br>

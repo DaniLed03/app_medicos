@@ -92,12 +92,12 @@
                             <span class="block text-sm text-gray-500">{{ Auth::user()->email }}</span>
                             <span class="block text-sm text-gray-500">{{ Auth::user()->telefono }}</span>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Profile</a>
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Informacion Personal</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a href="{{ route('logout') }}"
                                onclick="event.preventDefault(); this.closest('form').submit();"
-                               class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Sign out</a>
+                               class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Cerrar Sesion</a>
                         </form>
                     </div>
                 </div>                             
@@ -157,7 +157,7 @@
                                 <path d="M4 .5a.5.5 0 0 0-1 0v1H1.5A1.5 1.5 0 0 0 0 3v1.5h16V3a1.5 1.5 0 0 0-1.5-1.5H13v-1a.5.5 0 0 0-1 0v1H4v-1z"/>
                                 <path d="M0 4.5V11a1.5 1.5 0 0 0 1.5 1.5H2v1.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V12.5h.5A1.5 1.5 0 0 0 16 11V4.5H0z"/>
                             </svg>
-                            Gestión de Ventas
+                            Cobro de Servicios y Productos
                         </button>
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Ventas</a>

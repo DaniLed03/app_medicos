@@ -183,6 +183,10 @@
     .modal-header h2 {
         font-size: 1.75rem; /* Ajusta el tamaño del título */
     }
+    .fc-toolbar-title {
+        text-transform: capitalize;
+    }
+
 </style>
 
 <script>
@@ -191,11 +195,17 @@
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'es',
+            locale: 'es', // Establece el idioma en español
             headerToolbar: {
                 left: 'prev,today,next',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
             },
             events: {!! json_encode($citas->map(function($cita) {
                 return [
@@ -204,7 +214,7 @@
                     'url' => route('citas.editar', $cita->id),
                     'color' => '#33AD9B',
                     'textColor' => 'black',
-                    'id' => $cita->id // Asegúrate de incluir el ID de la cita
+                    'id' => $cita->id
                 ];
             })) !!},
             editable: true,

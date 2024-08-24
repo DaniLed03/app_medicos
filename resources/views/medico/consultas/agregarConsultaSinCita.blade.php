@@ -46,43 +46,43 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="hidden_talla" class="block text-sm font-medium text-gray-700">Talla</label>
-                                <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m">
+                                <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m" value="{{ old('hidden_talla') }}">
                             </div>
                             <div>
                                 <label for="hidden_temperatura" class="block text-sm font-medium text-gray-700">Temperatura</label>
-                                <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C">
-                            </div>
-                            <div>
-                                <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
-                                <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%">
+                                <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C" value="{{ old('hidden_temperatura') }}">
                             </div>
                             <div>
                                 <label for="hidden_frecuencia_cardiaca" class="block text-sm font-medium text-gray-700">Frecuencia Cardíaca</label>
-                                <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm">
+                                <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
                             </div>
                             <div>
                                 <label for="hidden_peso" class="block text-sm font-medium text-gray-700">Peso</label>
-                                <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg">
+                                <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg" value="{{ old('hidden_peso') }}">
                             </div>
                             <div>
                                 <label for="hidden_tension_arterial" class="block text-sm font-medium text-gray-700">Tensión Arterial</label>
-                                <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg">
+                                <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg" value="{{ old('hidden_tension_arterial') }}">
                             </div>
                             <div>
                                 <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Perimetro Cefalico</label>
-                                <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm">
+                                <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
+                            </div>
+                            <div>
+                                <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
+                                <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-gray-100 p-4 rounded-lg">
                         <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
-                        <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;"></textarea>
+                        <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('motivoConsulta') }}</textarea>
                     </div>
 
                     <div class="bg-gray-100 p-4 rounded-lg">
                         <label for="diagnostico" class="block text-sm font-medium text-gray-700">Diagnóstico</label>
-                        <textarea id="diagnostico" name="diagnostico" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;"></textarea>
+                        <textarea id="diagnostico" name="diagnostico" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('diagnostico') }}</textarea>
                     </div>
                 </div>
 
@@ -125,11 +125,16 @@
                     <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
                     <div class="mb-4">
                         <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
-                        <input type="text" id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
-                    </div>
+                        <div class="flex">
+                            <select id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
+                                <option value="Estudios de Laboratorio">Estudios de Laboratorio</option>
+                                <option value="Estudios de Gabinete">Estudios de Gabinete</option>
+                            </select>
+                        </div>
+                    </div>                    
                     <div class="mb-4">
                         <label for="modalRecetaInput" class="block text-sm font-medium text-gray-700">Receta</label>
-                        <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;"></textarea>
+                        <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">{{ old('modalRecetaInput') }}</textarea>
                     </div>
                     <div class="flex justify-end">
                         <button id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Cancelar</button>
@@ -149,7 +154,74 @@
                         <!-- Aquí se mostrará la receta -->
                     </div>
                 </div>
-            </div>            
+            </div>    
+            
+            @if (old('recetas'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        let recetas = @json(old('recetas'));
+                        let recetasDiv = document.getElementById('recetas');
+                        recetasDiv.innerHTML = ''; // Limpia el contenido actual
+
+                        recetas.forEach((receta, index) => {
+                            let newRecetaRow = document.createElement('tr');
+                            newRecetaRow.classList.add('receta', 'bg-gray-100', 'border-b', 'border-gray-200');
+                            newRecetaRow.setAttribute('data-index', index);
+
+                            newRecetaRow.innerHTML = `
+                                <td class="py-3 px-6 text-left whitespace-nowrap">${index + 1}</td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${index}][tipo_de_receta]" value="${receta.tipo_de_receta}">${receta.tipo_de_receta}
+                                </td>
+                                <td class="py-3 px-6 text-left">
+                                    <input type="hidden" name="recetas[${index}][receta]" value="${encodeURIComponent(receta.receta)}">
+                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta.receta)}">Previsualizar</button>
+                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${index}">Editar</button>
+                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                </td>
+                            `;
+
+                            recetasDiv.appendChild(newRecetaRow);
+
+                            // Añadir event listeners a los botones de cada receta
+                            newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
+                                newRecetaRow.remove();
+                                if (recetasDiv.getElementsByClassName('receta').length === 0) {
+                                    recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                                }
+                            });
+
+                            newRecetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
+                                const recetaContent = decodeURIComponent(this.dataset.receta);
+                                document.getElementById('recetaModalContent').innerHTML = recetaContent;
+                                document.getElementById('recetaModal').classList.remove('hidden');
+                            });
+
+                            newRecetaRow.querySelector('.editar-receta').addEventListener('click', function () {
+                                const recetaIndex = this.dataset.recetaIndex;
+                                const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
+                                const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
+                                
+                                document.getElementById('modalTipoReceta').value = tipoRecetaInput;
+                                CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
+                                document.getElementById('modalReceta').classList.remove('hidden');
+                                document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
+                            });
+                        });
+                    });
+                </script>
+            @endif
+
+
+            @if ($errors->any())
+                <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -342,6 +414,9 @@
                         }
                     });
                 }
+
+                
+
             </script>
             <style>
                 #recetaModalContent ul,

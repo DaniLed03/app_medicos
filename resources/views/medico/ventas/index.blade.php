@@ -5,20 +5,25 @@
                 <div class="p-6 text-gray-900">
                     <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Ventas</h1>
                     <div class="flex items-center justify-between mb-4">
+                        <!-- Contenedor de Total Facturación -->
                         <div class="flex items-center space-x-4">
-                            <!-- Contenedor de la Gráfica -->
                             <div class="bg-white p-4 shadow-2xl rounded-md flex items-center space-x-4">
+                                <div class="bg-icon-color p-2 rounded-full">
+                                    <svg class="w-8 h-8 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M5 2a3 3 0 0 0-3 3v16a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7l-6-5H5zm1 6h6v2H6V8zm8 2h4v2h-4v-2z"/>
+                                    </svg>
+                                </div>
                                 <div class="text-center">
-                                    <canvas id="ventasChart" width="400" height="200"></canvas>
+                                    <h2 class="text-lg font-bold">Total facturación: ${{ number_format($totalFacturacion, 2) }}</h2>
+                                    <p class="text-gray-600">Período: {{ ucfirst(\Carbon\Carbon::now()->translatedFormat('F Y')) }}</p>
                                 </div>
                             </div>
                         </div>
+                        
                         <!-- Botón para descargar ventas en PDF -->
-                        <div>
-                            <a href="{{ route('ventas.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded ml-4">
-                                Descargar Ventas PDF
-                            </a>
-                        </div>
+                        <a href="{{ route('ventas.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded">
+                            Descargar Ventas PDF
+                        </a>
                     </div>
 
                     <!-- Tabla de ventas -->
@@ -159,34 +164,6 @@
                 document.getElementById('viewModal').classList.add('hidden');
             });
 
-            // Datos de la gráfica
-            const ventasData = @json($ventas->pluck('total')->toArray()); 
-            const labels = @json($ventas->pluck('paciente.nombres')->toArray());
-
-            const ctx = document.getElementById('ventasChart').getContext('2d');
-            const ventasChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Ventas',
-                        data: ventasData,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-
-        $(document).ready(function() {
             // Manejo de la acción de pago con confirmación
             $('.pagar-form').on('submit', function(e) {
                 e.preventDefault();

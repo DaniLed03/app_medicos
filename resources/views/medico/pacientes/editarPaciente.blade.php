@@ -35,11 +35,12 @@
                             <a class="tab-link" href="#antecedentes" onclick="openTab(event, 'antecedentes')">Antecedentes Familiares</a>
                         </li>
                         <li class="mr-1">
-                            <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Datos de Facturación</a>
+                            <a class="tab-link" href="#historial" onclick="openTab(event, 'historial')">Historial Clinico</a>
                         </li>
                         <li class="mr-1">
-                            <a class="tab-link" href="#historial" onclick="openTab(event, 'historial')">Historial</a>
+                            <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Datos de Facturación</a>
                         </li>
+                        
                     </ul>
 
                     <!-- Tab Content -->

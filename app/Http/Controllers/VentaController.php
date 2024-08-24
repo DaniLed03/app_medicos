@@ -9,8 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Picqer\Barcode\BarcodeGeneratorHTML;
 use Barryvdh\DomPDF\Facade\Pdf;
-
-
+use Carbon\Carbon;
 
 class VentaController extends Controller
 {
@@ -40,17 +39,42 @@ class VentaController extends Controller
     
     public function index()
     {
+        Carbon::setLocale('es'); // Configurar Carbon en español
+
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
-        
-        // Filtrar las ventas según el ID del médico o el ID del usuario autenticado a través de la relación con la consulta
+
+        // Obtener el mes actual y año
+        $currentMonth = Carbon::now()->format('Y-m');
+        $lastMonth = cache()->get('last_month', $currentMonth);
+
+        // Si el mes ha cambiado, reiniciar el total de facturación
+        if ($currentMonth !== $lastMonth) {
+            cache()->put('last_month', $currentMonth);
+            cache()->put('total_facturacion', 0);
+        }
+
+        // Obtener todas las ventas del médico actual o usuario autenticado
         $ventas = Venta::whereHas('consulta', function($query) use ($medicoId, $currentUser) {
             $query->where('usuariomedicoid', $medicoId)
                 ->orWhere('usuariomedicoid', $currentUser->id);
         })->get();
 
-        return view('medico.ventas.index', compact('ventas'));
+        // Calcular el total de facturación para el mes actual
+        $totalFacturacion = Venta::whereHas('consulta', function($query) use ($medicoId, $currentUser) {
+            $query->where('usuariomedicoid', $medicoId)
+                ->orWhere('usuariomedicoid', $currentUser->id);
+        })
+        ->whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->sum('total');
+
+        // Guardar el total de facturación en el caché
+        cache()->put('total_facturacion', $totalFacturacion);
+
+        return view('medico.ventas.index', compact('ventas', 'totalFacturacion'));
     }
+
 
     public function store(Request $request)
     {
