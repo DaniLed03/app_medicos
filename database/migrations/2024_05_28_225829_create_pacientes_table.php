@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('no_exp'); // Remove unique constraint from here
+            $table->unsignedBigInteger('no_exp');
             $table->string('nombres');
             $table->string('apepat');
             $table->string('apemat');
@@ -25,7 +25,11 @@ return new class extends Migration
             $table->text('antecedentes')->nullable();
             $table->string('padre')->nullable();
             $table->string('madre')->nullable();
-            $table->string('direccion')->nullable();
+            $table->unsignedBigInteger('entidad_federativa_id')->nullable();
+            $table->unsignedBigInteger('municipio_id')->nullable();
+            $table->unsignedBigInteger('localidad_id')->nullable();
+            $table->unsignedBigInteger('calle_id')->nullable();
+            $table->unsignedBigInteger('colonia_id')->nullable();
             $table->string('correo')->nullable();
             $table->string('telefono');
             $table->string('telefono2')->nullable();
@@ -37,11 +41,18 @@ return new class extends Migration
             $table->string('RFC')->nullable();
             $table->string('Regimen_fiscal')->nullable();
             $table->string('CFDI')->nullable();
-            $table->unsignedBigInteger('medico_id'); // Define medico_id only once
+            $table->unsignedBigInteger('medico_id');
             $table->timestamps();
 
+            // Foreign Keys
             $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unique(['medico_id', 'no_exp']); // Composite unique key
+            $table->foreign('entidad_federativa_id')->references('id')->on('entidades_federativas')->onDelete('set null');
+            $table->foreign('municipio_id')->references('id')->on('municipios')->onDelete('set null');
+            $table->foreign('localidad_id')->references('id')->on('localidades')->onDelete('set null');
+            $table->foreign('calle_id')->references('id')->on('calles')->onDelete('set null');
+            $table->foreign('colonia_id')->references('id')->on('colonias')->onDelete('set null');
+
+            $table->unique(['medico_id', 'no_exp']);
         });
     }
 

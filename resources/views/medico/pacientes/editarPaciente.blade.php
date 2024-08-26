@@ -197,13 +197,76 @@
                                     <div class="flex justify-between items-center mb-4">
                                         <h3 class="text-lg font-semibold">Domicilio</h3>
                                     </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                                        <!-- Dirección -->
-                                        <div class="mt-4">
-                                            <x-input-label for="direccionEditar" :value="__('Calle/Numero/Colonia')" />
-                                            <x-text-input id="direccionEditar" class="block mt-1 w-full h-12" type="text" name="direccion" value="{{ $paciente->direccion ?? '' }}" />
-                                            <x-input-error :messages="$errors->get('direccion')" class="mt-2" />
-                                        </div>  
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <!-- Entidad Federativa -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="entidad_federativa" :value="__('Entidad Federativa')" />
+                                            <select id="entidad_federativa" class="block mt-1 w-full" name="entidad_federativa" onchange="updateMunicipios(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($entidadesFederativas as $entidad)
+                                                    <option value="{{ $entidad->id }}" {{ $paciente->entidad_federativa == $entidad->id ? 'selected' : '' }}>
+                                                        {{ $entidad->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('entidad_federativa')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Municipio -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="municipio" :value="__('Municipio')" />
+                                            <select id="municipio" class="block mt-1 w-full" name="municipio" onchange="updateLocalidades(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($municipios as $municipio)
+                                                    <option value="{{ $municipio->id }}" {{ $paciente->municipio == $municipio->id ? 'selected' : '' }}>
+                                                        {{ $municipio->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('municipio')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Localidad -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="localidad" :value="__('Localidad')" />
+                                            <select id="localidad" class="block mt-1 w-full" name="localidad" onchange="updateCalles(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($localidades as $localidad)
+                                                    <option value="{{ $localidad->id }}" {{ $paciente->localidad == $localidad->id ? 'selected' : '' }}>
+                                                        {{ $localidad->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('localidad')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Calle -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="calle" :value="__('Calle')" />
+                                            <select id="calle" class="block mt-1 w-full" name="calle" onchange="updateColonias(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($calles as $calle)
+                                                    <option value="{{ $calle->id }}" {{ $paciente->calle == $calle->id ? 'selected' : '' }}>
+                                                        {{ $calle->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('calle')" class="mt-2" />
+                                        </div>
+
+                                        <!-- Colonia -->
+                                        <div class="mt-4 md:col-span-1">
+                                            <x-input-label for="colonia" :value="__('Colonia')" />
+                                            <select id="colonia" class="block mt-1 w-full" name="colonia">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($colonias as $colonia)
+                                                    <option value="{{ $colonia->id }}" {{ $paciente->colonia == $colonia->id ? 'selected' : '' }}>
+                                                        {{ $colonia->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('colonia')" class="mt-2" />
+                                        </div>
                                     </div>
                                     <div class="flex justify-end mt-4">
                                         <x-primary-button class="ml-4" id="domicilioNew-update" onclick="submitForm('editPacienteFormNew')">
@@ -542,6 +605,67 @@
                 ]
             });
         });
+
+        function updateMunicipios(entidadId) {
+            if (entidadId) {
+                $.ajax({
+                    url: '/get-municipios/' + entidadId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#municipio').empty().append('<option value="">Seleccione una opción</option>');
+                        $.each(data, function(index, municipio) {
+                            $('#municipio').append('<option value="'+ municipio.id +'">'+ municipio.nombre +'</option>');
+                        });
+                    }
+                });
+            }
+        }
+
+        function updateLocalidades(municipioId) {
+            if (municipioId) {
+                $.ajax({
+                    url: '/get-localidades/' + municipioId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#localidad').empty().append('<option value="">Seleccione una opción</option>');
+                        $.each(data, function(index, localidad) {
+                            $('#localidad').append('<option value="'+ localidad.id +'">'+ localidad.nombre +'</option>');
+                        });
+                    }
+                });
+            }
+        }
+
+        function updateCalles(localidadId) {
+            if (localidadId) {
+                $.ajax({
+                    url: '/get-calles/' + localidadId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#calle').empty().append('<option value="">Seleccione una opción</option>');
+                        $.each(data, function(index, calle) {
+                            $('#calle').append('<option value="'+ calle.id +'">'+ calle.nombre +'</option>');
+                        });
+                    }
+                });
+            }
+        }
+
+        function updateColonias(calleId) {
+            if (calleId) {
+                $.ajax({
+                    url: '/get-colonias/' + calleId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#colonia').empty().append('<option value="">Seleccione una opción</option>');
+                        $.each(data, function(index, colonia) {
+                            $('#colonia').append('<option value="'+ colonia.id +'">'+ colonia.nombre +'</option>');
+                        });
+                    }
+                });
+            }
+        }
+
 
     </script>
 

@@ -54,12 +54,42 @@ class ProfileController extends Controller
         } catch (\Exception $e) {
             dd('Error: ' . $e->getMessage());
         }
-        
-        
 
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the consultorio information.
+     */
+    public function updateConsultorio(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Actualización o creación de la información del consultorio
+        $consultorioData = $request->only([
+            'nombre', 
+            'entidad_federativa', 
+            'municipio', 
+            'localidad', 
+            'calle', 
+            'colonia', 
+            'telefono', 
+            'cedula_profesional', 
+            'especialidad', 
+            'facultad_medicina'
+        ]);
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $consultorioData['logo'] = $file->store('logos', 'public');
+        }
+
+        // Aquí se actualiza o crea el registro del consultorio
+        $user->consultorio()->updateOrCreate(['user_id' => $user->id], $consultorioData);
+
+        return Redirect::route('profile.edit')->with('status', 'consultorio-updated');
     }
 
     public function updatePassword(Request $request)
@@ -83,8 +113,6 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'password-updated');
     }
-
-
 
     /**
      * Delete the user's account.

@@ -66,8 +66,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(User::class, 'medico_id');
     }
 
+    public function consultorio()
+    {
+        return $this->hasOne(Consultorio::class);
+    }
+
     public function getFullNameAttribute()
     {
         return "Dr. {$this->nombres} {$this->apepat} {$this->apemat}";
     }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->foto
+            ? asset('storage/' . $this->foto)
+            : asset('images/default-profile.png'); // Imagen por defecto si no hay foto
+    }
+
 }

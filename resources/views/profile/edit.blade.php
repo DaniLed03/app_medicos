@@ -6,6 +6,7 @@
                 <nav class="nav nav-borders justify-content-center">
                     <a class="nav-link active ms-0" id="information-tab" href="#information" data-bs-toggle="tab">Información</a>
                     <a class="nav-link" id="password-tab" href="#password" data-bs-toggle="tab">Contraseña</a>
+                    <a class="nav-link" id="consultorio-tab" href="#consultorio" data-bs-toggle="tab">Consultorio</a>
                 </nav>
                 <hr class="mt-0 mb-4">
                 <div class="tab-content px-4">
@@ -147,7 +148,122 @@
                             </div>
                         </div>
                     </div>
-                    
+
+                    <!-- Update Consultorio Information Form -->
+                    <div class="tab-pane fade" id="consultorio">
+                        <div class="row">
+                            <div class="col-md-4 d-flex justify-content-center">
+                                <!-- Consultorio logo card-->
+                                <div class="card mb-4 text-center">
+                                    <div class="card-header">Logo del Consultorio</div>
+                                    <div class="card-body">
+                                        @if($user->consultorio)
+                                            <!-- Consultorio logo image-->
+                                            <img id="consultorio-logo-preview" src="{{ $user->consultorio->logo ? asset('storage/' . $user->consultorio->logo) : asset('images/default-logo.png') }}" alt="Logo del consultorio" class="img-account-profile rounded-circle mb-2">
+                                        @else
+                                            <!-- Mostrar un logo por defecto si no hay consultorio -->
+                                            <img id="consultorio-logo-preview" src="{{ asset('images/default-logo.png') }}" alt="Logo del consultorio" class="img-account-profile rounded-circle mb-2">
+                                            <p class="text-muted mt-2">No tienes un consultorio registrado.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <form method="post" action="{{ route('profile.updateConsultorio') }}" class="mt-3" enctype="multipart/form-data">
+                                    @csrf
+                                    @method('patch')
+                                    
+                                    <!-- Campo de carga de imagen y botón -->
+                                    <div class="mb-3">
+                                        <input type="file" id="logo" name="logo" accept="image/*" class="form-control d-none" onchange="previewConsultorioLogo(event)">
+                                        <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('logo').click()">Subir nuevo logo</button>
+                                        <x-input-error class="mt-2" :messages="$errors->get('logo')" />
+                                        <!-- Logo help block-->
+                                        <div class="small font-italic text-muted mt-2">JPG o PNG no mayor a 2 MB</div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <x-input-label for="nombre" :value="__('Nombre del Consultorio')" />
+                                            <x-text-input id="nombre" name="nombre" type="text" class="form-control" :value="old('nombre', $user->consultorio->nombre ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-input-label for="entidad_federativa" :value="__('Entidad Federativa')" />
+                                            <x-text-input id="entidad_federativa" name="entidad_federativa" type="text" class="form-control" :value="old('entidad_federativa', $user->consultorio->entidad_federativa ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('entidad_federativa')" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <x-input-label for="municipio" :value="__('Municipio')" />
+                                            <x-text-input id="municipio" name="municipio" type="text" class="form-control" :value="old('municipio', $user->consultorio->municipio ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('municipio')" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-input-label for="localidad" :value="__('Localidad')" />
+                                            <x-text-input id="localidad" name="localidad" type="text" class="form-control" :value="old('localidad', $user->consultorio->localidad ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('localidad')" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <x-input-label for="calle" :value="__('Calle')" />
+                                            <x-text-input id="calle" name="calle" type="text" class="form-control" :value="old('calle', $user->consultorio->calle ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('calle')" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-input-label for="colonia" :value="__('Colonia')" />
+                                            <x-text-input id="colonia" name="colonia" type="text" class="form-control" :value="old('colonia', $user->consultorio->colonia ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('colonia')" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <x-input-label for="telefono" :value="__('Teléfono del Consultorio')" />
+                                            <x-text-input id="telefono" name="telefono" type="text" class="form-control" :value="old('telefono', $user->consultorio->telefono ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-input-label for="cedula_profesional" :value="__('Cédula Profesional')" />
+                                            <x-text-input id="cedula_profesional" name="cedula_profesional" type="text" class="form-control" :value="old('cedula_profesional', $user->consultorio->cedula_profesional ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('cedula_profesional')" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <x-input-label for="especialidad" :value="__('Especialidad')" />
+                                            <x-text-input id="especialidad" name="especialidad" type="text" class="form-control" :value="old('especialidad', $user->consultorio->especialidad ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('especialidad')" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-input-label for="facultad_medicina" :value="__('Facultad de Medicina')" />
+                                            <x-text-input id="facultad_medicina" name="facultad_medicina" type="text" class="form-control" :value="old('facultad_medicina', $user->consultorio->facultad_medicina ?? '')" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('facultad_medicina')" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <x-primary-button>{{ __('Guardar Consultorio') }}</x-primary-button>
+
+                                        @if (session('status') === 'consultorio-updated')
+                                            <p
+                                                x-data="{ show: true }"
+                                                x-show="show"
+                                                x-transition
+                                                x-init="setTimeout(() => show = false, 2000)"
+                                                class="text-sm text-gray-600"
+                                            >{{ __('Guardado.') }}</p>
+                                        @endif
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -263,6 +379,15 @@
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+
+    function previewConsultorioLogo(event) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const output = document.getElementById('consultorio-logo-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
 </script>
 <script>
     // Mostrar mensaje de éxito al actualizar el perfil
@@ -282,6 +407,17 @@
             icon: 'success',
             title: 'Contraseña Actualizada',
             text: 'Tu contraseña se ha actualizado exitosamente.',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    // Mostrar mensaje de éxito al actualizar el consultorio
+    @if (session('status') === 'consultorio-updated')
+        Swal.fire({
+            icon: 'success',
+            title: 'Consultorio Actualizado',
+            text: 'La información del consultorio se ha actualizado exitosamente.',
             timer: 3000,
             showConfirmButton: false
         });

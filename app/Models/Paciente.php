@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Paciente extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'no_exp',
         'nombres',
@@ -25,7 +25,11 @@ class Paciente extends Model
         'antecedentes',
         'padre',
         'madre',
-        'direccion',
+        'entidad_federativa_id',
+        'municipio_id',
+        'localidad_id',
+        'calle_id',
+        'colonia_id',
         'correo',
         'telefono',
         'telefono2',
@@ -48,6 +52,30 @@ class Paciente extends Model
     public function medico()
     {
         return $this->belongsTo(User::class, 'medico_id');
-    }    
-}
+    }
 
+    public function entidadFederativa()
+    {
+        return $this->belongsTo(EntidadFederativa::class, 'entidad_federativa_id');
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class, 'municipio_id');
+    }
+
+    public function localidad()
+    {
+        return $this->belongsTo(Localidad::class, 'localidad_id');
+    }
+
+    public function calle()
+    {
+        return $this->belongsTo(Calle::class, 'calle_id');
+    }
+
+    public function colonia()
+    {
+        return $this->belongsTo(Colonia::class, 'colonia_id');
+    }
+}

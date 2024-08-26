@@ -3,7 +3,7 @@
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Ventas</h1>
+                    <h1 class="text-xl font-bold text-gray-900 uppercase">Cobro de Servicios</h1>
                     <div class="flex items-center justify-between mb-4">
                         <!-- Contenedor de Total Facturación -->
                         <div class="flex items-center space-x-4">
@@ -22,7 +22,7 @@
                         
                         <!-- Botón para descargar ventas en PDF -->
                         <a href="{{ route('ventas.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded">
-                            Descargar Ventas PDF
+                            Descargar Cobros PDF
                         </a>
                     </div>
 

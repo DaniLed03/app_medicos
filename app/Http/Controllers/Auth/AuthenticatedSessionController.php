@@ -56,15 +56,7 @@ class AuthenticatedSessionController extends Controller
 
     protected function redirectToRole($user)
     {
-        switch ($user->rol) {
-            case 'medico':
-                return redirect()->route('medico.dashboard');
-            case 'secretaria':
-                return redirect()->route('medico.dashboard');
-            case 'enfermera':
-                return redirect()->route('medico.dashboard');
-            default:
-                return redirect()->route('medico.dashboard');
-        }
+        return redirect()->route('vistaInicio');
     }
+
 }

@@ -33,11 +33,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('medico.dashboard'); // Apunta a la vista en resources/views/medico/dashboard.blade.php
     })->name('dashboard');
 
+    // Ruta para la vista de inicio
+    Route::get('/inicio', function () {
+        return view('vistaInicio');
+    })->name('vistaInicio');
+
     // Rutas del perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::patch('/profile/consultorio', [ProfileController::class, 'updateConsultorio'])->name('profile.updateConsultorio');
 
     Route::get('/usuarios', [AsignarController::class, 'index'])->name('users.index');
     Route::get('/usuarios/{id}/edit', [AsignarController::class, 'edit'])->name('users.edit');
@@ -131,5 +137,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /// nuevo vv
     Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
     Route::get('/medico/productos/pdf', [ProductoController::class, 'generateReport'])->name('productos.pdf');
+
+    Route::get('/get-municipios/{entidadId}', [MedicoController::class, 'getMunicipios']);
+    Route::get('/get-localidades/{municipioId}', [MedicoController::class, 'getLocalidades']);
+    Route::get('/get-calles/{localidadId}', [MedicoController::class, 'getCalles']);
+    Route::get('/get-colonias/{calleId}', [MedicoController::class, 'getColonias']);    
 
 });

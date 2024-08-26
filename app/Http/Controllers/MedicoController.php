@@ -7,6 +7,11 @@ use App\Models\User;
 use App\Models\Citas;
 use App\Models\Consultas;
 use App\Models\Persona;
+use App\Models\EntidadFederativa;
+use App\Models\Municipio;
+use App\Models\Localidad;
+use App\Models\Calle;
+use App\Models\Colonia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HorariosMedicos;
@@ -59,6 +64,11 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
+            'entidad_federativa' => 'nullable|string|max:255',
+            'municipio' => 'nullable|string|max:255',
+            'localidad' => 'nullable|string|max:255',
+            'calle' => 'nullable|string|max:255',
+            'colonia' => 'nullable|string|max:255',
         ]);
 
         // Crear el nuevo paciente con el medico_id correcto
@@ -70,8 +80,13 @@ class MedicoController extends Controller
             'fechanac' => $request->fechanac,
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
+            'entidad_federativa' => $request->entidad_federativa,
+            'municipio' => $request->municipio,
+            'localidad' => $request->localidad,
+            'calle' => $request->calle,
+            'colonia' => $request->colonia,
             'activo' => 'si',
-            'medico_id' => $medicoId, // Usar el ID del médico original
+            'medico_id' => $medicoId,
         ]);
 
         // Redirigir con un mensaje de éxito
@@ -146,20 +161,33 @@ class MedicoController extends Controller
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
 
-
-
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($id)
     {
         $medicoId = Auth::id();
         $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
-        
-        // Obtener las consultas del paciente con el mismo doctor
+
+        // Cargar los datos de las consultas del paciente con el mismo médico
         $consultas = Consultas::where('pacienteid', $id)->where('usuariomedicoid', $medicoId)->get();
 
-        return view('medico.pacientes.editarPaciente', compact('paciente', 'consultas'));
+        // Cargar datos de las tablas de catálogo
+        $entidadesFederativas = EntidadFederativa::all();
+        $municipios = Municipio::where('entidad_federativa_id', $paciente->entidad_federativa)->get();
+        $localidades = Localidad::where('municipio_id', $paciente->municipio)->get();
+        $calles = Calle::where('localidad_id', $paciente->localidad)->get();
+        $colonias = Colonia::where('calle_id', $paciente->calle)->get();
+
+        return view('medico.pacientes.editarPaciente', compact(
+            'paciente', 
+            'consultas', 
+            'entidadesFederativas', 
+            'municipios', 
+            'localidades', 
+            'calles', 
+            'colonias'
+        ));
     }
- 
+
 
     public function updatePaciente(Request $request, $id = null)
     {
@@ -179,7 +207,11 @@ class MedicoController extends Controller
             'antecedentes' => 'nullable|string',
             'padre' => 'nullable|string|max:255',
             'madre' => 'nullable|string|max:255',
-            'direccion' => 'nullable|string|max:255',
+            'entidad_federativa' => 'nullable|string|max:255',
+            'municipio' => 'nullable|string|max:255',
+            'localidad' => 'nullable|string|max:255',
+            'calle' => 'nullable|string|max:255',
+            'colonia' => 'nullable|string|max:255',
             'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $id,
             'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
@@ -214,7 +246,11 @@ class MedicoController extends Controller
             $paciente->curp = $request->curp ?? '';
             $paciente->correo = $request->correo ?? '';
             $paciente->sexo = $request->sexo ?? '';
-            $paciente->direccion = $request->direccion ?? '';
+            $paciente->entidad_federativa = $request->entidad_federativa ?? '';
+            $paciente->municipio = $request->municipio ?? '';
+            $paciente->localidad = $request->localidad ?? '';
+            $paciente->calle = $request->calle ?? '';
+            $paciente->colonia = $request->colonia ?? '';
             $paciente->telefono = $request->telefono ?? '';
             $paciente->no_exp = $nextNoExp;
             $paciente->medico_id = $medicoId;

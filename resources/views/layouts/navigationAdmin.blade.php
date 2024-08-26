@@ -56,7 +56,7 @@
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="{{ route('medico.dashboard') }}" class="flex items-center space-x-3">
+                    <a href="{{ route('vistaInicio') }}" class="flex items-center space-x-3">
                         <img src="{{ asset('images/LedeHealth.png') }}" alt="LedeHealth" class="h-8 w-auto">
                         <span class="text-white text-lg font-semibold">Lede<span class="text-[#33AD9B]">Health</span></span>
                     </a>
@@ -92,7 +92,7 @@
                             <span class="block text-sm text-gray-500">{{ Auth::user()->email }}</span>
                             <span class="block text-sm text-gray-500">{{ Auth::user()->telefono }}</span>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Informacion Personal</a>
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Perfil</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a href="{{ route('logout') }}"
@@ -157,10 +157,10 @@
                                 <path d="M4 .5a.5.5 0 0 0-1 0v1H1.5A1.5 1.5 0 0 0 0 3v1.5h16V3a1.5 1.5 0 0 0-1.5-1.5H13v-1a.5.5 0 0 0-1 0v1H4v-1z"/>
                                 <path d="M0 4.5V11a1.5 1.5 0 0 0 1.5 1.5H2v1.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V12.5h.5A1.5 1.5 0 0 0 16 11V4.5H0z"/>
                             </svg>
-                            Cobro de Servicios y Productos
+                            Caja
                         </button>
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
-                            <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Ventas</a>
+                            <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Servicios</a>
                             <a href="{{ route('productos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Productos</a>
                         </div>
                     </div>  
