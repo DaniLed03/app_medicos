@@ -9,13 +9,20 @@ return new class extends Migration
     public function up()
     {
         Schema::create('colonias', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('calle_id');
-            $table->string('nombre');
+            $table->unsignedBigInteger('id_asentamiento');
+            $table->unsignedBigInteger('id_entidad');
+            $table->unsignedBigInteger('id_municipio');
+            $table->string('cp');
+            $table->string('asentamiento');
+            $table->string('tipo_asentamiento');
             $table->timestamps();
 
-            $table->foreign('calle_id')->references('id')->on('calles')->onDelete('cascade');
-            $table->unique(['calle_id', 'nombre']);
+            // Definir la llave primaria compuesta
+            $table->primary(['id_asentamiento', 'id_entidad', 'id_municipio']);
+            
+            // Definir las relaciones
+            $table->foreign('id_entidad')->references('id')->on('entidades_federativas')->onDelete('cascade');
+            $table->foreign('id_municipio')->references('id_municipio')->on('municipios')->onDelete('cascade');
         });
     }
 
@@ -23,5 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('colonias');
     }
-
 };

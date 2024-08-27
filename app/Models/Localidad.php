@@ -9,16 +9,16 @@ class Localidad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['localidades', 'municipio_id'];
+    protected $fillable = ['nombre', 'municipio_id'];
     protected $table = 'localidades';
 
     public function municipio()
     {
-        return $this->belongsTo(Municipio::class);
+        return $this->belongsTo(Municipio::class, 'municipio_id');
     }
 
-    public function calles()
+    public function entidadFederativa()
     {
-        return $this->hasMany(Calle::class);
+        return $this->belongsTo(EntidadFederativa::class, 'entidad_federativa_id', 'id');
     }
 }

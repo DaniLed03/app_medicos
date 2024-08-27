@@ -28,7 +28,7 @@ class Paciente extends Model
         'entidad_federativa_id',
         'municipio_id',
         'localidad_id',
-        'calle_id',
+        'calle',  // Cambiado de `calle_id` a `calle` como string
         'colonia_id',
         'correo',
         'telefono',
@@ -61,7 +61,7 @@ class Paciente extends Model
 
     public function municipio()
     {
-        return $this->belongsTo(Municipio::class, 'municipio_id');
+        return $this->belongsTo(Municipio::class, 'municipio_id', 'id_municipio')->where('entidad_federativa_id', $this->entidad_federativa_id);
     }
 
     public function localidad()
@@ -69,13 +69,10 @@ class Paciente extends Model
         return $this->belongsTo(Localidad::class, 'localidad_id');
     }
 
-    public function calle()
-    {
-        return $this->belongsTo(Calle::class, 'calle_id');
-    }
-
     public function colonia()
     {
         return $this->belongsTo(Colonia::class, 'colonia_id');
     }
+
 }
+

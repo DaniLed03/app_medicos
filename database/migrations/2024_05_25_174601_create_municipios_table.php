@@ -9,13 +9,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('municipios', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id_municipio');
             $table->unsignedBigInteger('entidad_federativa_id');
             $table->string('nombre');
             $table->timestamps();
 
-            $table->foreign('entidad_federativa_id')->references('id')->on('entidades_federativas')->onDelete('cascade');
-            $table->unique(['entidad_federativa_id', 'nombre']);
+            $table->primary(['id_municipio', 'entidad_federativa_id']);
+            $table->foreign('entidad_federativa_id')
+                ->references('id')
+                ->on('entidades_federativas')
+                ->onDelete('cascade');
         });
     }
 
@@ -23,5 +26,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('municipios');
     }
-
 };

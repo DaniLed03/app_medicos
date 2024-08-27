@@ -64,11 +64,11 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
-            'entidad_federativa' => 'nullable|string|max:255',
-            'municipio' => 'nullable|string|max:255',
-            'localidad' => 'nullable|string|max:255',
+            'entidad_federativa_id' => 'nullable|exists:entidades_federativas,id',
+            'municipio_id' => 'nullable|exists:municipios,id_municipio',
+            'localidad_id' => 'nullable|exists:localidades,id_localidad',
             'calle' => 'nullable|string|max:255',
-            'colonia' => 'nullable|string|max:255',
+            'colonia_id' => 'nullable|exists:colonias,id_asentamiento',
         ]);
 
         // Crear el nuevo paciente con el medico_id correcto
@@ -80,11 +80,11 @@ class MedicoController extends Controller
             'fechanac' => $request->fechanac,
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
-            'entidad_federativa' => $request->entidad_federativa,
-            'municipio' => $request->municipio,
-            'localidad' => $request->localidad,
-            'calle' => $request->calle,
-            'colonia' => $request->colonia,
+            'entidad_federativa_id' => $request->entidad_federativa_id,
+            'municipio_id' => $request->municipio_id,
+            'localidad_id' => $request->localidad_id,
+            'calle' => $request->calle,  // Guardar el nombre de la calle directamente como texto
+            'colonia_id' => $request->colonia_id,
             'activo' => 'si',
             'medico_id' => $medicoId,
         ]);
@@ -92,6 +92,7 @@ class MedicoController extends Controller
         // Redirigir con un mensaje de éxito
         return redirect()->route('medico.dashboard')->with('status', 'Paciente creado con éxito');
     }
+
 
     public function showPaciente($id)
     {
@@ -172,10 +173,13 @@ class MedicoController extends Controller
 
         // Cargar datos de las tablas de catálogo
         $entidadesFederativas = EntidadFederativa::all();
-        $municipios = Municipio::where('entidad_federativa_id', $paciente->entidad_federativa)->get();
-        $localidades = Localidad::where('municipio_id', $paciente->municipio)->get();
-        $calles = Calle::where('localidad_id', $paciente->localidad)->get();
-        $colonias = Colonia::where('calle_id', $paciente->calle)->get();
+        $municipios = Municipio::where('entidad_federativa_id', $paciente->entidad_federativa_id)->get();
+        $localidades = Localidad::where('id_municipio', $paciente->municipio_id)
+                                ->where('id_entidad_federativa', $paciente->entidad_federativa_id)
+                                ->get();
+        $colonias = Colonia::where('id_municipio', $paciente->municipio_id)
+                        ->where('id_entidad', $paciente->entidad_federativa_id)
+                        ->get();
 
         return view('medico.pacientes.editarPaciente', compact(
             'paciente', 
@@ -183,11 +187,56 @@ class MedicoController extends Controller
             'entidadesFederativas', 
             'municipios', 
             'localidades', 
-            'calles', 
             'colonias'
         ));
     }
 
+
+    public function getMunicipios($entidadId)
+    {
+        $municipios = Municipio::where('entidad_federativa_id', $entidadId)->get(['id_municipio', 'nombre']);
+        return response()->json($municipios);
+    }    
+
+    public function getLocalidades($municipioId)
+    {
+        $entidadId = request()->get('entidad_id');
+
+        // Filtrar localidades por entidad y municipio
+        $localidades = Localidad::where('id_municipio', $municipioId)
+                                ->where('id_entidad_federativa', $entidadId)
+                                ->get(['id_localidad', 'nombre']);
+
+        // Mapear las localidades para concatenar los campos si es necesario
+        $localidades = $localidades->map(function($localidad) {
+            return [
+                'id_localidad' => $localidad->id_localidad,
+                'nombre' => $localidad->nombre // Puedes personalizar el nombre si deseas concatenar otros campos
+            ];
+        });
+
+        return response()->json($localidades);
+    }
+    
+    public function getColonias($municipioId)
+    {
+        $entidadId = request()->get('entidad_id');
+
+        // Filtrar colonias por entidad y municipio
+        $colonias = Colonia::where('id_municipio', $municipioId)
+                            ->where('id_entidad', $entidadId)
+                            ->get(['id_asentamiento', 'cp', 'tipo_asentamiento', 'asentamiento']);
+
+        // Mapear las colonias para concatenar los campos
+        $colonias = $colonias->map(function($colonia) {
+            return [
+                'id_asentamiento' => $colonia->id_asentamiento,
+                'nombre' => $colonia->cp . ' - ' . $colonia->tipo_asentamiento . ' - ' . $colonia->asentamiento
+            ];
+        });
+
+        return response()->json($colonias);
+    }
 
     public function updatePaciente(Request $request, $id = null)
     {
@@ -207,11 +256,10 @@ class MedicoController extends Controller
             'antecedentes' => 'nullable|string',
             'padre' => 'nullable|string|max:255',
             'madre' => 'nullable|string|max:255',
-            'entidad_federativa' => 'nullable|string|max:255',
-            'municipio' => 'nullable|string|max:255',
-            'localidad' => 'nullable|string|max:255',
-            'calle' => 'nullable|string|max:255',
-            'colonia' => 'nullable|string|max:255',
+            'entidad_federativa_id' => 'nullable|exists:entidades_federativas,id',
+            'municipio_id' => 'nullable|exists:municipios,id_municipio',
+            'localidad_id' => 'nullable|exists:localidades,id_localidad',
+            'colonia_id' => 'nullable|exists:colonias,id_asentamiento',
             'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $id,
             'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
@@ -230,6 +278,7 @@ class MedicoController extends Controller
         if ($paciente) {
             // Si el paciente existe, actualiza sus datos
             $paciente->update($request->all());
+            $paciente->localidad_id = $request->localidad_id; // Asignación manual de la localidad
             $mensaje = 'Paciente actualizado correctamente';
         } else {
             // Si el paciente es nuevo, genera el siguiente número de expediente
@@ -239,6 +288,7 @@ class MedicoController extends Controller
 
             // Crear el nuevo paciente manualmente
             $paciente = new Paciente();
+            $paciente->no_exp = $nextNoExp;
             $paciente->nombres = $request->nombres;
             $paciente->apepat = $request->apepat;
             $paciente->apemat = $request->apemat ?? '';
@@ -246,29 +296,39 @@ class MedicoController extends Controller
             $paciente->curp = $request->curp ?? '';
             $paciente->correo = $request->correo ?? '';
             $paciente->sexo = $request->sexo ?? '';
-            $paciente->entidad_federativa = $request->entidad_federativa ?? '';
-            $paciente->municipio = $request->municipio ?? '';
-            $paciente->localidad = $request->localidad ?? '';
+            $paciente->entidad_federativa_id = $request->entidad_federativa_id ?? null;
+            $paciente->municipio_id = $request->municipio_id ?? null;
+            $paciente->localidad_id = $request->localidad_id ?? null;
             $paciente->calle = $request->calle ?? '';
-            $paciente->colonia = $request->colonia ?? '';
+            $paciente->colonia_id = $request->colonia_id ?? null;
             $paciente->telefono = $request->telefono ?? '';
-            $paciente->no_exp = $nextNoExp;
+            $paciente->telefono2 = $request->telefono2 ?? null;
+            $paciente->Nombre_fact = $request->Nombre_fact ?? '';
+            $paciente->Direccion_fact = $request->Direccion_fact ?? '';
+            $paciente->RFC = $request->RFC ?? '';
+            $paciente->Regimen_fiscal = $request->Regimen_fiscal ?? '';
+            $paciente->CFDI = $request->CFDI ?? '';
+            $paciente->hospital = $request->hospital ?? '';
+            $paciente->tipoparto = $request->tipoparto ?? '';
+            $paciente->tiposangre = $request->tiposangre ?? '';
+            $paciente->lugar_naci = $request->lugar_naci ?? '';
+            $paciente->hora = $request->hora ?? null;
+            $paciente->peso = $request->peso ?? null;
+            $paciente->talla = $request->talla ?? null;
+            $paciente->padre = $request->padre ?? '';
+            $paciente->madre = $request->madre ?? '';
+            $paciente->antecedentes = $request->antecedentes ?? '';
             $paciente->medico_id = $medicoId;
             $paciente->activo = 'si';
-            // Asignar otros campos si es necesario
             $paciente->save();
 
             $mensaje = 'Paciente creado correctamente';
         }
 
-        // Verifica si el campo antecedentes está presente en la solicitud
-        $tab = $request->has('antecedentes') ? 'antecedentes' : $request->input('tab', 'datos');
-        
         // Redirecciona a la vista de edición de paciente con un mensaje de éxito
+        $tab = $request->has('antecedentes') ? 'antecedentes' : $request->input('tab', 'datos');
         return redirect()->route('pacientes.editar', ['id' => $paciente->id, 'tab' => $tab])->with('status', $mensaje);
     }
-
-
 
     // Marca a un paciente como inactivo (eliminado)
     public function eliminarPaciente($id)

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->unsignedBigInteger('entidad_federativa_id')->nullable();
             $table->unsignedBigInteger('municipio_id')->nullable();
             $table->unsignedBigInteger('localidad_id')->nullable();
-            $table->unsignedBigInteger('calle_id')->nullable();
+            $table->string('calle')->nullable();  // Cambiado de `calle_id` a `calle` como string para almacenar el nombre manualmente
             $table->unsignedBigInteger('colonia_id')->nullable();
             $table->string('correo')->nullable();
             $table->string('telefono');
@@ -47,10 +47,24 @@ return new class extends Migration
             // Foreign Keys
             $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('entidad_federativa_id')->references('id')->on('entidades_federativas')->onDelete('set null');
-            $table->foreign('municipio_id')->references('id')->on('municipios')->onDelete('set null');
-            $table->foreign('localidad_id')->references('id')->on('localidades')->onDelete('set null');
-            $table->foreign('calle_id')->references('id')->on('calles')->onDelete('set null');
-            $table->foreign('colonia_id')->references('id')->on('colonias')->onDelete('set null');
+
+            // Ajuste para clave compuesta en 'municipios'
+            $table->foreign(['municipio_id', 'entidad_federativa_id'], 'fk_pacientes_municipio')
+                  ->references(['id_municipio', 'entidad_federativa_id'])
+                  ->on('municipios')
+                  ->onDelete('set null');
+                  
+            // Ajuste para clave compuesta en 'localidades'
+            $table->foreign(['localidad_id', 'municipio_id', 'entidad_federativa_id'], 'fk_pacientes_localidad')
+                  ->references(['id_localidad', 'id_municipio', 'id_entidad_federativa'])
+                  ->on('localidades')
+                  ->onDelete('set null');
+            
+            // Ajuste para clave compuesta en 'colonias'
+            $table->foreign(['colonia_id', 'entidad_federativa_id', 'municipio_id'], 'fk_pacientes_colonia')
+                  ->references(['id_asentamiento', 'id_entidad', 'id_municipio'])  // Actualizado el nombre de las columnas referenciadas
+                  ->on('colonias')
+                  ->onDelete('set null');
 
             $table->unique(['medico_id', 'no_exp']);
         });

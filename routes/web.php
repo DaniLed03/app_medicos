@@ -138,9 +138,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
     Route::get('/medico/productos/pdf', [ProductoController::class, 'generateReport'])->name('productos.pdf');
 
-    Route::get('/get-municipios/{entidadId}', [MedicoController::class, 'getMunicipios']);
-    Route::get('/get-localidades/{municipioId}', [MedicoController::class, 'getLocalidades']);
-    Route::get('/get-calles/{localidadId}', [MedicoController::class, 'getCalles']);
-    Route::get('/get-colonias/{calleId}', [MedicoController::class, 'getColonias']);    
-
+    route::get('/get-municipios/{id}', [MedicoController::class, 'getMunicipios']);
+    Route::get('/get-localidades/{id}', [MedicoController::class, 'getLocalidades']);
+    route::get('/get-colonias/{id}', [MedicoController::class, 'getColonias']);
 });

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('entidades_federativas', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('nombre')->unique();
             $table->timestamps();
         });
