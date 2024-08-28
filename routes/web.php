@@ -141,4 +141,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     route::get('/get-municipios/{id}', [MedicoController::class, 'getMunicipios']);
     Route::get('/get-localidades/{id}', [MedicoController::class, 'getLocalidades']);
     route::get('/get-colonias/{id}', [MedicoController::class, 'getColonias']);
+
+    // Rutas de ProfileController para manejo de entidades, municipios, localidades y colonias
+    Route::get('/get-municipios/{entidad_id}', [ProfileController::class, 'getMunicipios']);
+    Route::get('/get-localidades/{municipio_id}', [ProfileController::class, 'getLocalidades']);
+    Route::get('/get-colonias/{municipio_id}', [ProfileController::class, 'getColonias']);
+
+
+
 });

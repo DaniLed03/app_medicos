@@ -189,22 +189,43 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
                                         </div>
                                         <div class="col-md-6">
-                                            <x-input-label for="entidad_federativa" :value="__('Entidad Federativa')" />
-                                            <x-text-input id="entidad_federativa" name="entidad_federativa" type="text" class="form-control" :value="old('entidad_federativa', $user->consultorio->entidad_federativa ?? '')" />
-                                            <x-input-error class="mt-2" :messages="$errors->get('entidad_federativa')" />
+                                            <x-input-label for="entidad_federativa_id" :value="__('Entidad Federativa')" />
+                                            <select id="entidad_federativa_id" name="entidad_federativa_id" class="form-select" onchange="updateMunicipios(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($entidadesFederativas as $entidad)
+                                                    <option value="{{ $entidad->id }}" {{ old('entidad_federativa_id', $user->consultorio->entidad_federativa_id ?? '') == $entidad->id ? 'selected' : '' }}>
+                                                        {{ $entidad->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('entidad_federativa_id')" class="mt-2" />
                                         </div>
                                     </div>
                                     
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <x-input-label for="municipio" :value="__('Municipio')" />
-                                            <x-text-input id="municipio" name="municipio" type="text" class="form-control" :value="old('municipio', $user->consultorio->municipio ?? '')" />
-                                            <x-input-error class="mt-2" :messages="$errors->get('municipio')" />
+                                            <x-input-label for="municipio_id" :value="__('Municipio')" />
+                                            <select id="municipio_id" name="municipio_id" class="form-select" onchange="updateLocalidades(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($municipios as $municipio)
+                                                    <option value="{{ $municipio->id_municipio }}" {{ old('municipio_id', $user->consultorio->municipio_id ?? '') == $municipio->id_municipio ? 'selected' : '' }}>
+                                                        {{ $municipio->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('municipio_id')" class="mt-2" />
                                         </div>
                                         <div class="col-md-6">
-                                            <x-input-label for="localidad" :value="__('Localidad')" />
-                                            <x-text-input id="localidad" name="localidad" type="text" class="form-control" :value="old('localidad', $user->consultorio->localidad ?? '')" />
-                                            <x-input-error class="mt-2" :messages="$errors->get('localidad')" />
+                                            <x-input-label for="localidad_id" :value="__('Localidad')" />
+                                            <select id="localidad_id" name="localidad_id" class="form-select" onchange="updateColonias(this.value)">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($localidades as $localidad)
+                                                    <option value="{{ $localidad->id_localidad }}" {{ old('localidad_id', $user->consultorio->localidad_id ?? '') == $localidad->id_localidad ? 'selected' : '' }}>
+                                                        {{ $localidad->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('localidad_id')" class="mt-2" />
                                         </div>
                                     </div>
                                     
@@ -215,9 +236,16 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('calle')" />
                                         </div>
                                         <div class="col-md-6">
-                                            <x-input-label for="colonia" :value="__('Colonia')" />
-                                            <x-text-input id="colonia" name="colonia" type="text" class="form-control" :value="old('colonia', $user->consultorio->colonia ?? '')" />
-                                            <x-input-error class="mt-2" :messages="$errors->get('colonia')" />
+                                            <x-input-label for="colonia_id" :value="__('Colonia')" />
+                                            <select id="colonia_id" name="colonia_id" class="form-select">
+                                                <option value="">Seleccione una opción</option>
+                                                @foreach($colonias as $colonia)
+                                                    <option value="{{ $colonia->id_asentamiento }}" {{ old('colonia_id', $user->consultorio->colonia_id ?? '') == $colonia->id_asentamiento ? 'selected' : '' }}>
+                                                        {{ $colonia->cp }} - {{ $colonia->tipo_asentamiento }} {{ $colonia->asentamiento }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('colonia_id')" class="mt-2" />
                                         </div>
                                     </div>
                                     
@@ -371,6 +399,57 @@
 </style>
 
 <script>
+    function updateMunicipios(entidadId) {
+        if (entidadId) {
+            $.ajax({
+                url: '/get-municipios/' + entidadId,
+                type: 'GET',
+                success: function(data) {
+                    $('#municipio_id').empty().append('<option value="">Seleccione una opción</option>');
+                    $.each(data, function(index, municipio) {
+                        $('#municipio_id').append('<option value="'+ municipio.id_municipio +'">'+ municipio.nombre +'</option>');
+                    });
+                    $('#localidad_id').empty().append('<option value="">Seleccione una opción</option>');
+                    $('#colonia_id').empty().append('<option value="">Seleccione una opción</option>');
+                }
+            });
+        }
+    }
+
+    function updateLocalidades(municipioId) {
+        let entidadId = $('#entidad_federativa_id').val();
+
+        if (municipioId && entidadId) {
+            $.ajax({
+                url: '/get-localidades/' + municipioId,
+                type: 'GET',
+                data: { entidad_id: entidadId },
+                success: function(data) {
+                    $('#localidad_id').empty().append('<option value="">Seleccione una opción</option>');
+                    $.each(data, function(index, localidad) {
+                        $('#localidad_id').append('<option value="'+ localidad.id_localidad +'">'+ localidad.nombre +'</option>');
+                    });
+                }
+            });
+
+            $.ajax({
+                url: '/get-colonias/' + municipioId,
+                type: 'GET',
+                data: { entidad_id: entidadId },
+                success: function(data) {
+                    $('#colonia_id').empty().append('<option value="">Seleccione una opción</option>');
+                    $.each(data, function(index, colonia) {
+                        $('#colonia_id').append('<option value="'+ colonia.id_asentamiento +'">'+ colonia.nombre +'</option>');
+                    });
+                }
+            });
+        } else {
+            $('#localidad_id').empty().append('<option value="">Seleccione una opción</option>');
+            $('#colonia_id').empty().append('<option value="">Seleccione una opción</option>');
+        }
+    }
+
+
     function previewImage(event) {
         const reader = new FileReader();
         reader.onload = function() {

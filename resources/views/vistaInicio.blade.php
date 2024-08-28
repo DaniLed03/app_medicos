@@ -21,7 +21,7 @@
             
             <div class="w-full md:w-1/3 flex flex-col items-center justify-center shadow-md rounded-lg p-6 bg-gray-100 mr-4">
                 <h3 class="text-2xl font-semibold mb-2 text-center">Avisos Pendientes</h3>
-   
+                <!-- Aquí irían los avisos pendientes -->
             </div>
             
             <!-- Contenedor Principal - Datos del Consultorio al lado derecho -->
@@ -33,21 +33,20 @@
                 @endif
                 <h3 class="text-2xl font-semibold mb-2 text-right">Datos del Consultorio</h3>
                 @if(Auth::user()->consultorio)
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Entidad Federativa:</strong> {{ Auth::user()->consultorio->entidad_federativa }}</p>
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Municipio:</strong> {{ Auth::user()->consultorio->municipio }}</p>
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Localidad:</strong> {{ Auth::user()->consultorio->localidad }}</p>
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Calle:</strong> {{ Auth::user()->consultorio->calle }}</p>
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Colonia:</strong> {{ Auth::user()->consultorio->colonia }}</p>
-                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Teléfono:</strong> {{ Auth::user()->consultorio->telefono }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Entidad Federativa:</strong> {{ Auth::user()->consultorio->entidadFederativa->nombre ?? 'No disponible' }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Municipio:</strong> {{ Auth::user()->consultorio->municipio->nombre ?? 'No disponible' }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Localidad:</strong> {{ Auth::user()->consultorio->localidad->nombre ?? 'No disponible' }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Calle:</strong> {{ Auth::user()->consultorio->calle ?? 'No disponible' }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Colonia:</strong> {{ Auth::user()->consultorio->colonia ? Auth::user()->consultorio->colonia->tipo_asentamiento . ' ' . Auth::user()->consultorio->colonia->asentamiento . ', C.P. ' . Auth::user()->consultorio->colonia->cp : 'No disponible' }}</p>
+                    <p class="text-gray-700 text-sm mb-0.5 text-right"><strong>Teléfono:</strong> {{ Auth::user()->consultorio->telefono ?? 'No disponible' }}</p>
                 @else
                     <p class="text-gray-700 text-sm mb-0.5 text-right">No tienes un consultorio registrado.</p>
                 @endif
-            </div>
-
-            
+            </div>            
         </div>
     </div>
 </x-app-layout>
+
 
 <!-- Estilos adicionales -->
 <style>

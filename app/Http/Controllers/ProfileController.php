@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Models\EntidadFederativa;
+use App\Models\Municipio;
+use App\Models\Localidad;
+use App\Models\Colonia;
 
 class ProfileController extends Controller
 {
@@ -19,11 +23,41 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
+        // Obtener el consultorio con todas las relaciones necesarias
+        $consultorio = $user->consultorio()->with(['entidadFederativa', 'municipio', 'localidad', 'colonia'])->first();
+
+        // Cargar todas las entidades federativas
+        $entidadesFederativas = EntidadFederativa::all();
+
+        // Obtener el municipio, localidad y colonia asociados al consultorio si existen
+        $municipios = $user->consultorio && $user->consultorio->entidad_federativa_id
+            ? Municipio::where('entidad_federativa_id', $user->consultorio->entidad_federativa_id)->get()
+            : collect([]);
+
+        $localidades = $user->consultorio && $user->consultorio->municipio_id
+            ? Localidad::where('id_municipio', $user->consultorio->municipio_id)
+                    ->where('id_entidad_federativa', $user->consultorio->entidad_federativa_id)
+                    ->get()
+            : collect([]);
+
+        $colonias = $user->consultorio && $user->consultorio->municipio_id
+            ? Colonia::where('id_municipio', $user->consultorio->municipio_id)
+                    ->where('id_entidad', $user->consultorio->entidad_federativa_id)
+                    ->get()
+            : collect([]);
+            
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'consultorio' => $consultorio, // Pasa el consultorio con las relaciones a la vista
+            'entidadesFederativas' => $entidadesFederativas,
+            'municipios' => $municipios,
+            'localidades' => $localidades,
+            'colonias' => $colonias,
         ]);
     }
-
+    
     /**
      * Update the user's profile information.
      */
@@ -70,11 +104,11 @@ class ProfileController extends Controller
         // Actualización o creación de la información del consultorio
         $consultorioData = $request->only([
             'nombre', 
-            'entidad_federativa', 
-            'municipio', 
-            'localidad', 
+            'entidad_federativa_id', 
+            'municipio_id', 
+            'localidad_id', 
             'calle', 
-            'colonia', 
+            'colonia_id', 
             'telefono', 
             'cedula_profesional', 
             'especialidad', 
@@ -91,6 +125,7 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'consultorio-updated');
     }
+
 
     public function updatePassword(Request $request)
     {

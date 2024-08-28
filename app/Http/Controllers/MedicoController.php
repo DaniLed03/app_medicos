@@ -231,12 +231,13 @@ class MedicoController extends Controller
         $colonias = $colonias->map(function($colonia) {
             return [
                 'id_asentamiento' => $colonia->id_asentamiento,
-                'nombre' => $colonia->cp . ' - ' . $colonia->tipo_asentamiento . ' - ' . $colonia->asentamiento
+                'nombre' => $colonia->cp . ' - ' . $colonia->tipo_asentamiento . ' ' . $colonia->asentamiento
             ];
         });
 
         return response()->json($colonias);
     }
+
 
     public function updatePaciente(Request $request, $id = null)
     {
