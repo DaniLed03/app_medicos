@@ -7,21 +7,16 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AsignarController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\PersonaAuthController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\EnsurePersonaIsAuthenticated;
-use App\Http\Middleware\EnsureUserIsAuthenticated;
-use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ErrorController;
+use App\Http\Controllers\ConceptoController;
 
 // Ruta de la página de bienvenida
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+
+Route::get('/error-database', [ErrorController::class, 'databaseError'])->name('error.database');
 
 // Incluir las rutas de autenticación generadas por Laravel Breeze
 require __DIR__.'/auth.php';
@@ -120,11 +115,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pacientes/completar-registro/{citaId}', [MedicoController::class, 'completarRegistroPaciente'])->name('pacientes.completarRegistro');
     Route::post('/users/{id}/reset-password', [AsignarController::class, 'resetPassword'])->name('users.resetPassword');
 
-    // Rutas para productos
-    Route::resource('productos', ProductoController::class);
-    Route::get('/productos/reporte', [ProductoController::class, 'generateReport'])->name('productos.reporte');
-    Route::get('/productos/{id}', [ProductoController::class, 'show'])->name('productos.show');
-
     // Rutas para ventas (ya existente)
     Route::get('ventas/generate/{consulta}', [ConsultaController::class, 'generateVenta'])->name('ventas.generate');
     Route::post('ventas/store/{venta}', [VentaController::class, 'store'])->name('ventas.store');
@@ -133,10 +123,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/ventas/agregar/{producto}', [VentaController::class, 'agregar'])->name('ventas.agregar');
     Route::get('ventas/{id}/generate-invoice', [VentaController::class, 'generateInvoice'])->name('ventas.generateInvoice');
     Route::post('/ventas/{id}/pagar', [VentaController::class, 'pagar'])->name('ventas.pagar');
+    route::get('ventas/pagar/{id}', [VentaController::class, 'marcarComoPagado'])->name('ventas.marcarComoPagado');
+    Route::post('ventas/actualizar/{id}', [VentaController::class, 'actualizarVenta'])->name('ventas.actualizarVenta');  
+    route::put('/ventas/{id}/actualizar', [VentaController::class, 'actualizarVenta'])->name('ventas.actualizar');
+    
+    Route::resource('conceptos', ConceptoController::class);
+    Route::get('/medico/catalogos/conceptos/pdf', [ConceptoController::class, 'generateReport'])->name('conceptos.pdf');
+    Route::resource('conceptos', ConceptoController::class);
 
     /// nuevo vv
     Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
-    Route::get('/medico/productos/pdf', [ProductoController::class, 'generateReport'])->name('productos.pdf');
 
     route::get('/get-municipios/{id}', [MedicoController::class, 'getMunicipios']);
     Route::get('/get-localidades/{id}', [MedicoController::class, 'getLocalidades']);

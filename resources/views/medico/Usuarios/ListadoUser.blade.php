@@ -181,6 +181,17 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+<!-- Botones de exportación para DataTables -->
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
+
 <script>
     document.querySelectorAll('.reset-password-button').forEach(button => {
         button.addEventListener('click', function() {
@@ -205,6 +216,47 @@
 <script>
     $(document).ready(function() {
         $('#usersTable').DataTable({
+            "dom": '<"row"<"col-sm-12 col-md-6"lB><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            "buttons": [
+                {
+                    extend: 'copy',
+                    text: 'Copiar',
+                    exportOptions: {
+                        columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    title: 'Listado de Usuarios',
+                    exportOptions: {
+                        columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    title: 'Listado de Usuarios',
+                    exportOptions: {
+                        columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    title: 'Listado de Usuarios',
+                    exportOptions: {
+                        columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: 'Imprimir',
+                    exportOptions: {
+                        columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                    }
+                }
+            ],
             "language": {
                 "decimal": "",
                 "emptyTable": "No hay usuarios registrados",
@@ -230,7 +282,7 @@
             "info": true,
             "scrollX": false,
             "autoWidth": true,
-            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]]
         });
 
         document.getElementById('openModal').addEventListener('click', function() {
@@ -244,6 +296,29 @@
 </script>
 
 <style>
+    .dt-buttons {
+        margin-bottom: 10px;
+    }
+
+    .buttons-html5, .buttons-print {
+        margin-right: 5px;
+    }
+
+    .dataTables_filter input[type="search"] {
+        width: 500px !important; /* Ajusta el tamaño a tu preferencia */
+        padding: 6px 12px; /* Ajuste de padding */
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+    }
+
+    .dataTables_filter input[type="search"]:focus {
+        border-color: #007bff; /* Color del borde azul */
+        outline: none; /* Elimina el outline por defecto */
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+    }
+    
     .bg-button-color {
         background-color: #33AD9B;
     }

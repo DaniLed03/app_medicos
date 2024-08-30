@@ -18,12 +18,7 @@
                                     <p class="text-gray-600">Período: {{ ucfirst(\Carbon\Carbon::now()->translatedFormat('F Y')) }}</p>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Botón para descargar ventas en PDF -->
-                        <a href="{{ route('ventas.pdf') }}" class="bg-blue-500 hover:bg-blue-700 text-white font py-2 px-4 rounded">
-                            Descargar Cobros PDF
-                        </a>
+                        </div>                        
                     </div>
 
                     <!-- Tabla de ventas -->
@@ -32,10 +27,12 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Fecha y Hora</th>
                                     <th>Paciente</th>
                                     <th>Precio Consulta</th>
-                                    <th>IVA</th>
+                                    <th>Impuesto</th>
                                     <th>Total</th>
+                                    <th>Fecha y Hora de Pago</th>
                                     <th>Status</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -44,33 +41,35 @@
                                 @foreach($ventas as $venta)
                                     <tr>
                                         <td>{{ $venta->id }}</td>
-                                        <td>{{ $venta->paciente ? $venta->paciente->nombres : 'No disponible' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($venta->created_at)->translatedFormat('j M Y h:i A') }}</td>
+                                        <td>
+                                            {{ $venta->paciente ? $venta->paciente->nombres . ' ' . $venta->paciente->apepat . ' ' . $venta->paciente->apemat : 'No disponible' }}
+                                        </td>
                                         <td>{{ number_format($venta->precio_consulta, 2) }}</td>
-                                        <td>{{ number_format($venta->iva, 2) }}</td>
-                                        <td>{{ number_format($venta->total, 2) }}</td>
+                                        <td>{{ number_format($venta->iva, 2) }}%</td>
+                                        <td>${{ number_format($venta->total, 2) }}</td>
+                                        <td>{{ $venta->status == 'Pagado' ? \Carbon\Carbon::parse($venta->updated_at)->translatedFormat('j M Y h:i A') : '-' }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="status-label bg-blue-200 text-blue-800 px-2 py-1 rounded-full">{{ ucfirst($venta->status) }}</span>
+                                            <span class="status-label {{ $venta->status == 'Pagado' ? 'bg-green-200 text-green-800' : 'bg-blue-200 text-blue-800' }} px-2 py-1 rounded-full">
+                                                {{ ucfirst($venta->status) }}
+                                            </span>
                                         </td>
                                         <td>
-                                            @if($venta->status == 'en proceso')
-                                                <!-- Botón para cambiar el estado a 'Pagado' -->
-                                                <form action="{{ route('ventas.pagar', $venta->id) }}" method="POST" class="inline-block pagar-form">
-                                                    @csrf
-                                                    <button type="submit" class="text-blue-500 hover:text-blue-700">
-                                                        Pagar
-                                                    </button>
-                                                </form>
+                                            @if($venta->status == 'Por pagar')
+                                                <a href="{{ route('ventas.marcarComoPagado', $venta->id) }}" class="text-blue-500 hover:text-blue-700">
+                                                    Pagar
+                                                </a>
                                             @endif
                                             <a href="{{ route('ventas.generateInvoice', $venta->id) }}" class="text-green-500 hover:text-green-700">
                                                 Generar Factura
                                             </a>
-                                        </td>                                        
+                                        </td>                                                                                                                       
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>                        
                     </div>
-
+                    
                     @if (session('success'))
                         <div class="bg-green-100 text-green-700 p-4 rounded mb-4 mt-4">
                             {{ session('success') }}
@@ -114,14 +113,65 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
+    <!-- Botones de exportación para DataTables -->
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
+
     <script>
         $(document).ready(function() {
             $('#ventasTable').DataTable({
+                "dom": '<"row"<"col-sm-12 col-md-6"lB><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: 'Copiar',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'CSV',
+                        title: 'Cobro de Servicios',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        title: 'Cobro de Servicios',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        title: 'Cobro de Servicios',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Excluye la última columna (Acciones)
+                        }
+                    }
+                ],
                 "language": {
                     "decimal": "",
                     "emptyTable": "No hay ventas registradas",
                     "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
                     "infoFiltered": "(Filtrado de _MAX_ total entradas)",
                     "infoPostFix": "",
                     "thousands": ",",
@@ -142,7 +192,7 @@
                 "info": true,
                 "scrollX": false,
                 "autoWidth": true,
-                "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
+                "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]]
             });
 
             // Open View Modal
@@ -210,6 +260,28 @@
     </script>
 
     <style>
+        .dataTables_filter input[type="search"] {
+            width: 500px !important; /* Ajusta el tamaño a tu preferencia */
+            padding: 6px 12px; /* Ajuste de padding */
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+        }
+
+        .dataTables_filter input[type="search"]:focus {
+            border-color: #007bff; /* Color del borde azul */
+            outline: none; /* Elimina el outline por defecto */
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+        }
+        
+        .dt-buttons {
+            margin-bottom: 10px;
+        }
+
+        .buttons-html5, .buttons-print {
+            margin-right: 5px;
+        }
         .bg-button-color {
             background-color: #33AD9B;
         }

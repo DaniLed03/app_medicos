@@ -21,71 +21,109 @@
                 </p>
             </div>
 
-            <!-- Contenido Principal: Productos y Carrito -->
+            <!-- Contenido Principal: Conceptos y Ticket -->
             <div class="flex" style="height: calc(100% - 128px);">
-                <!-- Contenedor de Selección de Productos -->
+                <!-- Contenedor de Selección de Conceptos -->
                 <div class="w-1/2 pr-4">
-                    <h2 class="text-2xl font-bold mb-4">Seleccionar Productos:</h2>
-                    <input type="text" id="buscar-producto" class="mb-4 p-2 border rounded w-full" placeholder="Buscar producto...">
-                    <div id="productos-lista" style="max-height: 500px; overflow-y: auto;">
-                        @foreach ($productos as $producto)
-                            <div class="mb-4 p-4 rounded border flex items-center producto-item">
-                                <div class="flex-grow">
-                                    <h3 class="font-bold">{{ $producto->nombre }}</h3>
-                                    <p class="text-sm text-gray-600">{{ $producto->descripcion }}</p>
-                                    <p class="text-sm text-gray-500">Cantidad disponible: {{ $producto->inventario }}</p>
-                                    <p class="text-lg font-semibold mt-1">${{ number_format($producto->precio, 2) }}</p>
+                    <h2 class="text-2xl font-bold mb-4">Seleccionar Conceptos:</h2>
+                    <div id="conceptos-lista" style="max-height: 500px; overflow-y: auto;">
+                        @foreach ($conceptos as $concepto)
+                            <div class="mb-4 p-4 rounded border flex items-center justify-between concepto-item">
+                                <div class="flex flex-col">
+                                    <h3 class="font-bold text-base">{{ $concepto->concepto }}</h3>
+                                    <p class="text-sm font-semibold mt-1" style="line-height: 1.1;">Precio Unitario: ${{ number_format($concepto->precio_unitario, 2) }}</p>
+                                    <p class="text-xs mt-1" style="line-height: 1.1;">Impuesto: {{ number_format($concepto->impuesto, 2) }}%</p>
+                                    <p class="text-xs mt-1" style="line-height: 1.1;">Unidad de Medida: {{ $concepto->unidad_medida }}</p>
+                                    <p class="text-xs mt-1" style="line-height: 1.1;">Tipo de Concepto: {{ $concepto->tipo_concepto }}</p>
                                 </div>
                                 <div>
-                                    <button class="bg-[#2D7498] text-white px-4 py-2 rounded" onclick="agregarAlCarrito({{ $producto->id }}, '{{ $producto->nombre }}', {{ $producto->precio }}, {{ $producto->inventario }})">Agregar</button>
+                                    <button class="bg-[#2D7498] text-white px-3 py-1 text-xs rounded btn-agregar" data-id="{{ $concepto->id_concepto }}" data-nombre="{{ $concepto->concepto }}" data-precio="{{ $concepto->precio_unitario }}" data-impuesto="{{ $concepto->impuesto }}" onclick="agregarAlCarrito(this)">Agregar</button>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <!-- Contenedor del Carrito -->
+                <!-- Contenedor del Ticket -->
                 <div class="w-1/2 pl-4">
-                    <h2 class="text-2xl font-bold mb-4">Carrito de Compras</h2>
-                    <form id="carrito-form" action="{{ route('ventas.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="consulta_id" value="{{ $venta->consulta_id }}">
-                        <input type="hidden" name="precio_consulta" value="{{ $venta->precio_consulta }}">
-                        <input type="hidden" name="iva" value="{{ $venta->iva }}">
-                        <input type="hidden" name="total" id="input-total" value="{{ $venta->total }}">
-                        <input type="hidden" name="paciente_id" value="{{ $venta->paciente_id }}">
+                    <div class="bg-white shadow-md p-4 rounded-md" style="width: 380px; background: #f8f8f8; border: 1px solid #ddd; font-family: 'Courier New', Courier, monospace;">
+                        <h2 class="text-xl font-bold mb-4 text-center">Cobro de Consulta</h2>
+                        
+                        <!-- Tabla para los items del carrito -->
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="py-2">ID</th>
+                                    <th>Concepto</th>
+                                    <th>Precio</th>
+                                    <th>Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody id="carrito-items">
+                                <!-- Aquí se mostrarán los conceptos agregados al carrito -->
+                            </tbody>
+                        </table>
 
-                        <div id="carrito-items" style="max-height: 400px; overflow-y: auto;">
-                            <!-- Aquí se mostrarán los productos agregados al carrito -->
-                        </div>
-
-                        <div class="mt-4">
-                            <p><strong>Precio de la Consulta:</strong> $<span id="precio_consulta">{{ number_format($venta->precio_consulta, 2) }}</span></p>
-                            <p><strong>IVA:</strong> $<span id="iva">{{ number_format($venta->iva, 2) }}</span></p>
+                        <div class="border-t mt-4 pt-4">
+                            <p><strong>Precio de la Consulta:</strong> $<span id="precio-consulta">{{ number_format($venta->precio_consulta, 2) }}</span></p>
+                            <p><strong>Importe:</strong> <span id="iva">{{ number_format($venta->iva, 2) }}</span>%</p>
                             <p><strong>Total a Pagar:</strong> $<span id="total">{{ number_format($venta->total, 2) }}</span></p>
-                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4">Guardar Venta</button>
                         </div>
-                    </form>
+                        <button onclick="mostrarModal()" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 w-full">Confirmar Cobro</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript para gestionar el carrito y los productos -->
+    <!-- Modal -->
+    <div id="modal-cobro" class="modal hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="modal-content bg-white shadow-lg rounded-lg p-8 mx-4 relative" style="width: 450px;">
+            <button class="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer text-2xl font-bold focus:outline-none" onclick="cerrarModal()">
+                &times;
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-4" style="color: black;">Total a Pagar: $<span id="modal-total">{{ number_format($venta->total, 2) }}</span></h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="pago-con">Pago con:</label>
+                <input type="number" id="pago-con" class="border rounded p-2 w-full focus:ring focus:ring-opacity-50 focus:ring-[#2D7498]" placeholder="Ingrese monto">
+            </div>
+            <p class="mb-4 text-gray-700 text-sm font-bold">Cambio: $<span id="cambio">0.00</span></p>
+            <form id="form-cobrar" method="POST" action="{{ route('ventas.actualizar', $venta->id) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="iva" id="iva-hidden" value="{{ $venta->iva }}">
+                <input type="hidden" name="total" id="total-hidden" value="{{ $venta->total }}">
+                <input type="hidden" name="conceptos" id="conceptos-json">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700">Actualizar Venta</button>
+            </form>            
+        </div>
+    </div>
+
     <script>
         let carrito = [];
+        let precioConsulta = {{ $venta->precio_consulta }};
+        let totalImpuestos = {{ $venta->iva }}; // Inicia con el impuesto de la venta existente
+        let totalAPagar = {{ $venta->total }}; // Inicia con el total de la venta existente
     
-        function agregarAlCarrito(id, nombre, precio, inventario) {
-            let item = carrito.find(producto => producto.id === id);
+        function agregarAlCarrito(button) {
+            const id = parseInt(button.getAttribute('data-id'));
+            const nombre = button.getAttribute('data-nombre');
+            const precio = parseFloat(button.getAttribute('data-precio'));
+            const impuesto = parseFloat(button.getAttribute('data-impuesto'));
+    
+            let item = carrito.find(concepto => concepto.id === id);
             if (item) {
-                if(item.cantidad < inventario) {
-                    item.cantidad += 1;
-                } else {
-                    alert("No hay suficiente inventario para agregar más de este producto.");
-                }
+                item.cantidad += 1;
             } else {
-                carrito.push({ id, nombre, precio, cantidad: 1, inventario });
+                carrito.push({ id, nombre, precio, impuesto, cantidad: 1 });
+                button.textContent = 'Eliminar';
+                button.classList.remove('bg-[#2D7498]');
+                button.classList.add('bg-red-500');
+                button.setAttribute('onclick', `eliminarDelCarrito(${id}, this)`);
             }
+    
+            totalImpuestos += impuesto; // Sumar el impuesto del nuevo concepto
+            precioConsulta += precio; // Sumar el precio del nuevo concepto al precio de la consulta
             actualizarCarrito();
         }
     
@@ -93,63 +131,74 @@
             let carritoItems = document.getElementById('carrito-items');
             carritoItems.innerHTML = '';
     
-            let total = parseFloat(document.getElementById('precio_consulta').innerText);
+            let total = precioConsulta; // Empezar con el precio de la consulta sumado con el de los conceptos agregados
+            let calculoImpuesto = (total * totalImpuestos) / 100; // Calcular el nuevo total del impuesto
     
-            carrito.forEach(producto => {
-                let subtotal = producto.precio * producto.cantidad;
+            carrito.forEach(concepto => {
+                let subtotal = concepto.precio * concepto.cantidad;
                 carritoItems.innerHTML += `
-                    <div class="mb-4 p-4 rounded border flex items-center justify-between">
-                        <div class="flex-grow">
-                            <h3 class="font-bold">${producto.nombre}</h3>
-                            <p class="text-sm text-gray-600">Precio unitario: $${producto.precio.toFixed(2)}</p>
-                            <input type="hidden" name="productos[${producto.id}][id]" value="${producto.id}">
-                            <input type="hidden" name="productos[${producto.id}][cantidad]" value="${producto.cantidad}">
-                            <input type="number" name="productos[${producto.id}][cantidad]" value="${producto.cantidad}" min="1" max="${producto.inventario}" class="w-16 mt-2 p-1 border rounded" oninput="cambiarCantidad(${producto.id}, this.value)">
-                            <p class="text-sm mt-2">Subtotal: $<span>${subtotal.toFixed(2)}</span></p>
-                        </div>
-                        <button type="button" class="bg-red-500 text-white px-4 py-2 rounded" onclick="eliminarDelCarrito(${producto.id})">Eliminar</button>
-                    </div>
+                    <tr class="border-b">
+                        <td class="py-2">${concepto.id}</td>
+                        <td>${concepto.nombre}</td>
+                        <td>$${concepto.precio.toFixed(2)}</td>
+                        <td>${concepto.impuesto.toFixed(2)}%</td> <!-- Muestra el impuesto en porcentaje -->
+                    </tr>
                 `;
-    
-                total += subtotal;
             });
     
-            let iva = total * 0.16;
-            total += iva;
+            total += calculoImpuesto; // Sumar el total con el nuevo cálculo de impuesto
+            totalAPagar = total;
     
-            document.getElementById('iva').innerText = iva.toFixed(2);
+            document.getElementById('iva').innerText = totalImpuestos.toFixed(2);
             document.getElementById('total').innerText = total.toFixed(2);
-            document.getElementById('input-total').value = total.toFixed(2);
+            document.getElementById('modal-total').innerText = totalAPagar.toFixed(2); // Actualiza el total en el modal
+    
+            // Actualizar los campos hidden para enviar al servidor
+            document.getElementById('iva-hidden').value = totalImpuestos.toFixed(2);
+            document.getElementById('total-hidden').value = total.toFixed(2);
+    
+            // Convertir el carrito a JSON y almacenarlo en el input hidden
+            document.getElementById('conceptos-json').value = JSON.stringify(carrito);
         }
     
-        function cambiarCantidad(id, cantidad) {
-            let item = carrito.find(producto => producto.id === id);
-            if (item) {
-                if(cantidad <= item.inventario) {
-                    item.cantidad = parseInt(cantidad);
-                } else {
-                    alert("No puedes exceder la cantidad disponible en inventario.");
-                    item.cantidad = item.inventario;
-                }
-            }
+        function eliminarDelCarrito(id, button) {
+            let item = carrito.find(concepto => concepto.id === id);
+            totalImpuestos -= item.impuesto; // Restar el impuesto del concepto eliminado
+            precioConsulta -= item.precio; // Restar el precio del concepto eliminado
+    
+            carrito = carrito.filter(concepto => concepto.id !== id);
+            button.textContent = 'Agregar';
+            button.classList.remove('bg-red-500');
+            button.classList.add('bg-[#2D7498]');
+            button.setAttribute('onclick', 'agregarAlCarrito(this)');
             actualizarCarrito();
         }
     
-        function eliminarDelCarrito(id) {
-            carrito = carrito.filter(producto => producto.id !== id);
-            actualizarCarrito();
+        function mostrarModal() {
+            document.getElementById('modal-total').innerText = totalAPagar.toFixed(2);
+            document.getElementById('modal-cobro').classList.remove('hidden');
+            document.getElementById('modal-cobro').style.display = "flex";
         }
     
-        document.getElementById('buscar-producto').addEventListener('input', function() {
-            let filter = this.value.toLowerCase();
-            document.querySelectorAll('.producto-item').forEach(function(item) {
-                let nombre = item.querySelector('h3').textContent.toLowerCase();
-                if (nombre.includes(filter)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+        function cerrarModal() {
+            document.getElementById('modal-cobro').classList.add('hidden');
+            document.getElementById('modal-cobro').style.display = "none";
+        }
+    
+        document.getElementById('pago-con').addEventListener('input', function() {
+            const pagoCon = parseFloat(this.value);
+            const cambio = pagoCon - totalAPagar;
+            document.getElementById('cambio').innerText = (cambio >= 0) ? cambio.toFixed(2) : "Monto insuficiente";
         });
-    </script>    
+    
+        // Cerrar el modal si se hace clic fuera del contenido
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-cobro');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+    
+    
 </x-app-layout>

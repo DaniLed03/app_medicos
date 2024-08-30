@@ -16,6 +16,9 @@
         .hero-bg {
             background-color: #316986;
         }
+        .hero-bg {
+            min-height: 85vh; /* Ajusta esto según sea necesario */
+        }
         button,
         .gradient2 {
             background-color: #f39f86;
@@ -185,7 +188,8 @@
                             Iniciar Sesión
                         </a>
                     </div>
-                    <div class="block lg:hidden pr-4">
+                    <!-- Botón de hamburguesa (solo visible en versión móvil) -->
+                    <div class="lg:hidden pr-4">
                         <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-600 hover:text-gray-800 hover:border-green-500 appearance-none focus:outline-none">
                             <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <title>Menu</title>
@@ -193,6 +197,7 @@
                             </svg>
                         </button>
                     </div>
+
                 </div>
             </nav>
             
@@ -220,8 +225,8 @@
             <!-- Hero Section -->
             <div class="container mx-auto h-screen">
                 <div class="text-center px-3 lg:px-0">
-                    <h1 class="my-4 text-2xl md:text-3xl lg:text-5xl font-black leading-tight text-white">Tu tiempo es para tus pacientes</h1>
-                    <p class="leading-normal text-white text-base md:text-xl lg:text-2xl mb-8">
+                    <h1 class="my-4 text-3xl md:text-4xl lg:text-6xl font-black leading-tight text-white">Tu tiempo es para tus pacientes</h1>
+                    <p class="leading-normal text-white text-lg md:text-2xl lg:text-3xl mb-8">
                         En LedeHealth creemos que tu valioso tiempo debe ser para brindarle la mejor atención a tus pacientes.
                     </p>
                     <button href="{{ route('register') }}" class="mx-auto lg:mx-0 hover:underline text-gray-800 font-extrabold rounded my-2 md:my-6 py-4 px-8 shadow-lg w-48" style="background-color: #33AD9B;">
@@ -237,13 +242,13 @@
                         </div>
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="{{ asset('images/citas.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 1">
+                                <img src="{{ asset('images/agenda.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 1">
                             </div>
                             <div class="carousel-item">
-                                <img src="{{ asset('images/consultas.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 2">
+                                <img src="{{ asset('images/cons.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 2">
                             </div>
                             <div class="carousel-item">
-                                <img src="{{ asset('images/pacientes.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 3">
+                                <img src="{{ asset('images/pas.jpg') }}" class="d-block w-full h-full object-cover rounded" alt="Doctor y paciente 3">
                             </div>
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -278,58 +283,56 @@
                         <p class="text-xl text-gray-600 mb-4 text-justify">Desde nuestra fundación, hemos crecido y evolucionado, siempre con el objetivo de estar a la vanguardia en tecnología de la salud. Creemos en la innovación constante y en la mejora continua de nuestros productos para satisfacer las necesidades cambiantes de nuestros clientes.</p>
                     </div>
                     <div class="md:w-1/2 md:pl-8 mb-8 md:mb-0">
-                        <img src="{{ asset('images/team.webp') }}" alt="Nuestro equipo" class="rounded-lg shadow-lg w-full">
+                        <img src="{{ asset('images/Team.jpg') }}" alt="Nuestro equipo" class="rounded-lg shadow-lg w-full">
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ¿Por qué LedeHealth? Section -->
-        <div id="por-que-ledehealth" class="py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="w-full text-5xl font-black leading-tight text-center text-gray-900">¿Por qué LedeHealth?</h2>
-                <!-- Linea debajo del titulo -->
-                <div class="w-full mb-4">
-                    <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
+        <div class="container mx-auto py-12">
+            <h2 class="text-4xl md:text-5xl font-black leading-tight text-center text-gray-900 mb-12">
+                ¿Por qué LedeHealth?
+            </h2>
+            <!-- Línea debajo del título -->
+            <div class="w-full mb-8">
+                <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Primer bloque -->
+                <div class="text-center">
+                    <div class="bg-[#33AD9B] text-white rounded-full p-6 inline-flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Tu tiempo es importante</h3>
+                    <p class="text-lg md:text-xl text-gray-600">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
                 </div>
-                <div class="mt-8 flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0 md:space-x-8">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-[#316986] text-[#33AD9B] rounded-full p-4 inline-flex items-center justify-center">
-                            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <h3 class="text-lg font-semibold text-gray-900">Tu tiempo es importante</h3>
-                            <p class="mt-2 text-sm text-gray-600">Creemos que tu tiempo debe ser para brindarle la mejor atención a tus pacientes.</p>
-                        </div>
+                <!-- Segundo bloque -->
+                <div class="text-center">
+                    <div class="bg-[#33AD9B] text-white rounded-full p-6 inline-flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
+                        </svg>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-[#316986] text-[#33AD9B] rounded-full p-4 inline-flex items-center justify-center">
-                            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <h3 class="text-lg font-semibold text-gray-900">Producto construido para ti</h3>
-                            <p class="mt-2 text-sm text-gray-600">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
-                        </div>
+                    <h3 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Producto construido para ti</h3>
+                    <p class="text-lg md:text-xl text-gray-600">Creamos productos fáciles de utilizar, con diseños amigables y con las funcionalidades que realmente necesitas.</p>
+                </div>
+                <!-- Tercer bloque -->
+                <div class="text-center">
+                    <div class="bg-[#33AD9B] text-white rounded-full p-6 inline-flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z"/>
+                            <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z"/>
+                        </svg>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-[#316986] text-[#33AD9B] rounded-full p-4 inline-flex items-center justify-center">
-                            <svg class="w-8 h-8" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z"/>
-                                <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <h3 class="text-lg font-semibold text-gray-900">Software en la nube</h3>
-                            <p class="mt-2 text-sm text-gray-600">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
-                        </div>
-                    </div>
+                    <h3 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Software en la nube</h3>
+                    <p class="text-lg md:text-xl text-gray-600">Podrás administrar expedientes médicos de tus pacientes, generar recetas y estudios de laboratorio, controlar cuentas y más.</p>
                 </div>
             </div>
         </div>
+
         
         <!-- Functionalities Section -->
         <section id="funcionalidades" class="bg-gray-100 py-8"> <!-- Aquí asegúrate de que el id es 'funcionalidades' -->

@@ -12,15 +12,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Venta;
+use App\Models\Concepto;
 
 class ConsultaController extends Controller
 {
     public function createWithoutCita($pacienteId)
     {
         $paciente = Paciente::findOrFail($pacienteId);
-        $medico = Auth::user();
+        $medicoId = Auth::id(); // Obtener el ID del usuario autenticado
+        $medico = Auth::user(); // Obtener el usuario autenticado
 
-        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico'));
+        // Realizar la búsqueda de conceptos
+        $conceptoConsulta = Concepto::where('medico_id', $medicoId)
+            ->where(function($query) {
+                $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
+                    ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
+            })
+            ->first();
+
+        // Verificar si no se encontró ningún concepto de consulta
+        $showAlert = !$conceptoConsulta; // Si no hay concepto, mostrar alerta
+        $precioConsulta = $conceptoConsulta ? $conceptoConsulta->precio_unitario : 0;
+
+        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert'));
     }
 
     public function storeWithoutCita(Request $request)
@@ -40,13 +54,36 @@ class ConsultaController extends Controller
             'diagnostico' => 'required|string',
             'plan' => 'nullable|string',
             'status' => 'required|string|in:en curso,Finalizada',
-            'totalPagar' => 'required|numeric',
+            'totalPagar' => 'required|numeric|min:1', // Aseguramos que el totalPagar no sea 0
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
             'recetas.*.receta' => 'required|string'
         ]);
+
+        // Obtener el concepto de la consulta
+        $conceptoConsulta = Concepto::where('medico_id', Auth::id())
+            ->where(function($query) {
+                $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
+                    ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
+            })
+            ->first();
+
+        // Si no hay un concepto de consulta definido, devolver un error
+        if (!$conceptoConsulta) {
+            return back()->withErrors(['message' => 'No hay un concepto de consulta definido. Por favor, configure uno antes de continuar.']);
+        }
+
+        // Verificar si el precio personalizado es válido, si no, usar el precio predeterminado
+        $precioConsulta = $request->input('totalPagar', $conceptoConsulta->precio_unitario);
+        $impuesto = $conceptoConsulta->impuesto;
+        $totalPagar = $precioConsulta + ($precioConsulta * ($impuesto / 100));
+
+        // Verificar si el precio es 0 antes de proceder
+        if ($totalPagar == 0) {
+            return back()->withErrors(['totalPagar' => 'El precio de la consulta no puede ser 0.']);
+        }
 
         // Creación de la consulta
         $consultaData = $request->except('recetas'); 
@@ -93,22 +130,19 @@ class ConsultaController extends Controller
             }
         }
 
-        // Generar la venta
-        $precioConsulta = $consulta->totalPagar;
-        $iva = $precioConsulta * 0.16; // 16% de IVA
-        $total = $precioConsulta + $iva;
-
         $venta = Venta::create([
             'consulta_id' => $consulta->id,
             'precio_consulta' => $precioConsulta,
-            'iva' => $iva,
-            'total' => $total,
-            'paciente_id' => $paciente->id, // Guardar el ID del paciente
+            'iva' => $impuesto,
+            'total' => $totalPagar,
+            'paciente_id' => $paciente->id,
+            'status' => 'Por pagar',  // Cambiar el estado aquí
         ]);
 
         // Redirigir a la vista de detalles de la consulta
-        return redirect()->route('ventas.show', $venta->id)->with('success', 'Consulta y venta finalizadas exitosamente.');
+        return redirect()->route('vistaInicio')->with('success', 'Consulta guardada exitosamente.');
     }
+
 
     public function index(Request $request)
     {
@@ -163,7 +197,6 @@ class ConsultaController extends Controller
             ])
         ]);
     }
-
 
     public function verificarPaciente(Request $request, $citaId)
     {
@@ -349,22 +382,42 @@ class ConsultaController extends Controller
     public function generateVenta($consultaId)
     {
         $consulta = Consultas::findOrFail($consultaId);
-        $pacienteId = $consulta->pacienteid; // Asegúrate de que este campo esté correctamente configurado en la tabla consultas
+        $pacienteId = $consulta->pacienteid;
 
-        $precioConsulta = $consulta->totalPagar;
-        $iva = $precioConsulta * 0.16; // 16% de IVA
-        $total = $precioConsulta + $iva;
+        // Obtener el concepto de la consulta
+        $conceptoConsulta = Concepto::where('medico_id', Auth::id())
+            ->where(function($query) {
+                $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
+                    ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
+            })
+            ->first();
 
+        // Si no hay un concepto de consulta definido, devolver un error
+        if (!$conceptoConsulta) {
+            return back()->withErrors(['message' => 'No hay un concepto de consulta definido. Por favor, configure uno antes de continuar.']);
+        }
+
+        // Obtener el precio de la consulta y el impuesto desde el concepto
+        $precioConsulta = $conceptoConsulta->precio_unitario;
+        $impuesto = $conceptoConsulta->impuesto; // Porcentaje de impuesto
+
+        // Calcular el total basado en el impuesto
+        $total = $precioConsulta + ($precioConsulta * ($impuesto / 100));
+
+        // Crear la venta con los datos calculados
         $venta = Venta::create([
             'consulta_id' => $consulta->id,
             'precio_consulta' => $precioConsulta,
-            'iva' => $iva,
+            'iva' => $impuesto, // Guardar el porcentaje de impuesto
             'total' => $total,
-            'paciente' => $pacienteId, // Guarda el ID del paciente en la tabla ventas
+            'paciente_id' => $pacienteId,
+            'status' => 'Por pagar',
         ]);
 
+        // Redirigir a la vista de la venta generada
         return view('medico.ventas.show', compact('venta'));
     }
+
 
     public function consultasPendientesHoy()
     {

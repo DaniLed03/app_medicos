@@ -112,10 +112,10 @@
                 <div class="mb-6">
                     <div class="bg-gray-100 p-4 rounded-lg">
                         <label for="totalPagar" class="block text-sm font-medium text-gray-700">Total a Pagar</label>
-                        <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-full border rounded-md">
+                        <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-full border rounded-md" value="{{ $precioConsulta }}">
                     </div>
                 </div>
-
+                                         
                 <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Terminar Consulta</button>
             </form>
 
@@ -415,8 +415,20 @@
                     });
                 }
 
-                
+                document.addEventListener('DOMContentLoaded', function() {
+                    let showAlert = @json($showAlert); // Pasamos la variable desde el backend
 
+                    if (showAlert) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Concepto de Consulta no encontrado',
+                            text: 'Por favor, agregue un concepto de consulta en la configuración antes de continuar.',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            window.location.href = "{{ route('conceptos.index') }}"; // Redirigir a la página de crear concepto
+                        });
+                    }
+                });
             </script>
             <style>
                 #recetaModalContent ul,

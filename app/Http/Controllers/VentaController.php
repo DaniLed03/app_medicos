@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
-use App\Models\Producto;
+use App\Models\Concepto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Picqer\Barcode\BarcodeGeneratorHTML;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Models\Paciente;    
 
 class VentaController extends Controller
 {
@@ -24,52 +25,45 @@ class VentaController extends Controller
     public function show($id)
     {
         $venta = Venta::findOrFail($id);
-        $productos = Producto::where('medico_id', Auth::id())->get();
-        $paciente = $venta->paciente; // Asumiendo que la relación 'paciente' está definida en el modelo Venta
+        $conceptos = Concepto::where('medico_id', Auth::id())->get();
+        $paciente = $venta->paciente;
 
-        return view('medico.ventas.show', compact('venta', 'productos', 'paciente'));
+        return view('medico.ventas.show', compact('venta', 'conceptos', 'paciente'));
     }
-    public function generateVentasPdf()
-    {
-        $ventas = Venta::with('paciente')->get();
-        
-        $pdf = PDF::loadView('medico.ventas.pdf', compact('ventas'));
-        return $pdf->download('Lista_de_Ventas.pdf');
-    }
-    
+
+
+
     public function index()
     {
-        Carbon::setLocale('es'); // Configurar Carbon en español
+        Carbon::setLocale('es');
 
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
-        // Obtener el mes actual y año
         $currentMonth = Carbon::now()->format('Y-m');
         $lastMonth = cache()->get('last_month', $currentMonth);
 
-        // Si el mes ha cambiado, reiniciar el total de facturación
         if ($currentMonth !== $lastMonth) {
             cache()->put('last_month', $currentMonth);
             cache()->put('total_facturacion', 0);
         }
 
-        // Obtener todas las ventas del médico actual o usuario autenticado
         $ventas = Venta::whereHas('consulta', function($query) use ($medicoId, $currentUser) {
             $query->where('usuariomedicoid', $medicoId)
                 ->orWhere('usuariomedicoid', $currentUser->id);
         })->get();
 
-        // Calcular el total de facturación para el mes actual
+        // Calcular el total de facturación solo de las ventas con estado "Pagado" o "pagado"
         $totalFacturacion = Venta::whereHas('consulta', function($query) use ($medicoId, $currentUser) {
             $query->where('usuariomedicoid', $medicoId)
                 ->orWhere('usuariomedicoid', $currentUser->id);
         })
+        ->where('status', 'Pagado')
+        ->orWhere('status', 'pagado')
         ->whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
         ->sum('total');
 
-        // Guardar el total de facturación en el caché
         cache()->put('total_facturacion', $totalFacturacion);
 
         return view('medico.ventas.index', compact('ventas', 'totalFacturacion'));
@@ -78,90 +72,139 @@ class VentaController extends Controller
 
     public function store(Request $request)
     {
-        // Validación de datos
         $request->validate([
-            'consulta_id' => 'required|exists:consultas,id',
+            'consulta_id' => 'nullable|exists:consultas,id', 
             'precio_consulta' => 'required|numeric',
-            'iva' => 'required|numeric',
             'total' => 'required|numeric',
             'paciente_id' => 'required|exists:pacientes,id',
-            'productos' => 'nullable|array', // Asegura que productos es un array, puede ser null
-            'productos.*.id' => 'required_with:productos|exists:productos,id',
-            'productos.*.cantidad' => 'required_with:productos|integer|min:1',
+            'conceptos' => 'nullable|array',
+            'conceptos.*.id' => 'required_with:conceptos|exists:conceptos,id',
+            'conceptos.*.cantidad' => 'required_with:conceptos|integer|min:1',
         ]);
 
-        // Inicializar total con el precio de la consulta
+        // Buscar si ya existe una venta para esta consulta
+        $venta = Venta::where('consulta_id', $request->consulta_id)->first();
+
         $total = $request->precio_consulta;
-        $iva = $total * 0.16; // IVA inicial basado solo en el precio de la consulta
+        $impuestos = 0;
+        $conceptosAgregados = false;
 
-        if (!empty($request->productos)) {
-            foreach ($request->productos as $producto) {
-                $productoModel = Producto::find($producto['id']);
+        if (!empty($request->conceptos)) {
+            foreach ($request->conceptos as $concepto) {
+                $conceptoModel = Concepto::find($concepto['id']);
 
-                // Verificar que haya suficiente inventario
-                if ($productoModel->inventario < $producto['cantidad']) {
-                    return redirect()->back()->with('error', 'No hay suficiente inventario para el producto ' . $productoModel->nombre);
+                $subtotal = $conceptoModel->precio_unitario * $concepto['cantidad'];
+                $total += $subtotal;
+
+                // Calcular el impuesto basado en el porcentaje de impuesto del concepto
+                if ($conceptoModel->impuesto > 0) {
+                    $impuestos += ($subtotal * ($conceptoModel->impuesto / 100));
                 }
-
-                // Sumar el precio de los productos al total
-                $total += $productoModel->precio * $producto['cantidad'];
+                $conceptosAgregados = true;  // Indicar que se han agregado nuevos conceptos
             }
-
-            // Recalcular el IVA basado en el nuevo total
-            $iva = $total * 0.16;
         }
 
-        // Crear la venta con el total final y los datos de la consulta
+        // Si existen nuevos conceptos, actualizamos el total y el IVA
+        if ($venta && !$conceptosAgregados) {
+            $impuestos = $venta->iva;  // Mantener el IVA existente
+            $total = $venta->total;    // Mantener el total existente
+        } else {
+            $totalConImpuesto = $total + $impuestos;
+        }
+
+        // Guardar o actualizar la venta
         $venta = Venta::updateOrCreate(
             ['consulta_id' => $request->consulta_id],
             [
                 'precio_consulta' => $request->precio_consulta,
-                'iva' => $iva,
-                'total' => $total + $iva,
+                'iva' => $impuestos, // Guardar o mantener el impuesto calculado
+                'total' => $totalConImpuesto ?? $total, // Guardar o mantener el total
                 'paciente_id' => $request->paciente_id,
-                'status' => 'en proceso',
+                'status' => $venta ? $venta->status : 'Por pagar', // Mantener el estado o establecerlo como 'Por pagar'
             ]
         );
 
-        // Asociar productos a la venta y actualizar inventario si existen productos
-        if (!empty($request->productos)) {
-            foreach ($request->productos as $producto) {
-                $productoModel = Producto::find($producto['id']);
-                $venta->productos()->syncWithoutDetaching([$producto['id'] => ['cantidad' => $producto['cantidad']]]);
-                $productoModel->inventario -= $producto['cantidad'];
-                $productoModel->save();
+        // Asociar conceptos a la venta
+        if (!empty($request->conceptos)) {
+            foreach ($request->conceptos as $concepto) {
+                $venta->conceptos()->syncWithoutDetaching([$concepto['id'] => ['cantidad' => $concepto['cantidad']]]);
             }
         }
 
-        // Redirigir con un mensaje de éxito a la vista de consultas
-        return redirect()->route('consultas.index')->with('success', 'Venta guardada exitosamente y el inventario ha sido actualizado.');
+        return redirect()->route('ventas.index')->with('success', 'Venta guardada correctamente.');
     }
 
+    public function marcarComoPagado($id)
+    {
+        $venta = Venta::findOrFail($id);
+        $conceptos = Concepto::where('medico_id', Auth::id())->get();
+        $paciente = $venta->paciente;
+
+        // Redirigir a la vista show con los datos de la venta actual
+        return view('medico.ventas.show', compact('venta', 'conceptos', 'paciente'));
+    }
+
+    public function actualizarVenta(Request $request, $id)
+    {
+        $venta = Venta::findOrFail($id);
+
+        // Inicializar valores
+        $precioConsulta = $venta->precio_consulta;
+        $total = $precioConsulta;
+        $porcentajeImpuestoTotal = $venta->iva;
+
+        // Decodificar el JSON enviado desde la vista
+        $conceptos = json_decode($request->input('conceptos'), true);
+
+        // Verificar si se han agregado conceptos
+        if (is_array($conceptos) && !empty($conceptos)) {
+            foreach ($conceptos as $conceptoData) {
+                $concepto = Concepto::find($conceptoData['id']);
+
+                // Calcular subtotal del concepto
+                $subtotal = $concepto->precio_unitario * $conceptoData['cantidad'];
+                $total += $subtotal;
+
+                // Acumular el porcentaje de impuesto de cada concepto
+                $porcentajeImpuestoTotal += $concepto->impuesto;
+            }
+        }
+
+        // Calcular el total del impuesto basado en el porcentaje total acumulado
+        $impuestoCalculado = ($total * $porcentajeImpuestoTotal) / 100;
+        $totalConImpuesto = $total + $impuestoCalculado;
+
+        // Actualizar el total, IVA y marcar como "Pagado"
+        $venta->update([
+            'iva' => $porcentajeImpuestoTotal,
+            'total' => $totalConImpuesto,
+            'status' => 'Pagado',
+        ]);
+
+        return redirect()->route('ventas.index')->with('success');
+    }
+
+
+    
     public function generateInvoice($id)
     {
         $venta = Venta::findOrFail($id);
         $paciente = $venta->paciente;
 
-        // Generar el código de barras en HTML utilizando el ID de la venta y ajustando el ancho y la altura
         $generator = new BarcodeGeneratorHTML();
-        $barcode = $generator->getBarcode($venta->id, $generator::TYPE_CODE_128, 3, 50); // Ajusta la escala y la altura
+        $barcode = $generator->getBarcode($venta->id, $generator::TYPE_CODE_128, 3, 50);
 
-        // Usar la instancia PDF para generar la factura e incluir el código de barras
         $pdf = PDF::loadView('medico.ventas.invoice', compact('venta', 'paciente', 'barcode'));
 
-        // Definir el nombre del archivo como "NombreDelPaciente_Factura.pdf"
         $fileName = $paciente->Nombre_fact . '_Factura.pdf';
 
-        // Verificar si la carpeta 'facturas' existe, si no, crearla
         $facturasPath = storage_path('app/facturas');
         if (!file_exists($facturasPath)) {
             mkdir($facturasPath, 0777, true);
         }
 
-        // Guardar el archivo en el sistema de archivos (en la carpeta 'facturas' dentro de 'storage/app')
         $pdf->save($facturasPath . '/' . $fileName);
 
-        // Retornar la descarga del archivo
         return response()->download($facturasPath . '/' . $fileName);
     }
 
@@ -174,4 +217,18 @@ class VentaController extends Controller
         return redirect()->route('ventas.index')->with('success', 'El estado de la venta ha sido actualizado a Pagado.');
     }
 
+    public function mostrarVenta($ventaId)
+    {
+        $venta = Venta::findOrFail($ventaId);
+        $paciente = $venta->paciente;
+
+        // Recuperar todos los conceptos (puedes aplicar un filtro si es necesario)
+        $conceptos = Concepto::all();
+
+        $edad = \Carbon\Carbon::parse($paciente->fechanac)->diff(\Carbon\Carbon::now());
+
+        return view('medico.ventas.show', compact('venta', 'paciente', 'edad', 'conceptos'));
+    }
+
 }
+

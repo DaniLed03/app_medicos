@@ -153,17 +153,29 @@
                     @endcan
                     <div x-data="{ dropdownOpen: false }" class="relative">
                         <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase-fill mr-2" viewBox="0 0 16 16">
-                                <path d="M4 .5a.5.5 0 0 0-1 0v1H1.5A1.5 1.5 0 0 0 0 3v1.5h16V3a1.5 1.5 0 0 0-1.5-1.5H13v-1a.5.5 0 0 0-1 0v1H4v-1z"/>
-                                <path d="M0 4.5V11a1.5 1.5 0 0 0 1.5 1.5H2v1.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V12.5h.5A1.5 1.5 0 0 0 16 11V4.5H0z"/>
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-front-fill mr-2" viewBox="0 0 16 16">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm0 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
+                            </svg>                           
                             Caja
                         </button>
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
-                            <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Servicios</a>
-                            <a href="{{ route('productos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Productos</a>
+                            <a href="{{ route('ventas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Cobro</a>
+                            <a href="" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Facturación</a>
                         </div>
                     </div>  
+                    <div x-data="{ dropdownOpen: false }" class="relative">
+                        <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-text mr-2" viewBox="0 0 16 16">
+                                <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
+                                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
+                            </svg>
+                            Catálogos
+                        </button>
+                        <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
+                            <a href="{{ route('conceptos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Conceptos de cobro</a>
+                        </div>
+                    </div>                    
                     <div x-data="{ dropdownOpen: false }" class="relative">
                         <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill mr-2" viewBox="0 0 16 16">

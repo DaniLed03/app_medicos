@@ -446,13 +446,13 @@
         </div>
     </div>
 
+    <!-- Ensure jQuery is included -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!-- DataTables CSS & JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Ensure jQuery is included -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- CKEditor -->
     <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
@@ -647,59 +647,62 @@
             const tab = urlParams.get('tab') || 'datos';
             openTab({currentTarget: document.querySelector(`[href="#${tab}"]`)}, tab);
 
-            $('#historialTable').DataTable({
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "No hay consultas registradas",  // Mensaje cuando no hay registros
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
-                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-                    "lengthMenu": "Mostrar _MENU_ entradas",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscar:",
-                    "zeroRecords": "Sin resultados encontrados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
-                },
-                "paging": true,
-                "searching": true,
-                "info": true,
-                "scrollX": false,
-                "autoWidth": true,
-                "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-                "columnDefs": [
-                    {
-                        "targets": 0,
-                        "width": "15%"
+            $(document).ready(function() {
+                $('#historialTable').DataTable({
+                    "language": {
+                        "decimal": "",
+                        "emptyTable": "No hay consultas registradas",  // Mensaje cuando no hay registros
+                        "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                        "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
+                        "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                        "lengthMenu": "Mostrar _MENU_ entradas",
+                        "loadingRecords": "Cargando...",
+                        "processing": "Procesando...",
+                        "search": "Buscar:",
+                        "zeroRecords": "Sin resultados encontrados",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
                     },
-                    {
-                        "targets": 1,
-                        "width": "20%"
-                    },
-                    {
-                        "targets": 2,
-                        "width": "20%"
-                    },
-                    {
-                        "targets": 3,
-                        "width": "20%"
-                    },
-                    {
-                        "targets": 4,
-                        "width": "15%"
-                    },
-                    {
-                        "targets": 5,
-                        "width": "10%",
-                        "orderable": false
-                    }
-                ]
+                    "paging": true,
+                    "searching": true,
+                    "info": true,
+                    "scrollX": false,
+                    "autoWidth": true,
+                    "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "width": "15%"
+                        },
+                        {
+                            "targets": 1,
+                            "width": "20%"
+                        },
+                        {
+                            "targets": 2,
+                            "width": "20%"
+                        },
+                        {
+                            "targets": 3,
+                            "width": "20%"
+                        },
+                        {
+                            "targets": 4,
+                            "width": "15%"
+                        },
+                        {
+                            "targets": 5,
+                            "width": "10%",
+                            "orderable": false
+                        }
+                    ]
+                });
             });
+
         });
 
         function updateMunicipios(entidadId) {

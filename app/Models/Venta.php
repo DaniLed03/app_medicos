@@ -28,10 +28,9 @@ class Venta extends Model
         return $this->belongsTo(Paciente::class, 'paciente_id');
     }
     
-    public function productos()
+    public function conceptos()
     {
-        return $this->belongsToMany(Producto::class, 'producto_venta')->withPivot('cantidad')->withTimestamps();
+        return $this->belongsToMany(Concepto::class, 'concepto_venta')->withPivot('cantidad')->withTimestamps();
     }
-
 }
 

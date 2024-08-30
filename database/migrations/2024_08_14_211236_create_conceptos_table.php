@@ -8,12 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('productos', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->text('descripcion')->nullable();
-            $table->integer('inventario');
-            $table->decimal('precio', 10, 2); // Agregar el campo precio
+        Schema::create('conceptos', function (Blueprint $table) {
+            $table->id('id_concepto');
+            $table->string('concepto');
+            $table->decimal('precio_unitario', 10, 2);
+            $table->decimal('impuesto', 5, 2)->nullable();
+            $table->string('unidad_medida');
+            $table->string('tipo_concepto');
             $table->foreignId('medico_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
@@ -21,6 +22,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('productos');
+        Schema::dropIfExists('conceptos');
     }
 };
