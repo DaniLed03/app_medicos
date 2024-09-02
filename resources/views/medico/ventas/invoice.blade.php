@@ -65,7 +65,7 @@
                 <th>Cantidad</th>
                 <th>Unidad</th>
                 <th>Valor Unitario</th>
-                <th>Importe</th>
+                <th>Impuesto</th>
             </tr>
         </thead>
         <tbody>
@@ -74,17 +74,26 @@
                 <td>Consulta Médica</td>
                 <td>1</td>
                 <td>Servicio</td>
-                <td>{{ number_format($venta->precio_consulta, 2) }}</td>
-                <td>{{ number_format($venta->precio_consulta, 2) }}</td>
+                <td>${{ number_format($venta->precio_consulta, 2) }}</td>
+                <td>{{ number_format($consultaImpuesto, 2) }}%</td> <!-- Aquí se muestra el impuesto dinámico -->
             </tr>
-            @foreach ($venta->productos as $producto)
+            
+            
+            
+            @foreach ($venta->conceptos as $concepto)
+                <?php
+                    $precioUnitario = $concepto->precio_unitario;
+                    $impuesto = $concepto->impuesto;
+                    $cantidad = $concepto->pivot->cantidad;
+                    $impuestoCalculado = ($precioUnitario * $impuesto / 100);
+                ?>
                 <tr>
                     <td>01010101</td> <!-- Clave de Producto/Servicio SAT -->
-                    <td>{{ $producto->nombre }}</td>
-                    <td>{{ $producto->pivot->cantidad }}</td>
-                    <td>Unidad</td> <!-- Unidad de Medida SAT -->
-                    <td>{{ number_format($producto->precio, 2) }}</td>
-                    <td>{{ number_format($producto->pivot->cantidad * $producto->precio, 2) }}</td>
+                    <td>{{ $concepto->concepto }}</td>
+                    <td>{{ $cantidad }}</td>
+                    <td>Unidad</td>
+                    <td>${{ number_format($precioUnitario, 2) }}</td>
+                    <td>{{ number_format($impuesto, 2) }}%</td>
                 </tr>
             @endforeach
         </tbody>
@@ -92,12 +101,12 @@
 
     <div class="total">
         <p><strong>Subtotal:</strong> {{ number_format($venta->total - $venta->iva, 2) }}</p>
-        <p><strong>IVA (16%):</strong> {{ number_format($venta->iva, 2) }}</p>
+        <p><strong>IVA ({{ $venta->iva > 0 ? '16%' : '0%' }}):</strong> {{ number_format($venta->iva, 2) }}</p>
         <p><strong>Total:</strong> {{ number_format($venta->total, 2) }}</p>
     </div>
 
     <p><strong>Forma de Pago:</strong> Pago en una sola exhibición</p>
-    <p><strong>Método de Pago:</strong> Transferencia Electrónica</p>
+    <p><strong>Método de Pago:</strong> {{ $venta->tipo_pago }}</p> <!-- Aquí se muestra el método de pago -->
 </div>
 
 <div class="footer">

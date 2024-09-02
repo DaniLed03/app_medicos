@@ -12,6 +12,7 @@ use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\ConceptoController;
+use App\Http\Controllers\ColoniaController;
 
 // Ruta de la página de bienvenida
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -75,7 +76,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/pacientes/pdf', [MedicoController::class, 'generatePatientListPdf'])->name('pacientes.pdf');
     Route::get('/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('dashboard');
 
-
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');
     Route::get('/medico/citas/editar/{id}', [MedicoController::class, 'editarCita'])->name('citas.editar');
@@ -131,6 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/catalogos/conceptos/pdf', [ConceptoController::class, 'generateReport'])->name('conceptos.pdf');
     Route::resource('conceptos', ConceptoController::class);
 
+    Route::resource('colonias', ColoniaController::class);
+    route::get('/colonias/create', [ColoniaController::class, 'create'])->name('colonias.create');
+    
     /// nuevo vv
     Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
 

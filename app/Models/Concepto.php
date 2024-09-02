@@ -32,7 +32,12 @@ class Concepto extends Model
     // Relación con el modelo Venta
     public function ventas()
     {
-        return $this->belongsToMany(Venta::class, 'concepto_venta')->withPivot('cantidad')->withTimestamps();
+        return $this->belongsToMany(Venta::class, 'venta_conceptos')
+                    ->withPivot('cantidad')
+                    ->withTimestamps();
     }
+
+
+
 }
 

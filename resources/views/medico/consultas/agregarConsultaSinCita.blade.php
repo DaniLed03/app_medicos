@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-gray-100 min-h-screen flex justify-center items-center">
         <div class="bg-white shadow-lg rounded-lg p-8 mx-4 my-8 w-full" style="max-width: 100%;">
-            <div class="flex justify-between items-center mb-6 border-b-2 pb-4">
+            <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center">
                     <div class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-xl font-bold border-2" style="border-color: #2D7498; color: #33AD9B;">
                         {{ substr($paciente->nombres, 0, 1) }}{{ substr($paciente->apepat, 0, 1) }}
@@ -20,142 +20,151 @@
                 </p>
             </div>
 
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            <!-- Aquí comienza los tabs, elimina cualquier HR o borde antes de ellos -->
+            <ul class="flex border-b mb-4" id="tabs">
+                <li class="-mb-px mr-1">
+                    <a class="tab-link active-tab" href="#consultaTab" onclick="openTab(event, 'consultaTab')">Consulta</a>
+                </li>
+                <li class="mr-1">
+                    <a class="tab-link" href="#recetasTab" onclick="openTab(event, 'recetasTab')">Recetas</a>
+                </li>
+            </ul>
+
+            <!-- Contenedor para el contenido de las pestañas -->
+            <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+                <div id="consultaTab" class="tab-pane active">
+                    <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
+                        @csrf
+                        <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
+                        <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
+                        <input type="hidden" name="status" value="en curso">
+                        <input type="hidden" name="notas_padecimiento" value="">
+                        <input type="hidden" name="interrogatorio_por_aparatos" value="">
+                        <input type="hidden" name="examen_fisico" value="">
+                        <input type="hidden" name="plan" value="">
+
+                        <div class="mb-6 grid md:grid-cols-3 gap-4">
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label for="hidden_talla" class="block text-sm font-medium text-gray-700">Talla</label>
+                                        <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m" value="{{ old('hidden_talla') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_temperatura" class="block text-sm font-medium text-gray-700">Temperatura</label>
+                                        <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C" value="{{ old('hidden_temperatura') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_frecuencia_cardiaca" class="block text-sm font-medium text-gray-700">Frecuencia Cardíaca</label>
+                                        <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_peso" class="block text-sm font-medium text-gray-700">Peso</label>
+                                        <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg" value="{{ old('hidden_peso') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_tension_arterial" class="block text-sm font-medium text-gray-700">Tensión Arterial</label>
+                                        <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg" value="{{ old('hidden_tension_arterial') }}">
+                                    </div>
+                                    <div>
+                                        <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Perímetro Cefálico</label>
+                                        <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
+                                        <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
+                                <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('motivoConsulta') }}</textarea>
+                            </div>
+
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <label for="diagnostico" class="block text-sm font-medium text-gray-700">Diagnóstico</label>
+                                <textarea id="diagnostico" name="diagnostico" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('diagnostico') }}</textarea>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            @endif
 
-            <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
-                @csrf
-                <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
-                <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
-                <input type="hidden" name="status" value="en curso">
-                <input type="hidden" name="notas_padecimiento" value="">
-                <input type="hidden" name="interrogatorio_por_aparatos" value="">
-                <input type="hidden" name="examen_fisico" value="">
-                <input type="hidden" name="plan" value="">
+                <div id="recetasTab" class="tab-pane hidden">
+                    <div class="mb-6">
+                        <div class="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+                            <h3 class="text-lg font-medium mb-2">Recetas</h3>
+                            <button type="button" id="addReceta" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agregar Receta</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border rounded-lg">
+                                <thead>
+                                    <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
+                                        <th class="py-3 px-6 text-left">No.Receta</th>
+                                        <th class="py-3 px-6 text-left">Tipo de Receta</th>
+                                        <th class="py-3 px-6 text-left">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recetas">
+                                    <tr id="noRecetasMessage">
+                                        <td colspan="3" class="text-center py-3">No hay recetas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                <div class="mb-6 grid md:grid-cols-3 gap-4">
-                    <div class="bg-gray-100 p-4 rounded-lg">
-                        <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="hidden_talla" class="block text-sm font-medium text-gray-700">Talla</label>
-                                <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m" value="{{ old('hidden_talla') }}">
+                    <!-- Modal -->
+                    <div id="modalReceta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
+                        <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
+                            <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
+                            <div class="mb-4">
+                                <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
+                                <div class="flex">
+                                    <select id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
+                                        <option value="Estudios de Laboratorio">Estudios de Laboratorio</option>
+                                        <option value="Estudios de Gabinete">Estudios de Gabinete</option>
+                                    </select>
+                                </div>
+                            </div>                    
+                            <div class="mb-4">
+                                <label for="modalRecetaInput" class="block text-sm font-medium text-gray-700">Receta</label>
+                                <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">{{ old('modalRecetaInput') }}</textarea>
                             </div>
-                            <div>
-                                <label for="hidden_temperatura" class="block text-sm font-medium text-gray-700">Temperatura</label>
-                                <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C" value="{{ old('hidden_temperatura') }}">
-                            </div>
-                            <div>
-                                <label for="hidden_frecuencia_cardiaca" class="block text-sm font-medium text-gray-700">Frecuencia Cardíaca</label>
-                                <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
-                            </div>
-                            <div>
-                                <label for="hidden_peso" class="block text-sm font-medium text-gray-700">Peso</label>
-                                <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg" value="{{ old('hidden_peso') }}">
-                            </div>
-                            <div>
-                                <label for="hidden_tension_arterial" class="block text-sm font-medium text-gray-700">Tensión Arterial</label>
-                                <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg" value="{{ old('hidden_tension_arterial') }}">
-                            </div>
-                            <div>
-                                <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Perimetro Cefalico</label>
-                                <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
-                            </div>
-                            <div>
-                                <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
-                                <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
+                            <div class="flex justify-end">
+                                <button id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Cancelar</button>
+                                <button id="saveReceta" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-100 p-4 rounded-lg">
-                        <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
-                        <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('motivoConsulta') }}</textarea>
-                    </div>
-
-                    <div class="bg-gray-100 p-4 rounded-lg">
-                        <label for="diagnostico" class="block text-sm font-medium text-gray-700">Diagnóstico</label>
-                        <textarea id="diagnostico" name="diagnostico" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ old('diagnostico') }}</textarea>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <div class="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
-                        <h3 class="text-lg font-medium mb-2">Recetas</h3>
-                        <button type="button" id="addReceta" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agregar Receta</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border rounded-lg">
-                            <thead>
-                                <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
-                                    <th class="py-3 px-6 text-left">No.Receta</th>
-                                    <th class="py-3 px-6 text-left">Tipo de Receta</th>
-                                    <th class="py-3 px-6 text-left">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recetas">
-                                <tr id="noRecetasMessage">
-                                    <td colspan="3" class="text-center py-3">No hay recetas</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <div class="bg-gray-100 p-4 rounded-lg">
-                        <label for="totalPagar" class="block text-sm font-medium text-gray-700">Total a Pagar</label>
-                        <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-full border rounded-md" value="{{ $precioConsulta }}">
-                    </div>
-                </div>
-                                         
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Terminar Consulta</button>
-            </form>
-
-            <!-- Modal -->
-            <div id="modalReceta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
-                <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
-                    <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
-                    <div class="mb-4">
-                        <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
-                        <div class="flex">
-                            <select id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
-                                <option value="Estudios de Laboratorio">Estudios de Laboratorio</option>
-                                <option value="Estudios de Gabinete">Estudios de Gabinete</option>
-                            </select>
+                    <!-- Preview Modal -->
+                    <div id="recetaModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                        <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">
+                            <div class="flex justify-between items-center mb-4 border-b-2 pb-4">
+                                <h3 id="recetaModalTitle" class="text-xl font-medium">Receta</h3>
+                                <button id="closeRecetaModal" class="text-red-600 font-bold text-lg">&times;</button>
+                            </div>
+                            <div id="recetaModalContent" class="mt-4">
+                                <!-- Aquí se mostrará la receta -->
+                            </div>
                         </div>
-                    </div>                    
-                    <div class="mb-4">
-                        <label for="modalRecetaInput" class="block text-sm font-medium text-gray-700">Receta</label>
-                        <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">{{ old('modalRecetaInput') }}</textarea>
-                    </div>
-                    <div class="flex justify-end">
-                        <button id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Cancelar</button>
-                        <button id="saveReceta" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar</button>
-                    </div>
-                </div>
+                    </div> 
+                </div>      
             </div>
 
-            <!-- Preview Modal -->
-            <div id="recetaModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-                <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">
-                    <div class="flex justify-between items-center mb-4 border-b-2 pb-4">
-                        <h3 id="recetaModalTitle" class="text-xl font-medium">Receta</h3>
-                        <button id="closeRecetaModal" class="text-red-600 font-bold text-lg">&times;</button>
-                    </div>
-                    <div id="recetaModalContent" class="mt-4">
-                        <!-- Aquí se mostrará la receta -->
-                    </div>
-                </div>
-            </div>    
             
+            <!-- Fila fija para "Total a Pagar" y "Terminar Consulta" -->
+            <div class="flex justify-end items-center mb-4 space-x-4">
+                <label for="totalPagar" class="block text-sm font-medium text-gray-700 w-1/8 text-right">Total a Pagar</label>
+                <input type="number" id="totalPagar" name="totalPagar" 
+                class="mt-1 p-2 w-1/8 border rounded-md" 
+                value="{{ $precioConsulta }}" 
+                {{ $precioConsulta ? '' : 'required' }}>
+                <button type="submit" form="consultasForm" class="bg-green-500 text-white px-4 py-2 rounded-md w-1/7">Terminar Consulta</button>
+            </div>
+
             @if (old('recetas'))
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -212,7 +221,6 @@
                 </script>
             @endif
 
-
             @if ($errors->any())
                 <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
                     <ul>
@@ -227,6 +235,25 @@
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
             <script>
+                function openTab(event, tabName) {
+                    var i, tabcontent, tablinks;
+                    tabcontent = document.getElementsByClassName("tab-pane");
+                    for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].classList.remove("active");
+                    }
+                    tablinks = document.getElementsByClassName("tab-link");
+                    for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].classList.remove("active-tab");
+                    }
+                    document.getElementById(tabName).classList.add("active");
+                    event.currentTarget.classList.add("active-tab");
+                }
+
+                // Set default tab
+                document.addEventListener("DOMContentLoaded", function() {
+                    openTab({currentTarget: document.querySelector(`[href="#consultaTab"]`)}, 'consultaTab');
+                });
+
                 CKEDITOR.replace('motivoConsulta', {
                     versionCheck: false,
                     enterMode: CKEDITOR.ENTER_P, // Salto de línea con interlineado
@@ -430,6 +457,7 @@
                     }
                 });
             </script>
+
             <style>
                 #recetaModalContent ul,
                 #recetaModalContent ol {
@@ -455,7 +483,48 @@
                     margin: 0; /* No agrega espacio cuando se presiona Shift + Enter */
                     line-height: 1.2em; /* Opcional: ajusta el interlineado de las líneas */
                 }
-            </style>            
+
+                /* Estilos para las pestañas */
+                .tab-link {
+                    color: black;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    display: inline-block;
+                    font-weight: normal;
+                    border-bottom: 2px solid transparent;
+                    cursor: pointer;
+                    font-size: 16px; /* Asegúrate de que el tamaño de la fuente sea el mismo */
+                }
+
+                .active-tab {
+                    font-weight: bold;
+                    border-bottom: 2px solid #2D7498;
+                }
+
+                .tab-link:hover {
+                    font-weight: bold;
+                }
+
+                .tab-pane {
+                    display: none;
+                }
+
+                .tab-pane.active {
+                    display: block;
+                }
+
+                /* Si la línea es un borde en el contenedor del nombre, elimínalo */
+                .nombre-contenedor {
+                    border-bottom: none; /* Asegúrate de que el borde inferior esté desactivado */
+                    margin-bottom: 0; /* Ajusta el margen si es necesario */
+                }
+
+                /* Mantén la línea en los tabs */
+                #tabs {
+                    border-bottom: 1px solid #e2e8f0; /* Mantén la línea en los tabs */
+                    margin-top: 0; /* Elimina el margen superior para que las pestañas estén pegadas al nombre */
+                }
+            </style>
         </div>
     </div>
 </x-app-layout>

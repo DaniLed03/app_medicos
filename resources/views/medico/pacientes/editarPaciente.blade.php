@@ -29,6 +29,9 @@
                             <a class="tab-link active-tab" href="#datos" onclick="openTab(event, 'datos')">Datos del Paciente</a>
                         </li>
                         <li class="mr-1">
+                            <a class="tab-link" href="#domicilio" onclick="openTab(event, 'domicilio')">Domicilio</a>
+                        </li>
+                        <li class="mr-1">
                             <a class="tab-link" href="#padres" onclick="openTab(event, 'padres')">Padres</a>
                         </li>
                         <li class="mr-1">
@@ -190,86 +193,89 @@
                                             {{ __('Actualizar Contacto') }}                                            
                                         </x-primary-button>
                                     </div>
-                                </div>
-
-                                <!-- Domicilio -->
-                                <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="domicilioNew">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-lg font-semibold">Domicilio</h3>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <!-- Entidad Federativa -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="entidad_federativa" :value="__('Entidad Federativa')" />
-                                            <select id="entidad_federativa" class="block mt-1 w-full form-select select2" name="entidad_federativa_id" onchange="updateMunicipios(this.value)">
-                                                <option value="">Seleccione una opción</option>
-                                                @foreach($entidadesFederativas as $entidad)
-                                                    <option value="{{ $entidad->id }}" {{ $paciente->entidad_federativa_id == $entidad->id ? 'selected' : '' }}>
-                                                        {{ $entidad->nombre }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                
-                                        <!-- Municipio -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="municipio" :value="__('Municipio')" />
-                                            <select id="municipio" class="block mt-1 w-full form-select select2" name="municipio_id" onchange="updateColonias(this.value)">
-                                                <option value="">Seleccione una opción</option>
-                                                @foreach($municipios as $municipio)
-                                                    <option value="{{ $municipio->id_municipio }}" {{ $paciente->municipio_id == $municipio->id_municipio ? 'selected' : '' }}>
-                                                        {{ $municipio->nombre }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                
-                                        <!-- Localidad -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="localidad" :value="__('Localidad')" />
-                                            <select id="localidad" name="localidad_id" class="block mt-1 w-full form-select select2">
-                                                <option value="">Seleccione una opción</option>
-                                                @foreach($localidades as $localidad)
-                                                    <option value="{{ $localidad['id_localidad'] }}" {{ $paciente->localidad_id == $localidad['id_localidad'] ? 'selected' : '' }}>
-                                                        {{ $localidad['nombre'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                
-                                        <!-- Colonia -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="colonia" :value="__('Colonia')" />
-                                            <select id="colonia" class="block mt-1 w-full form-select select2" name="colonia_id">
-                                                <option value="">Seleccione una opción</option>
-                                                @foreach($colonias as $colonia)
-                                                    <option value="{{ $colonia->id_asentamiento }}" {{ $paciente->colonia_id == $colonia->id_asentamiento ? 'selected' : '' }}>
-                                                        {{ $colonia->cp }} - {{ $colonia->tipo_asentamiento }} - {{ $colonia->asentamiento }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <!-- Calle -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="calle" :value="__('Calle')" />
-                                            <x-text-input id="calle" class="block mt-1 w-full" type="text" name="calle" value="{{ $paciente->calle ?? '' }}" />
-                                            <x-input-error :messages="$errors->get('calle')" class="mt-2" />
-                                        </div>
-                                
-                                    </div>
-                                
-                                    <div class="flex justify-end mt-4">
-                                        <x-primary-button class="ml-4" id="domicilioNew-update" onclick="submitForm('editPacienteFormNew')">
-                                            {{ __('Actualizar Domicilio') }}
-                                        </x-primary-button>
-                                    </div>
-                                </div>
-                                                               
+                                </div>                                  
                             </form>
                         </div>
                     </div>
 
+                    <div id="domicilio" class="tab-content hidden mt-3">
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="domicilioForm">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="tab" value="domicilio">
+                            <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold">Domicilio</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <!-- Entidad Federativa -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="entidad_federativa" :value="__('Entidad Federativa')" />
+                                        <select id="entidad_federativa" class="block mt-1 w-full form-select select2" name="entidad_federativa_id" onchange="updateMunicipios(this.value)">
+                                            <option value="">Seleccione una opción</option>
+                                            @foreach($entidadesFederativas as $entidad)
+                                                <option value="{{ $entidad->id }}" {{ $paciente->entidad_federativa_id == $entidad->id ? 'selected' : '' }}>
+                                                    {{ $entidad->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            
+                                    <!-- Municipio -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="municipio" :value="__('Municipio')" />
+                                        <select id="municipio" class="block mt-1 w-full form-select select2" name="municipio_id" onchange="updateColonias(this.value)">
+                                            <option value="">Seleccione una opción</option>
+                                            @foreach($municipios as $municipio)
+                                                <option value="{{ $municipio->id_municipio }}" {{ $paciente->municipio_id == $municipio->id_municipio ? 'selected' : '' }}>
+                                                    {{ $municipio->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            
+                                    <!-- Localidad -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="localidad" :value="__('Localidad')" />
+                                        <select id="localidad" name="localidad_id" class="block mt-1 w-full form-select select2">
+                                            <option value="">Seleccione una opción</option>
+                                            @foreach($localidades as $localidad)
+                                                <option value="{{ $localidad['id_localidad'] }}" {{ $paciente->localidad_id == $localidad['id_localidad'] ? 'selected' : '' }}>
+                                                    {{ $localidad['nombre'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            
+                                    <!-- Colonia -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="colonia" :value="__('Colonia')" />
+                                        <select id="colonia" class="block mt-1 w-full form-select select2" name="colonia_id">
+                                            <option value="">Seleccione una opción</option>
+                                            @foreach($colonias as $colonia)
+                                                <option value="{{ $colonia->id_asentamiento }}" {{ $paciente->colonia_id == $colonia->id_asentamiento ? 'selected' : '' }}>
+                                                    {{ $colonia->cp }} - {{ $colonia->tipo_asentamiento }} - {{ $colonia->asentamiento }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                    
+                                    <!-- Calle -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="calle" :value="__('Calle')" />
+                                        <x-text-input id="calle" class="block mt-1 w-full" type="text" name="calle" value="{{ $paciente->calle ?? '' }}" />
+                                        <x-input-error :messages="$errors->get('calle')" class="mt-2" />
+                                    </div>
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4" id="domicilio-update" onclick="submitForm('domicilioForm')">
+                                        {{ __('Actualizar Domicilio') }}
+                                    </x-primary-button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
                     <div id="padres" class="tab-content hidden mt-3">
                         <!-- Contacto de Emergencias -->
                         <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="padresForm">

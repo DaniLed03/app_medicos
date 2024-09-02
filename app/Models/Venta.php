@@ -15,7 +15,8 @@ class Venta extends Model
         'iva',
         'total',
         'paciente_id',
-        'status', 
+        'status',
+        'tipo_pago', // Añadir tipo_pago al fillable
     ];
 
     public function consulta()
@@ -30,7 +31,13 @@ class Venta extends Model
     
     public function conceptos()
     {
-        return $this->belongsToMany(Concepto::class, 'concepto_venta')->withPivot('cantidad')->withTimestamps();
+        return $this->belongsToMany(Concepto::class, 'venta_conceptos', 'venta_id', 'concepto_id')
+                    ->withPivot('cantidad')
+                    ->withTimestamps();
     }
+
+
+
+
 }
 

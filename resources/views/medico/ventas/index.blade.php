@@ -3,22 +3,70 @@
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h1 class="text-xl font-bold text-gray-900 uppercase">Cobro de Servicios</h1>
-                    <div class="flex items-center justify-between mb-4">
-                        <!-- Contenedor de Total Facturación -->
+
+                    <!-- Título y Contenedor de Facturación y Filtros -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex flex-col">
+                            @php
+                                $startDate = request('start_date');
+                                $endDate = request('end_date');
+                                $today = \Carbon\Carbon::today()->format('d/m/Y');
+                            @endphp
+
+                            <!-- Título -->
+                            @if($startDate && $endDate && $startDate != $endDate)
+                                <h1 class="text-xl font-bold text-gray-900 uppercase">Cobros de {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</h1>
+                            @elseif($startDate)
+                                <h1 class="text-xl font-bold text-gray-900 uppercase">Cobros del {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}</h1>
+                            @else
+                                <h1 class="text-xl font-bold text-gray-900 uppercase">Cobros del {{ $today }}</h1>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <!-- Filtros de fecha -->
+                        <form id="filterForm" method="GET" action="{{ route('ventas.index') }}" class="flex items-center mb-4">
+                            <div class="mr-2">
+                                <label for="start_date" class="block text-sm font-medium text-gray-700">Fecha Inicio</label>
+                                <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" class="mt-1 block w-full pl-3 pr-12 py-2 border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div class="mr-2">
+                                <label for="end_date" class="block text-sm font-medium text-gray-700">Fecha Fin</label>
+                                <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" class="mt-1 block w-full pl-3 pr-12 py-2 border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Filtrar</button>
+                            </div>
+                            <div class="mt-4 ml-2">
+                                <button type="button" id="resetButton" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Reiniciar</button>
+                            </div>
+                        </form>
+
                         <div class="flex items-center space-x-4">
                             <div class="bg-white p-4 shadow-2xl rounded-md flex items-center space-x-4">
                                 <div class="bg-icon-color p-2 rounded-full">
-                                    <svg class="w-8 h-8 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd" d="M5 2a3 3 0 0 0-3 3v16a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7l-6-5H5zm1 6h6v2H6V8zm8 2h4v2h-4v-2z"/>
+                                    <!-- Nuevo SVG del ícono de facturación -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cash-coin text-white" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                                        <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                                        <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                                        <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
                                     </svg>
                                 </div>
                                 <div class="text-center">
                                     <h2 class="text-lg font-bold">Total facturación: ${{ number_format($totalFacturacion, 2) }}</h2>
-                                    <p class="text-gray-600">Período: {{ ucfirst(\Carbon\Carbon::now()->translatedFormat('F Y')) }}</p>
+                                    <p class="text-gray-600">Período: 
+                                        @if($startDate && $endDate && $startDate != $endDate)
+                                            {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
+                                        @else
+                                            {{ $today }}
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>
+                        
                     </div>
 
                     <!-- Tabla de ventas -->
@@ -60,10 +108,12 @@
                                                     Pagar
                                                 </a>
                                             @endif
-                                            <a href="{{ route('ventas.generateInvoice', $venta->id) }}" class="text-green-500 hover:text-green-700">
-                                                Generar Factura
-                                            </a>
-                                        </td>                                                                                                                       
+                                            @if($venta->status == 'Pagado')
+                                                <a href="{{ route('ventas.generateInvoice', $venta->id) }}" class="text-green-500 hover:text-green-700">
+                                                    Generar Factura
+                                                </a>
+                                            @endif
+                                        </td>                                        
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -75,32 +125,6 @@
                             {{ session('success') }}
                         </div>
                     @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Ver Venta -->
-    <div id="viewModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
-            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full" style="margin: 50px 0; height: auto;">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="sm:flex sm:items-center w-full">
-                            <h3 class="text-2xl leading-6 font-bold text-center text-gray-900 w-full" style="color: #316986;">
-                                Detalles de la Venta
-                            </h3>
-                            <button type="button" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-gray-500 text-4xl" id="closeViewModal">
-                                <span class="sr-only">Close</span>
-                                &times;
-                            </button>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-200 mt-4"></div>
-                    <div class="mt-2">
-                        <div id="ventaDetails"></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -126,6 +150,7 @@
     <script>
         $(document).ready(function() {
             $('#ventasTable').DataTable({
+                "order": [[1, 'desc']], // Ordenar por la columna de Fecha y Hora
                 "dom": '<"row"<"col-sm-12 col-md-6"lB><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 "buttons": [
                     {
@@ -138,7 +163,7 @@
                     {
                         extend: 'csv',
                         text: 'CSV',
-                        title: 'Cobro de Servicios',
+                        title: 'Cobros',
                         exportOptions: {
                             columns: ':not(:last-child)' // Excluye la última columna (Acciones)
                         }
@@ -146,7 +171,7 @@
                     {
                         extend: 'excel',
                         text: 'Excel',
-                        title: 'Cobro de Servicios',
+                        title: 'Cobros',
                         exportOptions: {
                             columns: ':not(:last-child)' // Excluye la última columna (Acciones)
                         }
@@ -154,7 +179,7 @@
                     {
                         extend: 'pdf',
                         text: 'PDF',
-                        title: 'Cobro de Servicios',
+                        title: 'Cobros',
                         exportOptions: {
                             columns: ':not(:last-child)' // Excluye la última columna (Acciones)
                         }
@@ -195,66 +220,15 @@
                 "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]]
             });
 
-            // Open View Modal
-            document.querySelectorAll('.view-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
+            document.getElementById('resetButton').addEventListener('click', function() {
+                const today = new Date();
+                const offset = today.getTimezoneOffset(); // Obtener la diferencia horaria
+                const adjustedToday = new Date(today.getTime() - offset * 60 * 1000); // Ajustar la fecha según la diferencia horaria
+                const formattedToday = adjustedToday.toISOString().split('T')[0]; // Obtener la fecha ajustada en formato YYYY-MM-DD
 
-                    // Fetch the venta details from the server and display in the modal
-                    fetch(`{{ url('ventas') }}/${id}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            document.getElementById('ventaDetails').innerHTML = html;
-                            document.getElementById('viewModal').classList.remove('hidden');
-                        });
-                });
-            });
-
-            document.getElementById('closeViewModal').addEventListener('click', function() {
-                document.getElementById('viewModal').classList.add('hidden');
-            });
-
-            // Manejo de la acción de pago con confirmación
-            $('.pagar-form').on('submit', function(e) {
-                e.preventDefault();
-                const form = $(this);
-                const actionUrl = form.attr('action');
-
-                // Mostrar alerta de confirmación
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "¡Esta acción marcará la venta como pagada!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, pagar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Si el usuario confirma, envía el formulario
-                        $.post(actionUrl, form.serialize(), function(data) {
-                            form.closest('tr').find('.status-label')
-                                .removeClass('bg-blue-200 text-blue-800')
-                                .addClass('bg-green-200 text-green-800')
-                                .text('Pagado');
-                            form.remove(); // Eliminar el botón de pagar
-
-                            // Mostrar alerta de éxito
-                            Swal.fire(
-                                'Pagado!',
-                                'El estado de la venta ha sido actualizado.',
-                                'success'
-                            );
-                        }).fail(function() {
-                            Swal.fire(
-                                'Error!',
-                                'Ocurrió un error al procesar el pago. Por favor, inténtalo de nuevo.',
-                                'error'
-                            );
-                        });
-                    }
-                });
+                document.getElementById('start_date').value = formattedToday;
+                document.getElementById('end_date').value = formattedToday;
+                document.getElementById('filterForm').submit();
             });
         });
     </script>
@@ -282,11 +256,8 @@
         .buttons-html5, .buttons-print {
             margin-right: 5px;
         }
-        .bg-button-color {
-            background-color: #33AD9B;
-        }
-        .hover\:bg-button-hover:hover {
-            background-color: #278A75;
+        .bg-table-header-color {
+            background-color: #2D7498;
         }
         .bg-icon-color {
             background-color: #2D7498;

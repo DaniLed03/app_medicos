@@ -54,7 +54,7 @@ class ConsultaController extends Controller
             'diagnostico' => 'required|string',
             'plan' => 'nullable|string',
             'status' => 'required|string|in:en curso,Finalizada',
-            'totalPagar' => 'required|numeric|min:1', // Aseguramos que el totalPagar no sea 0
+            'totalPagar' => 'nullable|numeric|min:1', // Aseguramos que el totalPagar no sea 0
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
             'recetas' => 'array',
