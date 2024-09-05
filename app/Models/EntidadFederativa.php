@@ -13,6 +13,7 @@ class EntidadFederativa extends Model
 
     public function municipios()
     {
-        return $this->hasMany(Municipio::class);
+        return $this->hasMany(Municipio::class, 'entidad_federativa_id', 'id');
     }
+    
 }

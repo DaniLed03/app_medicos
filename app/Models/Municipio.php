@@ -18,6 +18,7 @@ class Municipio extends Model
     {
         return $this->belongsTo(EntidadFederativa::class, 'entidad_federativa_id', 'id');
     }
+    
 
     public function localidades()
     {

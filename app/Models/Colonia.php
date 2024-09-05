@@ -1,7 +1,5 @@
 <?php
 
-// Colonia.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,11 +9,10 @@ class Colonia extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = ['id_asentamiento', 'id_entidad', 'id_municipio'];
-    public $incrementing = false;
-    protected $keyType = 'array';
+    public $incrementing = false;  // Desactivamos el auto-incremento
+    protected $keyType = 'string'; // Definimos que la clave primaria no será un número entero
 
-    // Definir los campos que pueden ser asignados en masa (mass assignment)
+    // Definimos los campos que se pueden asignar masivamente
     protected $fillable = [
         'id_asentamiento', 
         'id_entidad', 
@@ -29,8 +26,8 @@ class Colonia extends Model
     {
         return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
     }
-
-    public function entidad()
+    
+    public function entidadFederativa()
     {
         return $this->belongsTo(EntidadFederativa::class, 'id_entidad', 'id');
     }

@@ -57,7 +57,7 @@
                                                 data-tipo_concepto="{{ $concepto->tipo_concepto }}">
                                                 Editar
                                             </a>
-                                                                                 </td>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

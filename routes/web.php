@@ -133,8 +133,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('colonias', ColoniaController::class);
     route::get('/colonias/create', [ColoniaController::class, 'create'])->name('colonias.create');
-    
-    /// nuevo vv
+    route::get('/api/municipios/{id_entidad}', [ColoniaController::class, 'getMunicipiosByEntidad']);
+    route::get('/api/colonias/{id}', [ColoniaController::class, 'getColoniasByMunicipio']);
+    route::get('/api/municipios/{entidad}', [ColoniaController::class, 'getMunicipiosByEntidad']);
+    route::delete('/colonias/{id_asentamiento}/{id_entidad}/{id_municipio}', [ColoniaController::class, 'destroy'])->name('colonias.destroy');
+    route::get('/colonias/{id_asentamiento}/{id_entidad}/{id_municipio}/edit', [ColoniaController::class, 'edit'])->name('colonias.edit');   
+    route::put('/colonias/{id_asentamiento}/{id_entidad}/{id_municipio}', [ColoniaController::class, 'update'])->name('colonias.update');
+        /// nuevo vv
     Route::get('/medico/ventas/pdf', [VentaController::class, 'generateVentasPdf'])->name('ventas.pdf');
 
     route::get('/get-municipios/{id}', [MedicoController::class, 'getMunicipios']);
