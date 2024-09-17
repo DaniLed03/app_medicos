@@ -40,15 +40,18 @@
                 <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
                 <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
             </div>
-            <div>
-                <x-input-label for="sexo" :value="__('Sexo')" class="block" />
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-secondary">
-                        <input type="radio" name="sexo" id="masculino" value="masculino" autocomplete="off" required> Masculino
-                    </label>
-                    <label class="btn btn-secondary">
-                        <input type="radio" name="sexo" id="femenino" value="femenino" autocomplete="off" required> Femenino
-                    </label>
+            <!-- Sexo -->
+            <div class="mt-4">
+                <x-input-label for="sexo" :value="__('Sexo')" />
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <input type="radio" id="masculino" name="sexo" value="masculino" class="mr-2" required>
+                        <label for="masculino" class="text-sm font-medium text-gray-700">Masculino</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="femenino" name="sexo" value="femenino" class="mr-2" required>
+                        <label for="femenino" class="text-sm font-medium text-gray-700">Femenino</label>
+                    </div>
                 </div>
                 <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
             </div>

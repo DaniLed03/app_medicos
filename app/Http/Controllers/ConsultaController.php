@@ -142,8 +142,7 @@ class ConsultaController extends Controller
         // Redirigir a la vista de detalles de la consulta
         return redirect()->route('vistaInicio')->with('success', 'Consulta guardada exitosamente.');
     }
-
-
+    
     public function index(Request $request)
     {
         $currentUser = Auth::user();
@@ -190,13 +189,18 @@ class ConsultaController extends Controller
         $page = $request->input('page', 1);
         $paginatedConsultas = $consultas->slice(($page - 1) * $perPage, $perPage)->values();
 
+        // Cantidad de ventas "Por pagar"
+        $ventasPorPagar = Venta::where('status', 'Por pagar')->count();
+
         return view('medico.consultas.consultas', [
             'consultas' => new \Illuminate\Pagination\LengthAwarePaginator($paginatedConsultas, $consultas->count(), $perPage, $page, [
                 'path' => $request->url(),
                 'query' => $request->query()
-            ])
+            ]),
+            'ventasPorPagar' => $ventasPorPagar, // Enviamos el conteo de ventas por pagar
         ]);
     }
+
 
     public function verificarPaciente(Request $request, $citaId)
     {

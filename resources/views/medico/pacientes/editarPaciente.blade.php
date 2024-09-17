@@ -85,16 +85,19 @@
                                         <!-- Sexo -->
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="modalSexo" :value="__('Sexo')" />
-                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                <label class="btn btn-secondary">
-                                                    <input type="radio" name="sexo" id="modalMasculino" value="masculino" {{ ($paciente->sexo ?? '') == 'masculino' ? 'checked' : '' }} autocomplete="off" required> Masculino
-                                                </label>
-                                                <label class="btn btn-secondary">
-                                                    <input type="radio" name="sexo" id="modalFemenino" value="femenino" {{ ($paciente->sexo ?? '') == 'femenino' ? 'checked' : '' }} autocomplete="off" required> Femenino
-                                                </label>
+                                            <div class="flex items-center space-x-4">
+                                                <div class="flex items-center">
+                                                    <input type="radio" id="masculino" name="sexo" value="masculino" class="mr-2" {{ ($paciente->sexo ?? '') == 'masculino' ? 'checked' : '' }} required>
+                                                    <label for="masculino" class="text-sm font-medium text-gray-700">Masculino</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="radio" id="femenino" name="sexo" value="femenino" class="mr-2" {{ ($paciente->sexo ?? '') == 'femenino' ? 'checked' : '' }} required>
+                                                    <label for="femenino" class="text-sm font-medium text-gray-700">Femenino</label>
+                                                </div>
                                             </div>
                                             <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                         </div>
+
 
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="fecha_nacimiento" :value="__('Fecha de Nacimiento')" />
@@ -161,11 +164,6 @@
                                             <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
                                         </div>
                                     </div>
-                                    <div class="flex justify-end mt-4">
-                                        <x-primary-button class="ml-4" id="personalNew-update" onclick="submitForm('editPacienteFormNew')">
-                                            {{ __('Actualizar Información Personal') }}
-                                        </x-primary-button>
-                                    </div>
                                 </div>
 
                                 <!-- Nueva Sección de Contacto -->
@@ -188,12 +186,12 @@
                                             <x-input-error :messages="$errors->get('correo')" class="mt-2" />
                                         </div>
                                     </div>
-                                    <div class="flex justify-end mt-4">
-                                        <x-primary-button class="ml-4" id="contacto-update" onclick="submitForm('editPacienteFormNew')">
-                                            {{ __('Actualizar Contacto') }}                                            
-                                        </x-primary-button>
-                                    </div>
-                                </div>                                  
+                                </div>  
+                                <div class="flex justify-end mt-4">
+                                    <x-primary-button class="ml-4" id="contacto-update" onclick="submitForm('editPacienteFormNew')">
+                                        {{ __('Actualizar Informacion') }}                                            
+                                    </x-primary-button>
+                                </div>                                
                             </form>
                         </div>
                     </div>
@@ -267,11 +265,11 @@
                                         <x-input-error :messages="$errors->get('calle')" class="mt-2" />
                                     </div>
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4" id="domicilio-update" onclick="submitForm('domicilioForm')">
-                                        {{ __('Actualizar Domicilio') }}
-                                    </x-primary-button>
-                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <x-primary-button class="ml-4" id="domicilio-update" onclick="submitForm('domicilioForm')">
+                                    {{ __('Actualizar Informacion') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>
@@ -308,11 +306,11 @@
                                         <x-input-error :messages="$errors->get('telefono2')" class="mt-2" />
                                     </div>
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4" id="emergencias-update" onclick="submitForm('padresForm')">
-                                        {{ __('Actualizar Contacto de Emergencias') }}
-                                    </x-primary-button>
-                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <x-primary-button class="ml-4" id="emergencias-update" onclick="submitForm('padresForm')">
+                                    {{ __('Actualizar Informacion') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>
@@ -335,11 +333,11 @@
                                     </div>
                                     <x-input-error :messages="$errors->get('antecedentes')" class="mt-2" />
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4" id="antecedentes-update" onclick="submitForm('antecedentesForm')">
-                                        {{ __('Actualizar Antecedentes') }}
-                                    </x-primary-button>
-                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <x-primary-button class="ml-4" id="antecedentes-update" onclick="submitForm('antecedentesForm')">
+                                    {{ __('Actualizar Informacion') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>
@@ -391,11 +389,11 @@
                                         <x-input-error :messages="$errors->get('CFDI')" class="mt-2" />
                                     </div>
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <x-primary-button class="ml-4" id="facturacion-update" onclick="submitForm('facturacionForm')">
-                                        {{ __('Actualizar Información de Facturación') }}
-                                    </x-primary-button>
-                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <x-primary-button class="ml-4" id="facturacion-update" onclick="submitForm('facturacionForm')">
+                                    {{ __('Actualizar Información') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>

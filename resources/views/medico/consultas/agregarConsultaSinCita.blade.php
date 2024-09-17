@@ -20,15 +20,28 @@
                 </p>
             </div>
 
-            <!-- Aquí comienza los tabs, elimina cualquier HR o borde antes de ellos -->
-            <ul class="flex border-b mb-4" id="tabs">
-                <li class="-mb-px mr-1">
-                    <a class="tab-link active-tab" href="#consultaTab" onclick="openTab(event, 'consultaTab')">Consulta</a>
-                </li>
-                <li class="mr-1">
-                    <a class="tab-link" href="#recetasTab" onclick="openTab(event, 'recetasTab')">Recetas</a>
-                </li>
-            </ul>
+            <!-- Estructura de Tabs, Total a Pagar y Botón Terminar Consulta en la misma línea -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- Estructura de Tabs -->
+                <ul class="flex border-b mb-0" id="tabs">
+                    <li class="-mb-px mr-1">
+                        <a class="tab-link active-tab" href="#consultaTab" onclick="openTab(event, 'consultaTab')">Consulta</a>
+                    </li>
+                    <li class="mr-1">
+                        <a class="tab-link" href="#recetasTab" onclick="openTab(event, 'recetasTab')">Recetas</a>
+                    </li>
+                </ul>
+
+                <!-- Total a Pagar y Botón Terminar Consulta -->
+                <div class="flex items-center space-x-4">
+                    <label for="totalPagar" class="block text-sm font-medium text-gray-700">Precio de la Consulta</label>
+                    <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-24 border rounded-md" value="{{ $precioConsulta }}" {{ $precioConsulta ? '' : 'required' }}>
+                    
+                    <!-- Botón Terminar Consulta -->
+                    <button type="submit" form="consultasForm" class="bg-green-500 text-white px-4 py-2 rounded-md">Terminar Consulta</button>
+                </div>
+            </div>
+
 
             <!-- Contenedor para el contenido de las pestañas -->
             <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
@@ -152,17 +165,6 @@
                         </div>
                     </div> 
                 </div>      
-            </div>
-
-            
-            <!-- Fila fija para "Total a Pagar" y "Terminar Consulta" -->
-            <div class="flex justify-end items-center mb-4 space-x-4">
-                <label for="totalPagar" class="block text-sm font-medium text-gray-700 w-1/8 text-right">Total a Pagar</label>
-                <input type="number" id="totalPagar" name="totalPagar" 
-                class="mt-1 p-2 w-1/8 border rounded-md" 
-                value="{{ $precioConsulta }}" 
-                {{ $precioConsulta ? '' : 'required' }}>
-                <button type="submit" form="consultasForm" class="bg-green-500 text-white px-4 py-2 rounded-md w-1/7">Terminar Consulta</button>
             </div>
 
             @if (old('recetas'))
@@ -347,8 +349,10 @@
                                     <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
                                     <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${newRecetaIndex}">Editar</button>
                                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                    <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
                                 </td>
                             `;
+
                             recetasDiv.appendChild(newRecetaRow);
                         } else {
                             newRecetaRow = document.querySelector(`tr[data-index="${editIndex}"]`);
@@ -362,9 +366,60 @@
                                     <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
                                     <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${editIndex}">Editar</button>
                                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                    <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
                                 </td>
                             `;
                         }
+
+                        newRecetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
+                            const recetaContent = decodeURIComponent(this.dataset.receta);
+                            
+                            // Extraemos el nombre, fecha, talla y peso
+                            const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
+                            const fechaActual = new Date().toLocaleDateString();
+                            const talla = document.getElementById('hidden_talla').value || 'N/A';
+                            const peso = document.getElementById('hidden_peso').value || 'N/A';
+                            
+                            // Crear un elemento temporal para calcular el número de líneas
+                            const tempDiv = document.createElement('div');
+                            tempDiv.style.position = 'absolute';
+                            tempDiv.style.visibility = 'hidden';
+                            tempDiv.style.width = '800px';
+                            tempDiv.style.lineHeight = '1.5em';
+                            tempDiv.innerHTML = recetaContent;
+                            document.body.appendChild(tempDiv);
+                            
+                            // Calcular la altura y determinar cuántas líneas hay
+                            const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
+                            const totalLines = tempDiv.offsetHeight / lineHeight;
+                            
+                            // Remover el elemento temporal
+                            document.body.removeChild(tempDiv);
+
+                            // Verificar si excede el límite de 8 líneas
+                            if (totalLines > 6) {
+                                alert("Sobrepasa los límites de la receta");
+                            } else {
+                                const printWindow = window.open('', '', 'width=800,height=600');
+                                printWindow.document.write(`
+                                    <br><br><br><br><br><br><br>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
+                                        <div style="flex-basis: 40%; text-align: left; font-size: 15px; font-weight: normal;">${nombreCompleto}</div>
+                                        <div style="flex-basis: 20%; text-align: right; font-size: 15px; font-weight: normal;">${fechaActual}</div>
+                                        <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${peso}</div>
+                                        <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${talla}</div>
+                                    </div>
+                                    <div style="padding: 20px 40px; font-size: 15px;">
+                                        ${recetaContent}
+                                    </div>
+                                `);
+                                printWindow.document.write('</body></html>');
+                                printWindow.document.close();
+                                printWindow.focus();
+                                printWindow.print();
+                            }
+                        });
+
 
                         // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
                         newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {

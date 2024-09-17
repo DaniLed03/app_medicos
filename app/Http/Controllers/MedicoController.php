@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\HorariosMedicos;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Illuminate\Support\Facades\DB;
 
 class MedicoController extends Controller
 {
@@ -141,26 +141,47 @@ class MedicoController extends Controller
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
-        $pacientes = Paciente::where('activo', 'si')
-                    ->where(function($q) use ($medicoId, $currentUser) {
-                        $q->where('medico_id', $medicoId)
-                        ->orWhere('medico_id', $currentUser->id);
-                    });
+        // Obtén todos los pacientes para los cálculos de totales
+        $totalPacientes = Paciente::where('activo', 'si')
+                        ->where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('medico_id', $medicoId)
+                            ->orWhere('medico_id', $currentUser->id);
+                        })->count();
 
-        if ($request->has('name') && $request->name != '') {
-            $pacientes->where('nombres', 'like', '%' . $request->name . '%');
-        }
+        $totalMujeres = Paciente::where('activo', 'si')
+                        ->where('sexo', 'femenino')
+                        ->where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('medico_id', $medicoId)
+                            ->orWhere('medico_id', $currentUser->id);
+                        })->count();
 
-        $pacientes = $pacientes->get();
-        $totalPacientes = $pacientes->count();
-        $totalMujeres = $pacientes->where('sexo', 'femenino')->count();
-        $totalHombres = $pacientes->where('sexo', 'masculino')->count();
+        $totalHombres = Paciente::where('activo', 'si')
+                        ->where('sexo', 'masculino')
+                        ->where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('medico_id', $medicoId)
+                            ->orWhere('medico_id', $currentUser->id);
+                        })->count();
 
         $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
         $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
 
+        // Pacientes filtrados solo cuando hay búsqueda
+        $pacientes = collect(); // Inicia vacío
+        if ($request->has('name') && $request->name != '') {
+            $searchTerm = $request->name;
+            $pacientes = Paciente::where('activo', 'si')
+                        ->where(function ($query) use ($searchTerm, $medicoId, $currentUser) {
+                            $query->where(DB::raw("CONCAT(nombres, ' ', apepat, ' ', apemat)"), 'like', '%' . $searchTerm . '%')
+                                ->where(function($q) use ($medicoId, $currentUser) {
+                                    $q->where('medico_id', $medicoId)
+                                    ->orWhere('medico_id', $currentUser->id);
+                                });
+                        })->get();
+        }
+
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
+
 
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($id)

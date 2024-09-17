@@ -4,6 +4,8 @@
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h1 class="text-xl font-bold text-gray-900 uppercase">Lista de Pacientes</h1>
+                    
+                    <!-- Contenedor Total Pacientes y porcentaje -->
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <!-- Contenedor de Total Pacientes -->
@@ -21,13 +23,13 @@
                             <div class="flex items-center space-x-4">
                                 <div class="bg-white p-4 shadow-2xl rounded-md flex items-center space-x-4">
                                     <div class="bg-icon-color p-2 rounded-full">
-                                        <img src="{{ asset('images/woman.svg') }}" class="w-8 h-8 text-white" alt="Icono de Mujer">
+                                        <img src="{{ asset('images/woman.svg') }}" class="w-8 h-8" alt="Icono de Mujer">
                                     </div>
                                     <div class="text-center">
                                         <h2 class="text-lg font-bold">Mujeres: {{ number_format($porcentajeMujeres, 1) }}%</h2>
                                     </div>
                                     <div class="bg-icon-color p-2 rounded-full">
-                                        <img src="{{ asset('images/man.svg') }}" class="w-8 h-8 text-white" alt="Icono de Hombre">
+                                        <img src="{{ asset('images/man.svg') }}" class="w-8 h-8" alt="Icono de Hombre">
                                     </div>
                                     <div class="text-center">
                                         <h2 class="text-lg font-bold">Hombres: {{ number_format($porcentajeHombres, 1) }}%</h2>
@@ -35,6 +37,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Botón para agregar paciente -->
                         <div>
                             @can('Agregar Pacientes')
                                 <button id="openModal" class="bg-button-color hover:bg-button-hover text-white font py-2 px-4 rounded">
@@ -43,53 +46,76 @@
                             @endcan
                         </div>
                     </div>
+
+                    <!-- Formulario de búsqueda -->
+                    <form method="GET" action="{{ route('medico.dashboard') }}" class="mb-4">
+                        <input type="text" name="name" placeholder="Buscar por nombre completo" class="border rounded p-2 w-96"> <!-- w-96 hace que el campo sea más largo -->
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Buscar</button>
+                    </form>
+
                     
-                    <!-- Tabla de pacientes -->
-                    <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <table id="pacientesTable" class="display nowrap" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>No. Exp</th>
-                                    <th>Nombre del Paciente</th>
-                                    <th>Fecha de Nacimiento</th>
-                                    <th>Sexo</th>
-                                    <th>Teléfono</th>
-                                    <th>Correo</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($pacientes as $paciente)
-                                    <tr>
-                                        <td>{{ $paciente->no_exp }}</td>
-                                        <td>{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($paciente->fechanac)->format('j M, Y') }}</td>
-                                        <td>{{ $paciente->sexo }}</td>
-                                        <td>{{ $paciente->telefono }}</td>
-                                        <td>{{ $paciente->correo }}</td>
-                                        <td>
-                                            @can('Editar Paciente')
-                                                <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                            @endcan
-                                            @can('Eliminar Paciente')
-                                                <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
-                                                </form>
-                                            @endcan
-                                            @can('Consultar')
-                                                <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
-                                            @endcan
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- Tabla de pacientes (solo si hay búsqueda) -->
+                    @if(request()->has('name') && request()->name != '')
+                        @if($pacientes->isNotEmpty())
+                            <div class="overflow-x-auto bg-white dark:bg-neutral-700">
+                                <table id="pacientesTable" class="display nowrap" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>No. Exp</th>
+                                            <th>Nombre del Paciente</th>
+                                            <th>Fecha de Nacimiento</th>
+                                            <th>Sexo</th>
+                                            <th>Teléfono</th>
+                                            <th>Correo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pacientes as $paciente)
+                                            <tr>
+                                                <td>{{ $paciente->no_exp }}</td>
+                                                <td>{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($paciente->fechanac)->format('j M, Y') }}</td>
+                                                <td>{{ $paciente->sexo }}</td>
+                                                <td>{{ $paciente->telefono }}</td>
+                                                <td>{{ $paciente->correo }}</td>
+                                                <td>
+                                                    @can('Editar Paciente')
+                                                        <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                                    @endcan
+                                                    @can('Eliminar Paciente')
+                                                        <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                        </form>
+                                                    @endcan
+                                                    @can('Consultar')
+                                                        <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
+                                                    @endcan
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <script>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Sin resultados',
+                                    text: 'No se encontraron pacientes que coincidan con la búsqueda.'
+                                });
+                            </script>
+                        @endif
+                    @else
+                        <p>Ingresa un nombre para mostrar coincidencias.</p>
+                    @endif
+
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     @if(session('error'))
@@ -163,13 +189,15 @@
                                 <!-- Sexo -->
                                 <div class="mt-4 md:col-span-1">
                                     <x-input-label for="sexo" :value="__('Sexo')" />
-                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="masculino" value="masculino" autocomplete="off" required> Masculino
-                                        </label>
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="femenino" value="femenino" autocomplete="off" required> Femenino
-                                        </label>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex items-center">
+                                            <input type="radio" id="masculino" name="sexo" value="masculino" class="mr-2" required>
+                                            <label for="masculino" class="text-sm font-medium text-gray-700">Masculino</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="femenino" name="sexo" value="femenino" class="mr-2" required>
+                                            <label for="femenino" class="text-sm font-medium text-gray-700">Femenino</label>
+                                        </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                 </div>
