@@ -16,50 +16,54 @@
                         </div>
 
                         <!-- Número de Expediente -->
+                        <!-- Número de Expediente y botón de Consultar -->
                         <div class="text-right">
                             <x-input-label for="no_expEditar" :value="__('No. Expediente')" />
                             <x-text-input id="no_expEditar" class="block mt-1 w-full" type="text" name="no_exp" value="{{ $paciente->no_exp ?? '' }}" readonly />
                             <x-input-error :messages="$errors->get('no_exp')" class="mt-2" />
                         </div>
+
                     </div>
 
                     <!-- Tabs -->
-                    <ul class="flex border-b" id="tabs">
-                        <li class="-mb-px mr-1">
-                            <a class="tab-link active-tab" href="#datos" onclick="openTab(event, 'datos')">Datos del Paciente</a>
-                        </li>
-                        <li class="mr-1">
-                            <a class="tab-link" href="#domicilio" onclick="openTab(event, 'domicilio')">Domicilio</a>
-                        </li>
-                        <li class="mr-1">
-                            <a class="tab-link" href="#padres" onclick="openTab(event, 'padres')">Padres</a>
-                        </li>
-                        <li class="mr-1">
-                            <a class="tab-link" href="#antecedentes" onclick="openTab(event, 'antecedentes')">Antecedentes Familiares</a>
-                        </li>
-                        <li class="mr-1">
-                            <a class="tab-link" href="#historial" onclick="openTab(event, 'historial')">Historial Clinico</a>
-                        </li>
-                        <li class="mr-1">
-                            <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Datos de Facturación</a>
-                        </li>
-                        
-                    </ul>
+                    <!-- Tabs y enlace de Ir a Consultar -->
+                    <div class="flex items-center justify-between mb-4">
+                        <ul class="flex border-b" id="tabs">
+                            <li class="-mb-px mr-1">
+                                <a class="tab-link active-tab" href="#datos" onclick="openTab(event, 'datos')">Datos del Paciente</a>
+                            </li>
+                            <li class="mr-1">
+                                <a class="tab-link" href="#domicilio" onclick="openTab(event, 'domicilio')">Domicilio</a>
+                            </li>
+                            <li class="mr-1">
+                                <a class="tab-link" href="#padres" onclick="openTab(event, 'padres')">Padres</a>
+                            </li>
+                            <li class="mr-1">
+                                <a class="tab-link" href="#antecedentes" onclick="openTab(event, 'antecedentes')">Antecedentes Familiares</a>
+                            </li>
+                            <li class="mr-1">
+                                <a class="tab-link" href="#historial" onclick="openTab(event, 'historial')">Historial Clinico</a>
+                            </li>
+                            <li class="mr-1">
+                                <a class="tab-link" href="#facturacion" onclick="openTab(event, 'facturacion')">Datos de Facturación</a>
+                            </li>
+                        </ul>
+
+                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700 ml-4">Ir a Consultar</a>
+
+                    </div>
 
                     <!-- Tab Content -->
                     <div id="datos" class="tab-content">
                         <!-- Información Personal -->
                         <div class="mt-3">
                             <!-- Editar Paciente Section -->
-                            <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="editPacienteFormNew">
+                            <form method="POST" action="{{ route('pacientes.update', $paciente->no_exp ?? 0) }}" id="editPacienteFormNew">
                                 @csrf
                                 @method('PATCH')
 
                                 <!-- Información Personal -->
                                 <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="personalNew">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-lg font-semibold">Información Personal</h3>
-                                    </div>
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <!-- Nombres -->
                                         <div class="mt-4 md:col-span-1">
@@ -108,14 +112,14 @@
                                         <!-- CURP -->
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="curpEditar" :value="__('CURP')" />
-                                            <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp ?? '' }}" />
+                                            <x-text-input id="curpEditar" class="block mt-1 w-full" type="text" name="curp" value="{{ $paciente->curp ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                             <x-input-error :messages="$errors->get('curp')" class="mt-2" />
                                         </div>
 
                                         <!-- Lugar de Nacimiento -->
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="lugar_naciEditar" :value="__('Lugar de Nacimiento')" />
-                                            <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci ?? '' }}" />
+                                            <x-text-input id="lugar_naciEditar" class="block mt-1 w-full" type="text" name="lugar_naci" value="{{ $paciente->lugar_naci ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                             <x-input-error :messages="$errors->get('lugar_naci')" class="mt-2" />
                                         </div>
 
@@ -160,33 +164,13 @@
                                         <!-- Hospital -->
                                         <div class="mt-4">
                                             <x-input-label for="hospitalEditar" :value="__('Hospital')" />
-                                            <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital ?? '' }}" />
+                                            <x-text-input id="hospitalEditar" class="block mt-1 w-full" type="text" name="hospital" value="{{ $paciente->hospital ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                             <x-input-error :messages="$errors->get('hospital')" class="mt-2" />
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Nueva Sección de Contacto -->
-                                <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="contactoNew">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-lg font-semibold">Contacto</h3>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <!-- Teléfono -->
-                                        <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="telefono" :value="__('Teléfono')" />
-                                            <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" value="{{ $paciente->telefono ?? '' }}" />
-                                            <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
-                                        </div>
-
-                                        <!-- Correo -->
-                                        <div class="mt-4 md:col-span-3">
-                                            <x-input-label for="correo" :value="__('Correo')" />
-                                            <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" value="{{ $paciente->correo ?? '' }}" required autofocus autocomplete="email" />
-                                            <x-input-error :messages="$errors->get('correo')" class="mt-2" />
-                                        </div>
-                                    </div>
-                                </div>  
+                                
                                 <div class="flex justify-end mt-4">
                                     <x-primary-button class="ml-4" id="contacto-update" onclick="submitForm('editPacienteFormNew')">
                                         {{ __('Actualizar Informacion') }}                                            
@@ -197,14 +181,11 @@
                     </div>
 
                     <div id="domicilio" class="tab-content hidden mt-3">
-                        <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="domicilioForm">
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->no_exp  ?? 0) }}" id="domicilioForm">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="tab" value="domicilio">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Domicilio</h3>
-                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <!-- Entidad Federativa -->
                                     <div class="mt-4 md:col-span-1">
@@ -276,36 +257,50 @@
                     
                     <div id="padres" class="tab-content hidden mt-3">
                         <!-- Contacto de Emergencias -->
-                        <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="padresForm">
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->no_exp  ?? 0) }}" id="padresForm">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="tab" value="padres">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="emergencias">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Padres</h3>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <!-- Padre -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="padreEditar" :value="__('Padre')" />
-                                        <x-text-input id="padreEditar" class="block mt-1 w-full" type="text" name="padre" value="{{ $paciente->padre ?? '' }}" />
+                                        <x-text-input id="padreEditar" class="block mt-1 w-full" type="text" name="padre" value="{{ $paciente->padre ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                         <x-input-error :messages="$errors->get('padre')" class="mt-2" />
                                     </div>
                                 
                                     <!-- Madre -->
                                     <div class="mt-4 md:col-span-1">
                                         <x-input-label for="madreEditar" :value="__('Madre')" />
-                                        <x-text-input id="madreEditar" class="block mt-1 w-full" type="text" name="madre" value="{{ $paciente->madre ?? '' }}" />
+                                        <x-text-input id="madreEditar" class="block mt-1 w-full" type="text" name="madre" value="{{ $paciente->madre ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                         <x-input-error :messages="$errors->get('madre')" class="mt-2" />
                                     </div>
                                 
+                                </div> 
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    
                                     <!-- Teléfono Secundario -->
                                     <div class="mt-4 md:col-span-1">
-                                        <x-input-label for="telefono2Editar" :value="__('Teléfono Secundario')" />
+                                        <x-input-label for="telefono2Editar" :value="__('Teléfono del padre')" />
                                         <x-text-input id="telefono2Editar" class="block mt-1 w-full" type="text" name="telefono2" value="{{ $paciente->telefono2 ?? '' }}" />
                                         <x-input-error :messages="$errors->get('telefono2')" class="mt-2" />
                                     </div>
-                                </div>
+
+                                    <!-- Teléfono -->
+                                    <div class="mt-4 md:col-span-1">
+                                        <x-input-label for="telefono" :value="__('Teléfono de la madre')" />
+                                        <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" value="{{ $paciente->telefono ?? '' }}" />
+                                        <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Correo -->
+                                    <div class="mt-4 md:col-span-2">
+                                        <x-input-label for="correo" :value="__('Correo')" />
+                                        <x-text-input id="correo" class="block mt-1 w-full" type="email" name="correo" value="{{ $paciente->correo ?? '' }}" required autofocus autocomplete="email" />
+                                        <x-input-error :messages="$errors->get('correo')" class="mt-2" />
+                                    </div>
+                                </div> 
                             </div>
                             <div class="flex justify-end mt-4">
                                 <x-primary-button class="ml-4" id="emergencias-update" onclick="submitForm('padresForm')">
@@ -317,13 +312,10 @@
 
                     <div id="antecedentes" class="tab-content mt-3">
                         <!-- Antecedentes -->
-                        <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="antecedentesForm">
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->no_exp  ?? 0) }}" id="antecedentesForm">
                             @csrf
                             @method('PATCH')
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="antecedentes">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Antecedentes Familiares</h3>
-                                </div>
                                 <div class="mt-4">
                                     <div id="antecedentesContent">
                                         <!-- Textarea para CKEditor -->
@@ -344,26 +336,23 @@
 
                     <div id="facturacion" class="tab-content hidden mt-3">
                         <!-- Información de Facturación -->
-                        <form method="POST" action="{{ route('pacientes.update', $paciente->id ?? 0) }}" id="facturacionForm">
+                        <form method="POST" action="{{ route('pacientes.update', $paciente->no_exp  ?? 0) }}" id="facturacionForm">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="tab" value="facturacion">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6" id="facturacion">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-semibold">Información de Facturación</h3>
-                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <!-- Nombre de Facturación -->
                                     <div class="mt-4">
                                         <x-input-label for="Nombre_factEditar" :value="__('Razon Social')" />
-                                        <x-text-input id="Nombre_factEditar" class="block mt-1 w-full" type="text" name="Nombre_fact" value="{{ $paciente->Nombre_fact ?? '' }}" />
+                                        <x-text-input id="Nombre_factEditar" class="block mt-1 w-full" type="text" name="Nombre_fact" value="{{ $paciente->Nombre_fact ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                         <x-input-error :messages="$errors->get('Nombre_fact')" class="mt-2" />
                                     </div>
 
                                     <!-- Dirección de Facturación -->
                                     <div class="mt-4">
                                         <x-input-label for="Direccion_factEditar" :value="__('Domicilio Fiscal')" />
-                                        <x-text-input id="Direccion_factEditar" class="block mt-1 w-full" type="text" name="Direccion_fact" value="{{ $paciente->Direccion_fact ?? '' }}" />
+                                        <x-text-input id="Direccion_factEditar" class="block mt-1 w-full" type="text" name="Direccion_fact" value="{{ $paciente->Direccion_fact ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                         <x-input-error :messages="$errors->get('Direccion_fact')" class="mt-2" />
                                     </div>
                                 </div>
@@ -371,7 +360,7 @@
                                     <!-- RFC -->
                                     <div class="mt-4">
                                         <x-input-label for="RFCEditar" :value="__('RFC')" />
-                                        <x-text-input id="RFCEditar" class="block mt-1 w-full" type="text" name="RFC" value="{{ $paciente->RFC ?? '' }}" />
+                                        <x-text-input id="RFCEditar" class="block mt-1 w-full" type="text" name="RFC" value="{{ $paciente->RFC ?? '' }}" oninput="this.value = this.value.toUpperCase()"/>
                                         <x-input-error :messages="$errors->get('RFC')" class="mt-2" />
                                     </div>
 
@@ -401,7 +390,6 @@
                     <div id="historial" class="tab-content hidden mt-3">
                         <!-- Historial de Consultas -->
                         <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
-                            <h3 class="text-lg font-semibold mb-4">Historial de Consultas</h3>
                             <div class="overflow-x-auto">
                                 <table id="historialTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden display nowrap">
                                     <thead class="bg-[#2D7498] text-white">

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\View;
 use App\Http\Controllers\ConsultaController;
 use App\Models\Venta;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,10 +38,24 @@ class AppServiceProvider extends ServiceProvider
             $view->with('consultasPendientes', $consultasPendientes);
         });     
         
-        // Compartir el número de ventas "Por pagar" con todas las vistas
         View::composer('*', function ($view) {
-            $ventasPorPagar = Venta::where('status', 'Por pagar')->count();
-            $view->with('ventasPorPagar', $ventasPorPagar);
+            // Verificar si el usuario está autenticado
+            if (Auth::check()) {
+                // Obtener el ID del usuario autenticado
+                $currentUser = Auth::user();
+        
+                // Filtrar las ventas pendientes basadas en el ID del médico desde la tabla de consultas
+                $ventasPorPagar = Venta::whereHas('consulta', function($query) use ($currentUser) {
+                    $query->where('usuariomedicoid', $currentUser->id);
+                })->where('status', 'Por pagar')->count();
+                
+                // Compartir las ventas pendientes con la vista
+                $view->with('ventasPorPagar', $ventasPorPagar);
+            } else {
+                // Si no está autenticado, compartir 0 ventas pendientes
+                $view->with('ventasPorPagar', 0);
+            }
         });
+        
     }
 }

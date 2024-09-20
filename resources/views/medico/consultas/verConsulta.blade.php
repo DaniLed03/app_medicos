@@ -74,9 +74,10 @@
                             <input type="number" id="modalTotalPagar" value="{{ $consulta->totalPagar }}" class="mt-1 p-2 w-24 border rounded-md" disabled>
                             
                             <!-- Botón Cerrar -->
-                            <a href="{{ route('medico.pacientes.editarPaciente', ['id' => $paciente->id, 'tab' => 'historial']) }}" class="bg-green-500 text-white px-4 py-2 rounded-md">
+                            <a href="{{ route('medico.pacientes.editarPaciente', ['id' => $paciente->no_exp, 'tab' => 'historial']) }}">
                                 Cerrar
                             </a>
+                            
                         </div>
                     </div>
 

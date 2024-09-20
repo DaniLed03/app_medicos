@@ -9,9 +9,14 @@ class Consultas extends Model
 {
     use HasFactory;
 
+    protected $table = 'consultas';
+    public $incrementing = false;
+    protected $keyType = 'int';
+
     protected $fillable = [
-        'citai_id',
+        'usuariomedicoid',
         'pacienteid',
+        'id',
         'fechaHora',
         'talla',
         'temperatura',
@@ -27,30 +32,12 @@ class Consultas extends Model
         'plan',
         'status',
         'totalPagar',
-        'usuariomedicoid',
-        'circunferencia_cabeza' // New field
+        'circunferencia_cabeza',
     ];
 
     protected $casts = [
         'fechaHora' => 'datetime',
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->fechaHora = now();
-            if (is_null($model->totalPagar)) {
-                $model->totalPagar = 70; // Valor por defecto
-            }
-        });
-    }
-
-    public function cita()
-    {
-        return $this->belongsTo(Citas::class, 'citai_id');
-    }
 
     public function recetas()
     {

@@ -11,18 +11,27 @@ use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use App\Models\Consulta;
 use App\Models\Venta;
 use App\Models\Concepto;
+use App\Models\TipoDeReceta;
 
 class ConsultaController extends Controller
 {
     public function createWithoutCita($pacienteId)
     {
-        $paciente = Paciente::findOrFail($pacienteId);
-        $medicoId = Auth::id(); // Obtener el ID del usuario autenticado
-        $medico = Auth::user(); // Obtener el usuario autenticado
+        $paciente = Paciente::where('no_exp', $pacienteId)->firstOrFail();
+        $medicoId = Auth::id(); 
+        $medico = Auth::user(); 
 
-        // Realizar la búsqueda de conceptos
+        $tiposDeReceta = TipoDeReceta::all();
+
+        $recetas = ConsultaReceta::join('tipo_de_receta', 'consulta_recetas.id_tiporeceta', '=', 'tipo_de_receta.id')
+                                ->where('no_exp', $paciente->no_exp)
+                                ->select('consulta_recetas.*', 'tipo_de_receta.nombre as tipo_receta_nombre')
+                                ->get();
+
         $conceptoConsulta = Concepto::where('medico_id', $medicoId)
             ->where(function($query) {
                 $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
@@ -30,17 +39,16 @@ class ConsultaController extends Controller
             })
             ->first();
 
-        // Verificar si no se encontró ningún concepto de consulta
-        $showAlert = !$conceptoConsulta; // Si no hay concepto, mostrar alerta
+        $showAlert = !$conceptoConsulta;
         $precioConsulta = $conceptoConsulta ? $conceptoConsulta->precio_unitario : 0;
 
-        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert'));
+        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert', 'tiposDeReceta', 'recetas'));
     }
 
     public function storeWithoutCita(Request $request)
     {
         $request->validate([
-            'pacienteid' => 'required|exists:pacientes,id',
+            'pacienteid' => 'required|exists:pacientes,no_exp',
             'hidden_talla' => 'nullable|string',
             'hidden_temperatura' => 'nullable|string',
             'hidden_saturacion_oxigeno' => 'nullable|string',
@@ -54,7 +62,7 @@ class ConsultaController extends Controller
             'diagnostico' => 'required|string',
             'plan' => 'nullable|string',
             'status' => 'required|string|in:en curso,Finalizada',
-            'totalPagar' => 'nullable|numeric|min:1', // Aseguramos que el totalPagar no sea 0
+            'totalPagar' => 'nullable|numeric|min:1',
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
             'recetas' => 'array',
@@ -62,15 +70,17 @@ class ConsultaController extends Controller
             'recetas.*.receta' => 'required|string'
         ]);
 
+        $medicoId = $request->input('usuariomedicoid');
+        $pacienteId = $request->input('pacienteid');
+
         // Obtener el concepto de la consulta
-        $conceptoConsulta = Concepto::where('medico_id', Auth::id())
+        $conceptoConsulta = Concepto::where('medico_id', $medicoId)
             ->where(function($query) {
                 $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
                     ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
             })
             ->first();
 
-        // Si no hay un concepto de consulta definido, devolver un error
         if (!$conceptoConsulta) {
             return back()->withErrors(['message' => 'No hay un concepto de consulta definido. Por favor, configure uno antes de continuar.']);
         }
@@ -78,12 +88,18 @@ class ConsultaController extends Controller
         // Verificar si el precio personalizado es válido, si no, usar el precio predeterminado
         $precioConsulta = $request->input('totalPagar', $conceptoConsulta->precio_unitario);
         $impuesto = $conceptoConsulta->impuesto;
-        $totalPagar = $precioConsulta + ($precioConsulta * ($impuesto / 100));
+        $totalPagar = round($precioConsulta + ($precioConsulta * ($impuesto / 100)), 2);
 
-        // Verificar si el precio es 0 antes de proceder
         if ($totalPagar == 0) {
             return back()->withErrors(['totalPagar' => 'El precio de la consulta no puede ser 0.']);
         }
+
+        // Generar el 'id' de la consulta manualmente basado en las consultas previas del médico y paciente
+        $ultimoId = Consultas::where('usuariomedicoid', $medicoId)
+                             ->where('pacienteid', $pacienteId)
+                             ->max('id');
+
+        $nuevoId = $ultimoId ? $ultimoId + 1 : 1;
 
         // Creación de la consulta
         $consultaData = $request->except('recetas'); 
@@ -95,22 +111,24 @@ class ConsultaController extends Controller
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
         $consultaData['status'] = 'Finalizada'; 
+        $consultaData['id'] = $nuevoId; // Asignar el nuevo ID
+
         $consulta = Consultas::create($consultaData);
 
         // Obtener el correo y la CURP del paciente
-        $paciente = Paciente::find($request->pacienteid);
+        $paciente = Paciente::find($pacienteId);
         $email = $paciente->email;
         $curp = $paciente->curp;
 
         // Buscar persona que coincida con el paciente usando email y curp
         $persona = Persona::where('correo', $email)
-                        ->orWhere('curp', $curp) // Ajustar si 'curp' existe en la tabla Pacientes
+                        ->orWhere('curp', $curp)
                         ->first();
 
         // Actualizar el estado de la cita si la persona coincide
         if ($persona) {
             $cita = Citas::where('persona_id', $persona->id)
-                        ->where('status', '!=', 'Finalizada') // Asegurarse de que no esté ya finalizada
+                        ->where('status', '!=', 'Finalizada')
                         ->first();
 
             if ($cita) {
@@ -119,27 +137,43 @@ class ConsultaController extends Controller
             }
         }
 
-        // Guardar recetas
         if ($request->has('recetas')) {
             foreach ($request->recetas as $recetaData) {
+                // Obtener el siguiente valor de 'id' basado en la cantidad de recetas previas
+                $recetaId = ConsultaReceta::where('id_medico', $request->input('usuariomedicoid'))
+                    ->where('no_exp', $request->input('pacienteid'))
+                    ->where('consulta_id', $consulta->id)
+                    ->max('id');
+
+                // Si no hay resultados, empieza con 1, si hay, incrementa en 1.
+                $recetaId = $recetaId ? $recetaId + 1 : 1;
+
+        
                 ConsultaReceta::create([
                     'consulta_id' => $consulta->id,
-                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
-                    'receta' => $recetaData['receta']
+                    'id_medico' => $request->input('usuariomedicoid'),
+                    'no_exp' => $request->input('pacienteid'),
+                    'id_tiporeceta' => $recetaData['tipo_de_receta'],
+                    'receta' => $recetaData['receta'],
+                    'id' => $recetaId, // Asignar el nuevo ID único
                 ]);
             }
         }
+        
 
-        $venta = Venta::create([
+
+
+        Venta::create([
             'consulta_id' => $consulta->id,
             'precio_consulta' => $precioConsulta,
             'iva' => $impuesto,
             'total' => $totalPagar,
-            'paciente_id' => $paciente->id,
-            'status' => 'Por pagar',  // Cambiar el estado aquí
+            'no_exp' => $paciente->no_exp,
+            'medico_id' => $paciente->medico_id,
+            'status' => 'Por pagar',
         ]);
-
-        // Redirigir a la vista de detalles de la consulta
+        
+    
         return redirect()->route('vistaInicio')->with('success', 'Consulta guardada exitosamente.');
     }
     
@@ -167,7 +201,6 @@ class ConsultaController extends Controller
 
         // Consultas sin cita
         $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
-            ->whereNull('citai_id') // Filtrar las consultas sin cita asociada
             ->where('status', 'Finalizada') // Solo mostrar las consultas que ya están finalizadas
             ->whereBetween('fechaHora', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']) // Asegurarse de que la fecha y hora estén dentro del rango
             ->get()
@@ -247,14 +280,11 @@ class ConsultaController extends Controller
 
     public function show($id)
     {
-        $consulta = Consultas::with(['recetas', 'usuarioMedico', 'cita.paciente'])
-            ->findOrFail($id);
+        $consulta = Consultas::with(['recetas', 'usuarioMedico'])
+    ->findOrFail($id);
 
-        if ($consulta->cita) {
-            $paciente = $consulta->cita->paciente;
-        } else {
-            $paciente = Paciente::findOrFail($consulta->pacienteid);
-        }
+    $paciente = Paciente::findOrFail($consulta->pacienteid);
+
 
         // Formatear la fecha de la consulta
         $fechaConsulta = \Carbon\Carbon::parse($consulta->fechaHora)->format('d-m-Y');
@@ -396,9 +426,8 @@ class ConsultaController extends Controller
             })
             ->first();
 
-        // Si no hay un concepto de consulta definido, devolver un error
         if (!$conceptoConsulta) {
-            return back()->withErrors(['message' => 'No hay un concepto de consulta definido. Por favor, configure uno antes de continuar.']);
+            return ['success' => false, 'message' => 'No hay un concepto de consulta definido.'];
         }
 
         // Obtener el precio de la consulta y el impuesto desde el concepto
@@ -412,14 +441,19 @@ class ConsultaController extends Controller
         $venta = Venta::create([
             'consulta_id' => $consulta->id,
             'precio_consulta' => $precioConsulta,
-            'iva' => $impuesto, // Guardar el porcentaje de impuesto
+            'iva' => $impuesto,
             'total' => $total,
-            'paciente_id' => $pacienteId,
+            'no_exp' => $pacienteId, // Asegúrate de que esto sea correcto
+            'medico_id' => $consulta->usuariomedicoid, // Usar el ID del médico de la consulta
             'status' => 'Por pagar',
         ]);
 
-        // Redirigir a la vista de la venta generada
-        return view('medico.ventas.show', compact('venta'));
+        // Verifica que la venta se haya creado correctamente
+        if (!$venta) {
+            return ['success' => false, 'message' => 'No se pudo crear la venta.'];
+        }
+
+        return ['success' => true, 'venta' => $venta];
     }
 
 
@@ -436,6 +470,4 @@ class ConsultaController extends Controller
 
         return $consultasPendientes;
     }
-
-
 }

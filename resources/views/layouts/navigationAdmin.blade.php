@@ -7,6 +7,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.min.js" defer></script>
     <style>
+        .navbar-superior, .navbar-inferior {
+            display: none; /* Oculta los elementos inicialmente */
+        }
         .navbar-superior {
             background-color: #2D7498; /* Color especificado para el navbar superior */
         }
@@ -87,7 +90,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                    <div x-show="open" @click.away="open = false" class="dropdown-content origin-top-right mt-2 ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
                         <div class="px-4 py-3 bg-gray-100">
                             <span class="block text-sm text-gray-500">{{ Auth::user()->email }}</span>
                             <span class="block text-sm text-gray-500">{{ Auth::user()->telefono }}</span>
@@ -97,10 +100,10 @@
                             @csrf
                             <a href="{{ route('logout') }}"
                                onclick="event.preventDefault(); this.closest('form').submit();"
-                               class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Cerrar Sesion</a>
+                               class="block px-4 py-2 text-sm text-gray-700 dropdown-item" role="menuitem">Cerrar Sesión</a>
                         </form>
                     </div>
-                </div>                             
+                </div>                                            
             </div>
         </div>
     </nav>
@@ -251,3 +254,37 @@
 
 </body>
 </html>
+<script>
+    // Escuchar el evento `DOMContentLoaded`, que se dispara cuando todo el DOM ha sido cargado
+    document.addEventListener("DOMContentLoaded", function() {
+        // Mostrar los elementos cuando el DOM haya cargado
+        document.querySelector('.navbar-superior').style.display = 'block';
+        document.querySelector('.navbar-inferior').style.display = 'block';
+    });
+</script>
+<style>
+    .custom-button {
+        padding: 5px 10px;
+        border-radius: 9999px;
+        margin-right: 20px;
+        font-size: 0.875rem;
+    }
+
+    .dropdown-content {
+        min-width: 12rem; /* Mínimo de ancho para correos cortos */
+        width: auto; /* Permitir que crezca de acuerdo al contenido */
+        background-color: white;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 0.5rem;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 10;
+    }
+
+    .dropdown-item:hover {
+        background-color: #33AD9B;
+        color: white;
+    }
+</style>

@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
             PermissionsTableSeeder::class,
             ModelHasRolesTableSeeder::class,
             RoleHasPermissionsTableSeeder::class,
-            ConsultaSeeder::class, 
         ]);
     }
 }

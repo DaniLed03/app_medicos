@@ -39,7 +39,11 @@ class ConceptoController extends Controller
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
+        // Generar un id_concepto único
+        $id_concepto = Concepto::max('id_concepto') + 1;
+
         Concepto::create([
+            'id_concepto' => $id_concepto,  // Asignar el ID manualmente
             'concepto' => $request->concepto,
             'precio_unitario' => $request->precio_unitario,
             'impuesto' => $request->impuesto,
@@ -50,7 +54,6 @@ class ConceptoController extends Controller
 
         return redirect()->route('conceptos.index')->with('success');
     }
-
 
     public function edit($id_concepto)
     {

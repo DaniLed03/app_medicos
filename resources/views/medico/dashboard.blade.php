@@ -1,5 +1,10 @@
 <x-app-layout>
-    <div class="py-12">
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
+    <div class="py-12" style="display: none;">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -49,28 +54,26 @@
 
                     <!-- Formulario de búsqueda -->
                     <form method="GET" action="{{ route('medico.dashboard') }}" class="mb-4">
-                        <input type="text" name="name" placeholder="Buscar por nombre completo" class="border rounded p-2 w-96"> <!-- w-96 hace que el campo sea más largo -->
+                        <input type="text" name="name" placeholder="Buscar por nombre completo" class="border rounded p-2 w-96 uppercase-input"> <!-- w-96 hace que el campo sea más largo -->
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Buscar</button>
                     </form>
 
-                    
-                    <!-- Tabla de pacientes (solo si hay búsqueda) -->
-                    @if(request()->has('name') && request()->name != '')
-                        @if($pacientes->isNotEmpty())
-                            <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                                <table id="pacientesTable" class="display nowrap" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>No. Exp</th>
-                                            <th>Nombre del Paciente</th>
-                                            <th>Fecha de Nacimiento</th>
-                                            <th>Sexo</th>
-                                            <th>Teléfono</th>
-                                            <th>Correo</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <!-- Tabla de pacientes (siempre visible) -->
+                    <div class="overflow-x-auto bg-white dark:bg-neutral-700">
+                        <table id="pacientesTable" class="display nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>No. Exp</th>
+                                    <th>Nombre del Paciente</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Sexo</th>
+                                    <th>Teléfono</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(request()->has('name') && request()->name != '')
+                                    @if($pacientes->isNotEmpty())
                                         @foreach($pacientes as $paciente)
                                             <tr>
                                                 <td>{{ $paciente->no_exp }}</td>
@@ -78,40 +81,39 @@
                                                 <td>{{ \Carbon\Carbon::parse($paciente->fechanac)->format('j M, Y') }}</td>
                                                 <td>{{ $paciente->sexo }}</td>
                                                 <td>{{ $paciente->telefono }}</td>
-                                                <td>{{ $paciente->correo }}</td>
                                                 <td>
                                                     @can('Editar Paciente')
-                                                        <a href="{{ route('pacientes.editar', $paciente->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                                        <a href="{{ route('pacientes.editar', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
                                                     @endcan
                                                     @can('Eliminar Paciente')
-                                                        <form action="{{ route('pacientes.eliminar', $paciente->id) }}" method="POST" class="inline-block">
+                                                        <form action="{{ route('pacientes.eliminar', $paciente->no_exp) }}" method="POST" class="inline-block">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                            <button type="submit" class="eliminar-paciente text-red-500 hover:text-red-700 ml-4">
+                                                                Eliminar
+                                                            </button>
                                                         </form>
                                                     @endcan
+
                                                     @can('Consultar')
-                                                        <a href="{{ route('consultas.createWithoutCita', $paciente->id) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
+                                                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
                                                     @endcan
                                                 </td>
                                             </tr>
                                         @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <script>
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Sin resultados',
-                                    text: 'No se encontraron pacientes que coincidan con la búsqueda.'
-                                });
-                            </script>
-                        @endif
-                    @else
-                        <p>Ingresa un nombre para mostrar coincidencias.</p>
-                    @endif
-
+                                    @else
+                                        <script>
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Sin resultados',
+                                                text: 'No se encontraron pacientes que coincidan con la búsqueda.'
+                                            });
+                                        </script>
+                                    @endif
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,39 +152,42 @@
                     <div class="mt-2">
                         <form method="POST" action="{{ route('pacientes.store') }}" id="addPacienteForm">
                             @csrf
-                            <!-- Nombres -->
-                            <div class="mt-4">
-                                <x-input-label for="nombres" :value="__('Nombres')" />
-                                <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Nombres -->
+                                <div class="mt-4">
+                                    <x-input-label for="nombres" :value="__('Nombres')" />
+                                    <x-text-input id="nombres" class="block mt-1 w-full uppercase-input" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                                </div>
+                                
+                                <!-- Apellido Paterno -->
+                                <div class="mt-4">
+                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                    <x-text-input id="apepat" class="block mt-1 w-full uppercase-input" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
+                                </div>
                             </div>
-                            
-                            <!-- Apellido Paterno -->
-                            <div class="mt-4">
-                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                            </div>
-                            
-                            <!-- Apellido Materno -->
-                            <div class="mt-4">
-                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                            </div>
-                            
-                            <!-- Fecha de Nacimiento -->
-                            <div class="mt-4">
-                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Apellido Materno -->
+                                <div class="mt-4">
+                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                    <x-text-input id="apemat" class="block mt-1 w-full uppercase-input" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                                </div>
+                                
+                                <!-- Fecha de Nacimiento -->
+                                <div class="mt-4">
+                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                    <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
+                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Teléfono -->
                                 <div class="mt-4">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
-                                    <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
+                                    <x-text-input id="telefono" class="block mt-1 w-full uppercase-input" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
                             
@@ -225,7 +230,6 @@
                                 </x-primary-button>
                             </div>
                         </form>
-                        
                     </div>
                 </div>
             </div>
@@ -237,6 +241,7 @@
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
@@ -247,6 +252,29 @@
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
 
+<script>
+    document.querySelectorAll('.eliminar-paciente').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); // Evitar el envío inmediato del formulario
+            const form = this.closest('form'); // Buscar el formulario más cercano
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Si se confirma, enviar el formulario
+                }
+            });
+        });
+    });
+
+</script>
 <script>
     $(document).ready(function() {
         $('#pacientesTable').DataTable({
@@ -294,7 +322,7 @@
             ],
             "language": {
                 "decimal": "",
-                "emptyTable": "No hay pacientes registrados",
+                "emptyTable": "Ingresa un nombre para mostrar coincidencias.",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
                 "infoFiltered": "(Filtrado de _MAX_ entradas totales)",
@@ -376,6 +404,20 @@
             document.getElementById('modalEditar').classList.add('hidden');
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mostrar el loader
+        document.getElementById('loader').style.display = 'flex';
+
+        window.onload = function() {
+            // Ocultar el loader una vez que todo el contenido se haya cargado
+            document.getElementById('loader').style.display = 'none';
+            // Mostrar el contenido
+            document.querySelector('.py-12').style.display = 'block';
+        };
+    });
+
+
 </script>
 
 <style>
@@ -471,4 +513,69 @@
         overflow-x: hidden;
         overflow-y: hidden; /* Esto ocultará el scroll vertical */
     }
+    /* Pantalla de carga centrada */
+    .loader-container {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Aplica mayúsculas a toda la tabla excepto a la columna de acciones */
+    table tbody tr {
+        text-transform: uppercase;
+    }
+
+    table tbody tr td:last-child {
+        text-transform: none; /* Excepción para la columna de Acciones */
+    }
+
+    /* Forzar texto en mayúsculas al escribir en los campos */
+    .uppercase-input {
+        text-transform: uppercase;
+    }
+
+    .uppercase-input::placeholder {
+        text-transform: none; /* Para que los placeholders no se vean en mayúsculas */
+    }
+
+    input[type="text"] {
+        text-transform: uppercase; /* Convierte el texto a mayúsculas */
+    }
+
+    input[type="text"]::placeholder {
+        text-transform: none; /* Mantiene el placeholder sin cambios de formato */
+    }
+
+    /* Estilo para el campo de búsqueda en DataTables */
+    .dataTables_filter input[type="search"] {
+        text-transform: uppercase; /* Convierte el texto a mayúsculas */
+    }
+
+    .dataTables_filter input[type="search"]::placeholder {
+        text-transform: none; /* Placeholder permanece sin cambios */
+    }
+
+
+
 </style>

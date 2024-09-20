@@ -52,9 +52,8 @@ class MedicoController extends Controller
         // Obtener el ID del médico que creó al usuario autenticado (si existe)
         $medicoId = Auth::user()->medico_id ? Auth::user()->medico_id : $currentUserId;
 
-        // Obtener el último número de expediente del médico correspondiente y generar el siguiente
-        $lastPaciente = Paciente::where('medico_id', $medicoId)->orderBy('no_exp', 'desc')->first();
-        $nextNoExp = $lastPaciente ? $lastPaciente->no_exp + 1 : 1;
+        // Obtener el número máximo de expediente y sumar 1
+        $nextNoExp = Paciente::where('medico_id', $medicoId)->max('no_exp') + 1;
 
         // Validación de los datos del paciente
         $request->validate([
@@ -64,40 +63,29 @@ class MedicoController extends Controller
             'fechanac' => 'required|date',
             'telefono' => 'required|string|max:20',
             'sexo' => 'required|in:masculino,femenino',
-            'entidad_federativa_id' => 'nullable|exists:entidades_federativas,id',
-            'municipio_id' => 'nullable|exists:municipios,id_municipio',
-            'localidad_id' => 'nullable|exists:localidades,id_localidad',
-            'calle' => 'nullable|string|max:255',
-            'colonia_id' => 'nullable|exists:colonias,id_asentamiento',
         ]);
 
         // Crear el nuevo paciente con el medico_id correcto
         Paciente::create([
             'no_exp' => $nextNoExp,
-            'nombres' => $request->nombres,
-            'apepat' => $request->apepat,
-            'apemat' => $request->apemat,
+            'nombres' => strtoupper($request->nombres),
+            'apepat' => strtoupper($request->apepat),
+            'apemat' => strtoupper($request->apemat),
             'fechanac' => $request->fechanac,
             'telefono' => $request->telefono,
             'sexo' => $request->sexo,
-            'entidad_federativa_id' => $request->entidad_federativa_id,
-            'municipio_id' => $request->municipio_id,
-            'localidad_id' => $request->localidad_id,
-            'calle' => $request->calle,  // Guardar el nombre de la calle directamente como texto
-            'colonia_id' => $request->colonia_id,
             'activo' => 'si',
             'medico_id' => $medicoId,
         ]);
 
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('medico.dashboard')->with('status', 'Paciente creado con éxito');
+        // Redirigir a la vista de edición del paciente recién creado
+        return redirect()->route('pacientes.editar', ['no_exp' => $nextNoExp, 'medico_id' => $medicoId])->with('status', 'Paciente creado con éxito');
     }
-
 
     public function showPaciente($id)
     {
         $medicoId = Auth::id();
-        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
+        $paciente = paciente::where('no_exp', $id)->where('medico_id', $medicoId)->firstOrFail();
         
         // Obtener las consultas del paciente con el mismo doctor
         $consultas = Consultas::where('pacienteid', $id)->where('usuariomedicoid', $medicoId)->get();
@@ -184,13 +172,14 @@ class MedicoController extends Controller
 
 
     // Muestra el formulario de edición de un paciente específico
-    public function editarPaciente($id)
+    public function editarPaciente($noExp)
     {
         $medicoId = Auth::id();
-        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
-
+        $paciente = Paciente::where('no_exp', $noExp)
+                    ->where('medico_id', $medicoId)
+                    ->firstOrFail();
         // Cargar los datos de las consultas del paciente con el mismo médico
-        $consultas = Consultas::where('pacienteid', $id)->where('usuariomedicoid', $medicoId)->get();
+        $consultas = Consultas::where('pacienteid', $noExp)->where('usuariomedicoid', $medicoId)->get();
 
         // Cargar datos de las tablas de catálogo
         $entidadesFederativas = EntidadFederativa::all();
@@ -260,8 +249,10 @@ class MedicoController extends Controller
     }
 
 
-    public function updatePaciente(Request $request, $id = null)
+    public function updatePaciente(Request $request, $noExp = null)
     {
+        $medicoId = Auth::id();
+
         // Validación de los datos recibidos
         $request->validate([
             'nombres' => 'nullable|string|max:255',
@@ -282,11 +273,11 @@ class MedicoController extends Controller
             'municipio_id' => 'nullable|exists:municipios,id_municipio',
             'localidad_id' => 'nullable|exists:localidades,id_localidad',
             'colonia_id' => 'nullable|exists:colonias,id_asentamiento',
-            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $id,
+            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $noExp . ',no_exp,medico_id,' . $medicoId,
             'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
             'sexo' => 'nullable|in:masculino,femenino',
-            'curp' => 'nullable|string|max:18|unique:pacientes,curp,' . $id,
+            'curp' => 'nullable|string|max:18|unique:pacientes,curp,' . $noExp . ',no_exp,medico_id,' . $medicoId,
             'Nombre_fact' => 'nullable|string|max:255',
             'Direccion_fact' => 'nullable|string|max:255',
             'RFC' => 'nullable|string|max:255',
@@ -294,14 +285,27 @@ class MedicoController extends Controller
             'CFDI' => 'nullable|string|max:255',
         ]);
 
+        // Obtener el ID del médico autenticado
+        $medicoId = Auth::id();
+
         // Verifica si el paciente existe
-        $paciente = Paciente::find($id);
+        $paciente = Paciente::where('no_exp', $noExp)
+                            ->where('medico_id', $medicoId)
+                            ->first();
+
 
         if ($paciente) {
-            // Si el paciente existe, actualiza sus datos
-            $paciente->update($request->all());
-            $paciente->localidad_id = $request->localidad_id; // Asignación manual de la localidad
-            $mensaje = 'Paciente actualizado correctamente';
+            $data = array_filter($request->all(), function($value) {
+                return !is_null($value);
+            });
+                        
+            $paciente->fill($data);
+            if (!is_null($request->localidad_id)) {
+                $paciente->localidad_id = $request->localidad_id;
+            }
+
+            $paciente->save();
+            
         } else {
             // Si el paciente es nuevo, genera el siguiente número de expediente
             $medicoId = Auth::id();
@@ -349,17 +353,26 @@ class MedicoController extends Controller
 
         // Redirecciona a la vista de edición de paciente con un mensaje de éxito
         $tab = $request->has('antecedentes') ? 'antecedentes' : $request->input('tab', 'datos');
-        return redirect()->route('pacientes.editar', ['id' => $paciente->id, 'tab' => $tab])->with('status', $mensaje);
+        return redirect()->route('pacientes.editar', ['no_exp' => $paciente->no_exp, 'tab' => $tab])->with('status');
+
     }
 
-    // Marca a un paciente como inactivo (eliminado)
-    public function eliminarPaciente($id)
+    public function eliminarPaciente($no_exp)
     {
-        $medicoId = Auth::id();
-        $paciente = Paciente::where('id', $id)->where('medico_id', $medicoId)->firstOrFail();
-        $paciente->update(['activo' => 'no']);
+        $medicoId = Auth::id(); // Obtener el ID del médico autenticado
 
-        return redirect()->route('medico.dashboard')->with('status', 'Paciente eliminado correctamente');
+        // Buscar al paciente con las claves compuestas
+        $paciente = Paciente::where('no_exp', $no_exp)
+                            ->where('medico_id', $medicoId)
+                            ->firstOrFail();
+
+        if ($paciente) {
+            // Marcar al paciente como inactivo
+            $paciente->update(['activo' => 'no']);
+            return redirect()->route('medico.dashboard')->with('status', 'Paciente eliminado correctamente.');
+        } else {
+            return redirect()->route('medico.dashboard')->with('error', 'Paciente no encontrado o no tienes permisos para eliminarlo.');
+        }
     }
 
     //////////////////////////////////    CITAS    /////////////////////////////////////////

@@ -11,10 +11,11 @@ class Concepto extends Model
 
     protected $table = 'conceptos';
     protected $primaryKey = 'id_concepto';
-    public $incrementing = true;
+    public $incrementing = false; // Cambiar a false
     public $timestamps = true;
 
     protected $fillable = [
+        'id_concepto',  // Asegúrate de incluirlo en fillable
         'concepto',
         'precio_unitario',
         'impuesto',
@@ -23,21 +24,18 @@ class Concepto extends Model
         'medico_id',
     ];
 
-    // Relación con el modelo User
     public function medico()
     {
         return $this->belongsTo(User::class, 'medico_id');
     }
 
-    // Relación con el modelo Venta
     public function ventas()
     {
         return $this->belongsToMany(Venta::class, 'venta_conceptos')
                     ->withPivot('cantidad')
                     ->withTimestamps();
     }
-
-
-
 }
+
+
 

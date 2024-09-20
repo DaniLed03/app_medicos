@@ -25,10 +25,9 @@ class VentaController extends Controller
 
     public function show($id)
     {
-        $venta = Venta::findOrFail($id);
+        $venta = Venta::with('paciente')->findOrFail($id);
         $conceptos = Concepto::where('medico_id', Auth::id())->get();
         $paciente = $venta->paciente;
-        $consultaImpuesto = Concepto::where('id', $venta->consulta_id)->value('impuesto');
 
         return view('medico.ventas.show', compact('venta', 'conceptos', 'paciente'));
     }
@@ -45,17 +44,17 @@ class VentaController extends Controller
         $startDate = $request->input('start_date', $today->format('Y-m-d'));
         $endDate = $request->input('end_date', $today->format('Y-m-d'));
 
-        // Filtrar las ventas para el médico o el usuario asociado
+        // Filtrar las ventas para el médico
         $ventas = Venta::whereHas('consulta', function($query) use ($medicoId) {
-                $query->where('usuariomedicoid', $medicoId);
-            })
-            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->orderByRaw("CASE WHEN status = 'Por pagar' THEN 0 ELSE 1 END")
-            ->get();
+            $query->where('medico_id', $medicoId);
+        })
+        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+        ->orderByRaw("CASE WHEN status = 'Por pagar' THEN 0 ELSE 1 END")
+        ->get();
 
         // Calcular el total de facturación solo de las ventas con estado "Pagado"
         $totalFacturacion = Venta::whereHas('consulta', function($query) use ($medicoId) {
-                $query->where('usuariomedicoid', $medicoId);
+                $query->where('medico_id', $medicoId);
             })
             ->where('status', 'Pagado')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -63,7 +62,6 @@ class VentaController extends Controller
 
         return view('medico.ventas.index', compact('ventas', 'totalFacturacion'));
     }
-
 
     public function marcarComoPagado($id)
     {
@@ -77,7 +75,6 @@ class VentaController extends Controller
         // Redirigir a la vista show con los datos de la venta actual
         return view('medico.ventas.show', compact('venta', 'conceptos', 'paciente'));
     }
-
 
     public function actualizarVenta(Request $request, $id)
     {
@@ -140,8 +137,6 @@ class VentaController extends Controller
         return response()->download($facturasPath . '/' . $fileName);
     }
 
-
-
     public function mostrarVenta($ventaId)
     {
         $venta = Venta::findOrFail($ventaId);
@@ -157,7 +152,4 @@ class VentaController extends Controller
 
         return view('medico.ventas.show', compact('venta', 'paciente', 'edad', 'conceptos'));
     }
-
-
 }
-

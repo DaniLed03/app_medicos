@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('pacientes', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('medico_id');
             $table->unsignedBigInteger('no_exp');
             $table->string('nombres');
             $table->string('apepat');
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->unsignedBigInteger('entidad_federativa_id')->nullable();
             $table->unsignedBigInteger('municipio_id')->nullable();
             $table->unsignedBigInteger('localidad_id')->nullable();
-            $table->string('calle')->nullable();  // Cambiado de `calle_id` a `calle` como string para almacenar el nombre manualmente
+            $table->string('calle')->nullable();
             $table->unsignedBigInteger('colonia_id')->nullable();
             $table->string('correo')->nullable();
             $table->string('telefono');
@@ -41,32 +41,26 @@ return new class extends Migration
             $table->string('RFC')->nullable();
             $table->string('Regimen_fiscal')->nullable();
             $table->string('CFDI')->nullable();
-            $table->unsignedBigInteger('medico_id');
             $table->timestamps();
 
+            // Índice único para las dos columnas
+            $table->unique(['no_exp', 'medico_id']);
+            
             // Foreign Keys
             $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('entidad_federativa_id')->references('id')->on('entidades_federativas')->onDelete('set null');
-
-            // Ajuste para clave compuesta en 'municipios'
             $table->foreign(['municipio_id', 'entidad_federativa_id'], 'fk_pacientes_municipio')
                   ->references(['id_municipio', 'entidad_federativa_id'])
                   ->on('municipios')
                   ->onDelete('set null');
-                  
-            // Ajuste para clave compuesta en 'localidades'
             $table->foreign(['localidad_id', 'municipio_id', 'entidad_federativa_id'], 'fk_pacientes_localidad')
                   ->references(['id_localidad', 'id_municipio', 'id_entidad_federativa'])
                   ->on('localidades')
                   ->onDelete('set null');
-            
-            // Ajuste para clave compuesta en 'colonias'
             $table->foreign(['colonia_id', 'entidad_federativa_id', 'municipio_id'], 'fk_pacientes_colonia')
-                  ->references(['id_asentamiento', 'id_entidad', 'id_municipio'])  // Actualizado el nombre de las columnas referenciadas
+                  ->references(['id_asentamiento', 'id_entidad', 'id_municipio'])
                   ->on('colonias')
                   ->onDelete('set null');
-
-            $table->unique(['medico_id', 'no_exp']);
         });
     }
 
@@ -75,3 +69,4 @@ return new class extends Migration
         Schema::dropIfExists('pacientes');
     }
 };
+

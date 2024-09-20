@@ -65,9 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('medico.pacientes.agregarPaciente');
     })->name('agregarPaciente');
     Route::get('/medico/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('medico.dashboard');
-    Route::get('/medico/pacientes/editar/{id}', [MedicoController::class, 'editarPaciente'])->name('pacientes.editar');
-    Route::match(['put', 'patch'], '/medico/pacientes/editar/{id}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
-    Route::delete('/medico/pacientes/eliminar/{id}', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
+    Route::get('/medico/pacientes/editar/{no_exp}', [MedicoController::class, 'editarPaciente'])->name('pacientes.editar');
+    Route::patch('/pacientes/{no_exp}', [MedicoController::class, 'updatePaciente'])->name('pacientes.update');
+    Route::delete('/pacientes/{no_exp}/eliminar', [MedicoController::class, 'eliminarPaciente'])->name('pacientes.eliminar');
     Route::get('/medico/pacientes', [MedicoController::class, 'mostrarPacientes'])->name('pacientes.index');
     Route::post('/pacientes/storeDesdeModal', [MedicoController::class, 'storePacientesDesdeModal'])->name('pacientes.storeDesdeModal');
     Route::get('/pacientes/create', [MedicoController::class, 'create'])->name('pacientes.create');
@@ -107,7 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
     Route::get('/consultations/navigate', [ConsultaController::class, 'navigate'])->name('consultations.navigate');
     Route::post('/consultas/{id}/iniciar', [ConsultaController::class, 'iniciarConsulta'])->name('consultas.iniciar');
-
+    route::post('/recetas/store', [ConsultaController::class, 'storeReceta'])->name('recetas.store');
     // Rutas de Usuarios
     Route::post('/personas/storeDesdeModal', [PersonaController::class, 'storeDesdeModal'])->name('personas.storeDesdeModal');
     Route::get('/personas/create', [PersonaController::class, 'create'])->name('personas.create');

@@ -34,11 +34,11 @@
 
                 <!-- Total a Pagar y Botón Terminar Consulta -->
                 <div class="flex items-center space-x-4">
-                    <label for="totalPagar" class="block text-sm font-medium text-gray-700">Precio de la Consulta</label>
+                    <label for="totalPagar" class="block text-sm font-medium text-gray-700">Precio de la Consulta:</label>
                     <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-24 border rounded-md" value="{{ $precioConsulta }}" {{ $precioConsulta ? '' : 'required' }}>
                     
                     <!-- Botón Terminar Consulta -->
-                    <button type="submit" form="consultasForm" class="bg-green-500 text-white px-4 py-2 rounded-md">Terminar Consulta</button>
+                    <button type="submit" form="consultasForm" class="bg-[#33AD9B] text-white px-4 py-2 rounded-md">Guardar Consulta</button>                
                 </div>
             </div>
 
@@ -48,13 +48,14 @@
                 <div id="consultaTab" class="tab-pane active">
                     <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
                         @csrf
-                        <input type="hidden" name="pacienteid" value="{{ $paciente->id }}">
+                        <input type="hidden" name="pacienteid" value="{{ $paciente->no_exp }}">
                         <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
                         <input type="hidden" name="status" value="en curso">
                         <input type="hidden" name="notas_padecimiento" value="">
                         <input type="hidden" name="interrogatorio_por_aparatos" value="">
                         <input type="hidden" name="examen_fisico" value="">
                         <input type="hidden" name="plan" value="">
+                        <div id="recetasContainer"></div>
 
                         <div class="mb-6 grid md:grid-cols-3 gap-4">
                             <div class="bg-gray-100 p-4 rounded-lg">
@@ -119,12 +120,12 @@
                                         <th class="py-3 px-6 text-left">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="recetas">
+                                <tbody id="recetas" class="space-y-4"> <!-- Aquí agregamos espacio entre filas -->
                                     <tr id="noRecetasMessage">
                                         <td colspan="3" class="text-center py-3">No hay recetas</td>
                                     </tr>
                                 </tbody>
-                            </table>
+                            </table>                            
                         </div>
                     </div>
 
@@ -134,16 +135,16 @@
                             <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
                             <div class="mb-4">
                                 <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
-                                <div class="flex">
-                                    <select id="modalTipoReceta" class="mt-1 p-2 w-full border rounded-md">
-                                        <option value="Estudios de Laboratorio">Estudios de Laboratorio</option>
-                                        <option value="Estudios de Gabinete">Estudios de Gabinete</option>
-                                    </select>
-                                </div>
-                            </div>                    
+                                <select id="modalTipoReceta" name="recetas[0][tipo_de_receta]" class="mt-1 p-2 w-full border rounded-md">
+                                    <option value="" disabled selected>Selecciona una opción</option>
+                                    @foreach ($tiposDeReceta as $tipo)
+                                        <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="mb-4">
                                 <label for="modalRecetaInput" class="block text-sm font-medium text-gray-700">Receta</label>
-                                <textarea id="modalRecetaInput" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">{{ old('modalRecetaInput') }}</textarea>
+                                <textarea id="modalRecetaInput" name="recetas[0][receta]" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;"></textarea>
                             </div>
                             <div class="flex justify-end">
                                 <button id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Cancelar</button>
@@ -235,6 +236,7 @@
 
             <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
             <script>
                 function openTab(event, tabName) {
@@ -265,9 +267,9 @@
                         { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
                         { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
                         { name: 'insert', items: ['HorizontalRule'] },
-                        { name: 'document', items: ['Source'] },
                         { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
-                    ]
+                    ],
+                    removePlugins: 'exportpdf'
                 });
 
                 CKEDITOR.replace('diagnostico', {
@@ -279,9 +281,9 @@
                         { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
                         { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
                         { name: 'insert', items: ['HorizontalRule'] },
-                        { name: 'document', items: ['Source'] },
                         { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
-                    ]
+                    ],
+                    removePlugins: 'exportpdf'
                 });
 
                 CKEDITOR.replace('modalRecetaInput', {
@@ -293,11 +295,10 @@
                         { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
                         { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
                         { name: 'insert', items: ['HorizontalRule'] },
-                        { name: 'document', items: ['Source'] },
                         { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
-                    ]
+                    ],
+                    removePlugins: 'exportpdf' // Remover el plugin 'exportpdf'
                 });
-
                 CKEDITOR.extraPlugins = "justify"
                 CKEDITOR.extraPlugins = "font"
                 CKEDITOR.extraPlugins = "size"
@@ -309,154 +310,166 @@
                     document.getElementById('saveReceta').setAttribute('data-edit-index', '');
                 });
 
+                // Declarar una variable de contador fuera de la función para que mantenga el valor entre ejecuciones
+                let recetaCounter = 0;
+
+                document.getElementById('saveReceta').addEventListener('click', function () {
+                    let tipoRecetaId = document.getElementById('modalTipoReceta').value;
+                    let receta = CKEDITOR.instances['modalRecetaInput'].getData(); // Obtén el contenido en formato HTML
+
+                    // Obtener el nombre del tipo de receta basado en el ID seleccionado
+                    let tipoRecetaNombre = document.querySelector(`#modalTipoReceta option[value="${tipoRecetaId}"]`).textContent;
+
+                    if (tipoRecetaId && receta) {
+                        let recetaIndex = this.getAttribute('data-edit-index');
+                        let recetasDiv = document.getElementById('recetasContainer');
+                        let recetasTableBody = document.getElementById('recetas');
+
+                        if (recetaIndex !== '') {
+                            // Editar receta existente
+                            document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value = tipoRecetaId;
+                            document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value = receta;
+
+                            let existingRow = recetasTableBody.querySelectorAll('tr')[recetaIndex];
+                            existingRow.querySelector('td:nth-child(2)').innerText = tipoRecetaNombre; // Mostrar el nombre en lugar del ID
+                        } else {
+                            // Incrementar el contador de recetas
+                            recetaCounter++;
+
+                            // Agregar nueva receta
+                            recetasDiv.innerHTML += `
+                                <input type="hidden" name="recetas[${recetaCounter}][tipo_de_receta]" value="${tipoRecetaId}">
+                                <input type="hidden" name="recetas[${recetaCounter}][receta]" value="${receta}">`;
+
+                            // Agregar la receta a la tabla en la interfaz
+                            let newRecetaRow = document.createElement('tr');
+                            newRecetaRow.classList.add('receta');
+                            newRecetaRow.innerHTML = `
+                                <td>${recetaCounter}</td> <!-- Incrementar el número de receta correctamente -->
+                                <td>${tipoRecetaNombre}</td> <!-- Mostrar el nombre en lugar del ID -->
+                                <td>
+                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${receta}">Previsualizar</button>
+                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${recetaCounter}">Editar</button>
+                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
+                                    <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
+                                </td>`;
+
+                            recetasTableBody.appendChild(newRecetaRow);
+
+                            // Añadir eventos a los botones de previsualizar, editar, eliminar e imprimir
+                            attachRecetaEventListeners(newRecetaRow);
+                        }
+
+                        // Remover el mensaje de "No hay recetas" si existe
+                        let noRecetasMessage = document.getElementById('noRecetasMessage');
+                        if (noRecetasMessage) {
+                            noRecetasMessage.remove();
+                        }
+
+                        // Cerrar el modal de la receta
+                        document.getElementById('modalReceta').classList.add('hidden');
+                    } else {
+                        alert('Por favor, complete todos los campos.');
+                    }
+                });
+
+                function attachRecetaEventListeners(recetaRow) {
+                    // Botón Previsualizar Receta
+                    recetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
+                        const recetaContent = this.dataset.receta;
+                        document.getElementById('recetaModalContent').innerHTML = recetaContent;
+                        document.getElementById('recetaModal').classList.remove('hidden');
+                    });
+
+                    // Botón Editar Receta
+                    recetaRow.querySelector('.editar-receta').addEventListener('click', function () {
+                        const recetaIndex = this.dataset.recetaIndex;
+                        const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
+                        const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
+
+                        document.getElementById('modalTipoReceta').value = tipoRecetaInput;
+                        CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
+                        document.getElementById('modalReceta').classList.remove('hidden');
+                        document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
+                    });
+
+                    // Botón Eliminar Receta
+                    recetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
+                        recetaRow.remove();
+                        if (document.getElementById('recetas').getElementsByClassName('receta').length === 0) {
+                            document.getElementById('recetas').innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                        }
+                    });
+
+                    // Botón Imprimir Receta
+                    recetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
+                        const recetaContent = decodeURIComponent(this.dataset.receta);
+                        
+                        // Extraer los datos del paciente (nombre, talla, peso, etc.)
+                        const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
+                        const fechaActual = new Date().toLocaleDateString();
+                        const talla = document.getElementById('hidden_talla').value || 'N/A';
+                        const peso = document.getElementById('hidden_peso').value || 'N/A';
+
+                        // Crear un elemento temporal para calcular el número de líneas
+                        const tempDiv = document.createElement('div');
+                        tempDiv.style.position = 'absolute';
+                        tempDiv.style.visibility = 'hidden';
+                        tempDiv.style.width = '800px';
+                        tempDiv.style.lineHeight = '1.5em';
+                        tempDiv.innerHTML = recetaContent;
+                        document.body.appendChild(tempDiv);
+
+                        // Calcular la altura y determinar cuántas líneas tiene la receta
+                        const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
+                        const totalLines = tempDiv.offsetHeight / lineHeight;
+
+                        // Remover el elemento temporal
+                        document.body.removeChild(tempDiv);
+
+                        // Verificar si la receta excede el límite de líneas permitidas
+                        if (totalLines > 6) {
+                            alert("Sobrepasa los límites de la receta");
+                        } else {
+                            const printWindow = window.open('', '', 'width=800,height=600');
+                            printWindow.document.write(`
+                                <br><br><br><br><br><br><br>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
+                                    <div style="flex-basis: 40%; text-align: left; font-size: 15px; font-weight: normal;">${nombreCompleto}</div>
+                                    <div style="flex-basis: 20%; text-align: right; font-size: 15px; font-weight: normal;">${fechaActual}</div>
+                                    <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${peso}</div>
+                                    <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${talla}</div>
+                                </div>
+                                <div style="padding: 20px 40px; font-size: 15px;">
+                                    ${recetaContent}
+                                </div>
+                            `);
+                            printWindow.document.write('</body></html>');
+                            printWindow.document.close();
+                            printWindow.focus();
+                            printWindow.print();
+                        }
+                    });
+                }
+
+
+
+                // Evento para cerrar el modal de visualización de la receta
+                document.getElementById('closeRecetaModal').addEventListener('click', function () {
+                    document.getElementById('recetaModal').classList.add('hidden');
+                });
+
+                // Evento para cerrar el modal de edición de receta
                 document.getElementById('closeModal').addEventListener('click', function () {
                     clearModalFields();
                 });
 
+                // Función para limpiar los campos del modal
                 function clearModalFields() {
                     document.getElementById('modalReceta').classList.add('hidden');
                     document.getElementById('modalTipoReceta').value = '';
                     CKEDITOR.instances['modalRecetaInput'].setData('');
                 }
-
-                function saveReceta(clearModal) {
-                    let tipoReceta = document.getElementById('modalTipoReceta').value.trim();
-                    let receta = CKEDITOR.instances['modalRecetaInput'].getData().trim();
-                    let editIndex = document.getElementById('saveReceta').getAttribute('data-edit-index');
-
-                    if (tipoReceta && receta) {
-                        let recetasDiv = document.getElementById('recetas');
-                        let noRecetasMessage = document.getElementById('noRecetasMessage');
-
-                        if (noRecetasMessage) {
-                            noRecetasMessage.remove();
-                        }
-
-                        let newRecetaRow;
-                        if (editIndex === '') {
-                            let newRecetaIndex = recetasDiv.getElementsByClassName('receta').length;
-                            newRecetaRow = document.createElement('tr');
-                            newRecetaRow.classList.add('receta', 'bg-gray-100', 'border-b', 'border-gray-200');
-                            newRecetaRow.setAttribute('data-index', newRecetaIndex);
-
-                            newRecetaRow.innerHTML = `
-                                <td class="py-3 px-6 text-left whitespace-nowrap">${newRecetaIndex + 1}</td>
-                                <td class="py-3 px-6 text-left">
-                                    <input type="hidden" name="recetas[${newRecetaIndex}][tipo_de_receta]" value="${tipoReceta}">${tipoReceta}
-                                </td>
-                                <td class="py-3 px-6 text-left">
-                                    <input type="hidden" name="recetas[${newRecetaIndex}][receta]" value="${encodeURIComponent(receta)}">
-                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
-                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${newRecetaIndex}">Editar</button>
-                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
-                                    <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
-                                </td>
-                            `;
-
-                            recetasDiv.appendChild(newRecetaRow);
-                        } else {
-                            newRecetaRow = document.querySelector(`tr[data-index="${editIndex}"]`);
-                            newRecetaRow.innerHTML = `
-                                <td class="py-3 px-6 text-left whitespace-nowrap">${parseInt(editIndex) + 1}</td>
-                                <td class="py-3 px-6 text-left">
-                                    <input type="hidden" name="recetas[${editIndex}][tipo_de_receta]" value="${tipoReceta}">${tipoReceta}
-                                </td>
-                                <td class="py-3 px-6 text-left">
-                                    <input type="hidden" name="recetas[${editIndex}][receta]" value="${encodeURIComponent(receta)}">
-                                    <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${encodeURIComponent(receta)}">Previsualizar</button>
-                                    <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${editIndex}">Editar</button>
-                                    <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
-                                    <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
-                                </td>
-                            `;
-                        }
-
-                        newRecetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
-                            const recetaContent = decodeURIComponent(this.dataset.receta);
-                            
-                            // Extraemos el nombre, fecha, talla y peso
-                            const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
-                            const fechaActual = new Date().toLocaleDateString();
-                            const talla = document.getElementById('hidden_talla').value || 'N/A';
-                            const peso = document.getElementById('hidden_peso').value || 'N/A';
-                            
-                            // Crear un elemento temporal para calcular el número de líneas
-                            const tempDiv = document.createElement('div');
-                            tempDiv.style.position = 'absolute';
-                            tempDiv.style.visibility = 'hidden';
-                            tempDiv.style.width = '800px';
-                            tempDiv.style.lineHeight = '1.5em';
-                            tempDiv.innerHTML = recetaContent;
-                            document.body.appendChild(tempDiv);
-                            
-                            // Calcular la altura y determinar cuántas líneas hay
-                            const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
-                            const totalLines = tempDiv.offsetHeight / lineHeight;
-                            
-                            // Remover el elemento temporal
-                            document.body.removeChild(tempDiv);
-
-                            // Verificar si excede el límite de 8 líneas
-                            if (totalLines > 6) {
-                                alert("Sobrepasa los límites de la receta");
-                            } else {
-                                const printWindow = window.open('', '', 'width=800,height=600');
-                                printWindow.document.write(`
-                                    <br><br><br><br><br><br><br>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
-                                        <div style="flex-basis: 40%; text-align: left; font-size: 15px; font-weight: normal;">${nombreCompleto}</div>
-                                        <div style="flex-basis: 20%; text-align: right; font-size: 15px; font-weight: normal;">${fechaActual}</div>
-                                        <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${peso}</div>
-                                        <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${talla}</div>
-                                    </div>
-                                    <div style="padding: 20px 40px; font-size: 15px;">
-                                        ${recetaContent}
-                                    </div>
-                                `);
-                                printWindow.document.write('</body></html>');
-                                printWindow.document.close();
-                                printWindow.focus();
-                                printWindow.print();
-                            }
-                        });
-
-
-                        // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
-                        newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
-                            newRecetaRow.remove();
-                            if (recetasDiv.getElementsByClassName('receta').length === 0) {
-                                recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
-                            }
-                        });
-
-                        newRecetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
-                            const recetaContent = decodeURIComponent(this.dataset.receta);
-                            document.getElementById('recetaModalContent').innerHTML = recetaContent;
-                            document.getElementById('recetaModal').classList.remove('hidden');
-                        });
-
-                        newRecetaRow.querySelector('.editar-receta').addEventListener('click', function () {
-                            const recetaIndex = this.dataset.recetaIndex;
-                            const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
-                            const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
-                            
-                            document.getElementById('modalTipoReceta').value = tipoRecetaInput;
-                            CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
-                            document.getElementById('modalReceta').classList.remove('hidden');
-                            document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
-                        });
-
-                        if (clearModal) {
-                            clearModalFields();
-                        }
-                    } else {
-                        alert('Por favor, complete todos los campos.');
-                    }
-                }
-
-                document.getElementById('saveReceta').addEventListener('click', function () {
-                    saveReceta(true);
-                });
 
                 document.getElementById('closeRecetaModal').addEventListener('click', function () {
                     document.getElementById('recetaModal').classList.add('hidden');
@@ -472,11 +485,9 @@
                 });
 
                 document.getElementById('consultasForm').addEventListener('submit', function () {
-                    document.querySelectorAll('.receta input[name*="receta"]').forEach(function (input) {
-                        const recetaIndex = input.name.match(/recetas\[(\d+)\]/)[1];
-                        input.value = decodeURIComponent(input.value);  // Decodifica el contenido antes de enviar
-                    });
+                    CKEDITOR.instances['modalRecetaInput'].updateElement();
                 });
+
 
                 // Add unit validation on blur event for vital signs fields
                 const vitalSignsFields = {

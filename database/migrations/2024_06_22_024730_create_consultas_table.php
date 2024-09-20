@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('consultas', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('citai_id')->nullable()->constrained('citas')->cascadeOnDelete();
-            $table->foreignId('pacienteid')->constrained('pacientes')->cascadeOnDelete();
+            $table->unsignedBigInteger('usuariomedicoid');
+            $table->unsignedBigInteger('pacienteid');
+            $table->unsignedBigInteger('id'); // Asegúrate de que el tipo coincida
             $table->timestamp('fechaHora')->useCurrent();
             $table->string('talla')->nullable();
             $table->string('temperatura')->nullable();
@@ -27,9 +27,18 @@ return new class extends Migration
             $table->text('plan')->nullable();
             $table->string('status')->default('en curso');
             $table->decimal('totalPagar', 10, 2)->default(0);
-            $table->foreignId('usuariomedicoid')->constrained('users')->cascadeOnDelete();
-            $table->string('circunferencia_cabeza')->nullable(); // New field
+            $table->string('circunferencia_cabeza')->nullable();
             $table->timestamps();
+
+            // Crear un índice único en lugar de una clave primaria
+            $table->unique([ 'usuariomedicoid', 'pacienteid', 'id']);
+
+            // Crear un índice en la columna 'id' (si es necesario)
+            $table->index('id');
+
+            // Foreign keys
+            $table->foreign('pacienteid')->references('no_exp')->on('pacientes')->onDelete('cascade');
+            $table->foreign('usuariomedicoid')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
