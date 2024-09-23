@@ -190,7 +190,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <x-input-label for="entidad_federativa_id" :value="__('Entidad Federativa')" />
-                                            <select id="entidad_federativa_id" name="entidad_federativa_id" class="form-select" onchange="updateMunicipios(this.value)">
+                                            <select id="entidad_federativa_id" name="entidad_federativa_id" class="form-select select2" onchange="updateMunicipios(this.value)">
                                                 <option value="">Seleccione una opción</option>
                                                 @foreach($entidadesFederativas as $entidad)
                                                     <option value="{{ $entidad->id }}" {{ old('entidad_federativa_id', $user->consultorio->entidad_federativa_id ?? '') == $entidad->id ? 'selected' : '' }}>
@@ -205,7 +205,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <x-input-label for="municipio_id" :value="__('Municipio')" />
-                                            <select id="municipio_id" name="municipio_id" class="form-select" onchange="updateLocalidades(this.value)">
+                                            <select id="municipio_id" name="municipio_id" class="form-select select2" onchange="updateLocalidades(this.value)">
                                                 <option value="">Seleccione una opción</option>
                                                 @foreach($municipios as $municipio)
                                                     <option value="{{ $municipio->id_municipio }}" {{ old('municipio_id', $user->consultorio->municipio_id ?? '') == $municipio->id_municipio ? 'selected' : '' }}>
@@ -217,7 +217,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <x-input-label for="localidad_id" :value="__('Localidad')" />
-                                            <select id="localidad_id" name="localidad_id" class="form-select" onchange="updateColonias(this.value)">
+                                            <select id="localidad_id" name="localidad_id" class="form-select select2" onchange="updateColonias(this.value)">
                                                 <option value="">Seleccione una opción</option>
                                                 @foreach($localidades as $localidad)
                                                     <option value="{{ $localidad->id_localidad }}" {{ old('localidad_id', $user->consultorio->localidad_id ?? '') == $localidad->id_localidad ? 'selected' : '' }}>
@@ -237,7 +237,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <x-input-label for="colonia_id" :value="__('Colonia')" />
-                                            <select id="colonia_id" name="colonia_id" class="form-select">
+                                            <select id="colonia_id" name="colonia_id" class="form-select select2">
                                                 <option value="">Seleccione una opción</option>
                                                 @foreach($colonias as $colonia)
                                                     <option value="{{ $colonia->id_asentamiento }}" {{ old('colonia_id', $user->consultorio->colonia_id ?? '') == $colonia->id_asentamiento ? 'selected' : '' }}>
@@ -302,6 +302,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Agrega esto en el head o antes de cerrar el body -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 
 <style>
     body { 
@@ -396,9 +399,43 @@
         background-color: #17a2b8; /* Color de fondo cuando está seleccionado o en hover */
         color: white; /* Color de texto cuando está seleccionado o en hover */
     }
+
+    .select2-container .select2-selection--single {
+        height: calc(2.25rem + 2px); /* Ajusta la altura para que coincida con otros inputs */
+        padding: 0.375rem 0.75rem; /* Padding similar a otros inputs */
+        border: 1px solid #ced4da; /* Borde igual a los otros inputs */
+        border-radius: 0.25rem; /* Borde redondeado para que sea coherente */
+        background-color: #fff; /* Fondo blanco */
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 8%);
+    }
+
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* Color de texto */
+        line-height: calc(2.25rem); /* Alinear verticalmente el texto */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: calc(2.25rem); /* Ajustar la altura del icono de flecha */
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-color: #ced4da; /* Color de borde igual al resto de los inputs */
+    }
+
+    /* Ajustar el ancho de la lista desplegable */
+    .select2-container {
+        width: 100% !important;
+    }
+
 </style>
 
 <script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            width: '100%' // Ajusta el ancho al 100% del contenedor
+        });
+    });
+
     function updateMunicipios(entidadId) {
         if (entidadId) {
             $.ajax({

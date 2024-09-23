@@ -46,7 +46,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-4 font-bold">Fecha</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Hora</th>
-                                    <th scope="col" class="px-6 py-4 font-bold">Persona</th>
+                                    <th scope="col" class="px-6 py-4 font-bold">Paciente</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Estado</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Acciones</th>
                                 </tr>
@@ -71,9 +71,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4">
-                                            @if($consulta->isCita && $consulta->persona)
-                                                {{ $consulta->persona->nombres }} {{ $consulta->persona->apepat }} {{ $consulta->persona->apemat }}
-                                            @elseif(!$consulta->isCita)
+                                            @if($consulta->paciente)
                                                 {{ $consulta->paciente->nombres }} {{ $consulta->paciente->apepat }} {{ $consulta->paciente->apemat }}
                                             @else
                                                 No disponible
@@ -202,9 +200,9 @@
 
     document.getElementById('resetButton').addEventListener('click', function() {
         const today = new Date();
-        const offset = today.getTimezoneOffset(); // Obtener la diferencia horaria
-        const adjustedToday = new Date(today.getTime() - offset * 60 * 1000); // Ajustar la fecha según la diferencia horaria
-        const formattedToday = adjustedToday.toISOString().split('T')[0]; // Obtener la fecha ajustada en formato YYYY-MM-DD
+        const offset = today.getTimezoneOffset();
+        const adjustedToday = new Date(today.getTime() - offset * 60 * 1000);
+        const formattedToday = adjustedToday.toISOString().split('T')[0];
 
         document.getElementById('start_date').value = formattedToday;
         document.getElementById('end_date').value = formattedToday;
@@ -220,7 +218,6 @@
             const estado = this.closest('tr').querySelector('.status-label').textContent.trim();
 
             if (estado === 'En proceso') {
-                // Redirigir directamente si el estado es "En proceso"
                 window.location.href = `/consultas/verificarPaciente/${consultaId}`;
             } else {
                 Swal.fire({
@@ -240,7 +237,6 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data); // <-- Agrega esta línea para depuración
                             if (data.success) {
                                 Swal.fire('¡Consulta iniciada!', '', 'success').then(() => {
                                     window.location.href = `/consultas/verificarPaciente/${consultaId}`;
@@ -249,7 +245,6 @@
                                 Swal.fire('Hubo un error', 'No se pudo iniciar la consulta', 'error');
                             }
                         });
-
                     }
                 });
             }
@@ -260,18 +255,18 @@
 
 <style>
     .dataTables_filter input[type="search"] {
-        width: 500px !important; /* Ajusta el tamaño a tu preferencia */
-        padding: 6px 12px; /* Ajuste de padding */
+        width: 500px !important;
+        padding: 6px 12px;
         font-size: 16px;
         border-radius: 4px;
         border: 1px solid #ccc;
-        box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+        box-sizing: border-box;
     }
 
     .dataTables_filter input[type="search"]:focus {
-        border-color: #007bff; /* Color del borde azul */
-        outline: none; /* Elimina el outline por defecto */
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
     
     .dt-buttons {

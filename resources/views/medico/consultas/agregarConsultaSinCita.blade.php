@@ -42,54 +42,79 @@
                 </div>
             </div>
 
-
-            <!-- Contenedor para el contenido de las pestañas -->
-            <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+            <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px;">
                 <div id="consultaTab" class="tab-pane active">
                     <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
                         @csrf
                         <input type="hidden" name="pacienteid" value="{{ $paciente->no_exp }}">
                         <input type="hidden" name="usuariomedicoid" value="{{ $medico->id }}">
                         <input type="hidden" name="status" value="en curso">
-                        <input type="hidden" name="notas_padecimiento" value="">
-                        <input type="hidden" name="interrogatorio_por_aparatos" value="">
-                        <input type="hidden" name="examen_fisico" value="">
-                        <input type="hidden" name="plan" value="">
                         <div id="recetasContainer"></div>
 
-                        <div class="mb-6 grid md:grid-cols-3 gap-4">
-                            <div class="bg-gray-100 p-4 rounded-lg">
-                                <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Contenedores de Edad y Signos Vitales -->
+                        <div class="flex justify-between space-x-2 mb-8">
+                            <!-- Contenedor de Edad -->
+                            <div class="w-1/4 bg-gray-100 p-4 rounded-lg">
+                                <h3 class="text-lg font-medium mb-4">Edad</h3>
+                                <div class="grid grid-cols-3 gap-2">
                                     <div>
-                                        <label for="hidden_talla" class="block text-sm font-medium text-gray-700">Talla</label>
-                                        <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-2 w-full border rounded-md" placeholder="m" value="{{ old('hidden_talla') }}">
+                                        <label for="edad_anios" class="block text-xs font-medium text-gray-700">Años</label>
+                                        <input type="text" id="edad_anios" name="años" class="mt-1 p-1 w-full border rounded-md text-xs opacity-50" style="width: 90px;" value="{{ $edad->y }}" readonly>
                                     </div>
                                     <div>
-                                        <label for="hidden_temperatura" class="block text-sm font-medium text-gray-700">Temperatura</label>
-                                        <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-2 w-full border rounded-md" placeholder="°C" value="{{ old('hidden_temperatura') }}">
+                                        <label for="edad_meses" class="block text-xs font-medium text-gray-700">Meses</label>
+                                        <input type="text" id="edad_meses" name="meses" class="mt-1 p-1 w-full border rounded-md text-xs opacity-50" style="width: 90px;" value="{{ $edad->m }}" readonly>
                                     </div>
                                     <div>
-                                        <label for="hidden_frecuencia_cardiaca" class="block text-sm font-medium text-gray-700">Frecuencia Cardíaca</label>
-                                        <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-2 w-full border rounded-md" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
-                                    </div>
-                                    <div>
-                                        <label for="hidden_peso" class="block text-sm font-medium text-gray-700">Peso</label>
-                                        <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-2 w-full border rounded-md" placeholder="kg" value="{{ old('hidden_peso') }}">
-                                    </div>
-                                    <div>
-                                        <label for="hidden_tension_arterial" class="block text-sm font-medium text-gray-700">Tensión Arterial</label>
-                                        <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-2 w-full border rounded-md" placeholder="mmHg" value="{{ old('hidden_tension_arterial') }}">
-                                    </div>
-                                    <div>
-                                        <label for="circunferencia_cabeza" class="block text-sm font-medium text-gray-700">Perímetro Cefálico</label>
-                                        <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-2 w-full border rounded-md" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
-                                    </div>
-                                    <div>
-                                        <label for="hidden_saturacion_oxigeno" class="block text-sm font-medium text-gray-700">Saturación de Oxígeno</label>
-                                        <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-2 w-full border rounded-md" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
+                                        <label for="edad_dias" class="block text-xs font-medium text-gray-700">Días</label>
+                                        <input type="text" id="edad_dias" name="dias" class="mt-1 p-1 w-full border rounded-md text-xs opacity-50" style="width: 90px;" value="{{ $edad->d }}" readonly>
                                     </div>
                                 </div>
+                            </div>
+                        
+                            <!-- Contenedor de Signos Vitales -->
+                            <div class="w-3/4 bg-gray-100 p-4 rounded-lg">
+                                <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
+                                <div class="grid grid-cols-7 gap-2">
+                                    <div>
+                                        <label for="hidden_talla" class="block text-xs font-medium text-gray-700">Talla</label>
+                                        <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="m" value="{{ old('hidden_talla') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_temperatura" class="block text-xs font-medium text-gray-700">Temperatura</label>
+                                        <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="°C" value="{{ old('hidden_temperatura') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_frecuencia_cardiaca" class="block text-xs font-medium text-gray-700">Frecuencia Cardíaca</label>
+                                        <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_peso" class="block text-xs font-medium text-gray-700">Peso</label>
+                                        <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="kg" value="{{ old('hidden_peso') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_tension_arterial" class="block text-xs font-medium text-gray-700">Tensión Arterial</label>
+                                        <input type="text" id="hidden_tension_arterial" name="hidden_tension_arterial" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="mmHg" value="{{ old('hidden_tension_arterial') }}">
+                                    </div>
+                                    <div>
+                                        <label for="circunferencia_cabeza" class="block text-xs font-medium text-gray-700">Perímetro Cefálico</label>
+                                        <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_saturacion_oxigeno" class="block text-xs font-medium text-gray-700">Saturación de Oxígeno</label>
+                                        <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos de la consulta -->
+                        <div class="mb-6 grid md:grid-cols-3 gap-4">
+                            <div class="bg-gray-100 p-4 rounded-lg ">
+                                <h3 class="text-lg font-medium mb-4">Antecedentes</h3>
+                                <textarea id="antecedentes" class="mt-1 p-2 w-full border rounded-md resize-none opacity-50" style="height: 300px;" readonly>
+                                    {{ $paciente->antecedentes }}
+                                </textarea>
                             </div>
 
                             <div class="bg-gray-100 p-4 rounded-lg">
@@ -165,7 +190,7 @@
                             </div>
                         </div>
                     </div> 
-                </div>      
+                </div>    
             </div>
 
             @if (old('recetas'))
@@ -239,6 +264,36 @@
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
             <script>
+                // Función para calcular la edad en años, meses y días
+                function calcularEdad(fechaNacimiento) {
+                    var hoy = new Date();
+                    var nacimiento = new Date(fechaNacimiento);
+
+                    var años = hoy.getFullYear() - nacimiento.getFullYear();
+                    var meses = hoy.getMonth() - nacimiento.getMonth();
+                    var dias = hoy.getDate() - nacimiento.getDate();
+
+                    if (meses < 0 || (meses === 0 && dias < 0)) {
+                        años--;
+                        meses += (meses < 0 ? 12 : 0);
+                    }
+
+                    if (dias < 0) {
+                        meses--;
+                        dias += 30;  // Ajuste aproximado para días del mes
+                    }
+
+                    // Asignar los valores a los campos ocultos
+                    document.getElementById('hidden_anios').value = años;
+                    document.getElementById('hidden_meses').value = meses;
+                    document.getElementById('hidden_dias').value = dias;
+                }
+
+                // Calcular edad en base a la fecha de nacimiento del paciente antes de enviar el formulario
+                document.getElementById('consultasForm').addEventListener('submit', function(event) {
+                    calcularEdad("{{ $paciente->fechanac }}");  // Usa la fecha de nacimiento del paciente
+                });
+
                 function openTab(event, tabName) {
                     var i, tabcontent, tablinks;
                     tabcontent = document.getElementsByClassName("tab-pane");
@@ -330,8 +385,11 @@
                             document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value = tipoRecetaId;
                             document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value = receta;
 
-                            let existingRow = recetasTableBody.querySelectorAll('tr')[recetaIndex];
+                            let existingRow = recetasTableBody.querySelectorAll('tr')[recetaIndex - 1]; // Cambiamos aquí para ajustar el índice
                             existingRow.querySelector('td:nth-child(2)').innerText = tipoRecetaNombre; // Mostrar el nombre en lugar del ID
+                            // Actualizar los atributos `data-receta` en los botones de Previsualizar e Imprimir
+                            existingRow.querySelector('.previsualizar-receta').setAttribute('data-receta', encodeURIComponent(receta));
+                            existingRow.querySelector('.imprimir-receta').setAttribute('data-receta', encodeURIComponent(receta));
                         } else {
                             // Incrementar el contador de recetas
                             recetaCounter++;
@@ -352,12 +410,86 @@
                                     <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${recetaCounter}">Editar</button>
                                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
                                     <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
+
                                 </td>`;
 
                             recetasTableBody.appendChild(newRecetaRow);
 
                             // Añadir eventos a los botones de previsualizar, editar, eliminar e imprimir
-                            attachRecetaEventListeners(newRecetaRow);
+                            newRecetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
+                                const recetaContent = decodeURIComponent(this.dataset.receta);
+                                
+                                // Extraemos el nombre, fecha, talla y peso
+                                const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
+                                const fechaActual = new Date().toLocaleDateString();
+                                const talla = document.getElementById('hidden_talla').value || 'N/A';
+                                const peso = document.getElementById('hidden_peso').value || 'N/A';
+                                
+                                // Crear un elemento temporal para calcular el número de líneas
+                                const tempDiv = document.createElement('div');
+                                tempDiv.style.position = 'absolute';
+                                tempDiv.style.visibility = 'hidden';
+                                tempDiv.style.width = '800px';
+                                tempDiv.style.lineHeight = '1.5em';
+                                tempDiv.innerHTML = recetaContent;
+                                document.body.appendChild(tempDiv);
+                                
+                                // Calcular la altura y determinar cuántas líneas hay
+                                const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
+                                const totalLines = tempDiv.offsetHeight / lineHeight;
+                                
+                                // Remover el elemento temporal
+                                document.body.removeChild(tempDiv);
+
+                                // Verificar si excede el límite de 8 líneas
+                                if (totalLines > 6) {
+                                    alert("Sobrepasa los límites de la receta");
+                                } else {
+                                    const printWindow = window.open('', '', 'width=800,height=600');
+                                    printWindow.document.write(`
+                                        <br><br><br><br><br><br><br>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
+                                            <div style="flex-basis: 40%; text-align: left; font-size: 12px; font-weight: normal;">${nombreCompleto}</div>
+                                            <div style="flex-basis: 20%; text-align: right; font-size: 12px; font-weight: normal;">${fechaActual}</div>
+                                            <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${peso}</div>
+                                            <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${talla}</div>
+                                        </div>
+                                        <div style="padding: 20px 40px; font-size: 15px;">
+                                            ${recetaContent}
+                                        </div>
+                                    `);
+                                    printWindow.document.write('</body></html>');
+                                    printWindow.document.close();
+                                    printWindow.focus();
+                                    printWindow.print();
+                                }
+                            });
+
+
+                            // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
+                            newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
+                                newRecetaRow.remove();
+                                if (recetasDiv.getElementsByClassName('receta').length === 0) {
+                                    recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                                }
+                            });
+
+                            newRecetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
+                                const recetaContent = decodeURIComponent(this.dataset.receta);
+                                document.getElementById('recetaModalContent').innerHTML = recetaContent;
+                                document.getElementById('recetaModal').classList.remove('hidden');
+                            });
+
+                            newRecetaRow.querySelector('.editar-receta').addEventListener('click', function () {
+                                const recetaIndex = this.dataset.recetaIndex;
+                                const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
+                                const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
+                                
+                                document.getElementById('modalTipoReceta').value = tipoRecetaInput;
+                                CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
+                                document.getElementById('modalReceta').classList.remove('hidden');
+                                document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
+                            });
                         }
 
                         // Remover el mensaje de "No hay recetas" si existe
@@ -372,87 +504,6 @@
                         alert('Por favor, complete todos los campos.');
                     }
                 });
-
-                function attachRecetaEventListeners(recetaRow) {
-                    // Botón Previsualizar Receta
-                    recetaRow.querySelector('.previsualizar-receta').addEventListener('click', function () {
-                        const recetaContent = this.dataset.receta;
-                        document.getElementById('recetaModalContent').innerHTML = recetaContent;
-                        document.getElementById('recetaModal').classList.remove('hidden');
-                    });
-
-                    // Botón Editar Receta
-                    recetaRow.querySelector('.editar-receta').addEventListener('click', function () {
-                        const recetaIndex = this.dataset.recetaIndex;
-                        const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
-                        const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
-
-                        document.getElementById('modalTipoReceta').value = tipoRecetaInput;
-                        CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
-                        document.getElementById('modalReceta').classList.remove('hidden');
-                        document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
-                    });
-
-                    // Botón Eliminar Receta
-                    recetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
-                        recetaRow.remove();
-                        if (document.getElementById('recetas').getElementsByClassName('receta').length === 0) {
-                            document.getElementById('recetas').innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
-                        }
-                    });
-
-                    // Botón Imprimir Receta
-                    recetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
-                        const recetaContent = decodeURIComponent(this.dataset.receta);
-                        
-                        // Extraer los datos del paciente (nombre, talla, peso, etc.)
-                        const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
-                        const fechaActual = new Date().toLocaleDateString();
-                        const talla = document.getElementById('hidden_talla').value || 'N/A';
-                        const peso = document.getElementById('hidden_peso').value || 'N/A';
-
-                        // Crear un elemento temporal para calcular el número de líneas
-                        const tempDiv = document.createElement('div');
-                        tempDiv.style.position = 'absolute';
-                        tempDiv.style.visibility = 'hidden';
-                        tempDiv.style.width = '800px';
-                        tempDiv.style.lineHeight = '1.5em';
-                        tempDiv.innerHTML = recetaContent;
-                        document.body.appendChild(tempDiv);
-
-                        // Calcular la altura y determinar cuántas líneas tiene la receta
-                        const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
-                        const totalLines = tempDiv.offsetHeight / lineHeight;
-
-                        // Remover el elemento temporal
-                        document.body.removeChild(tempDiv);
-
-                        // Verificar si la receta excede el límite de líneas permitidas
-                        if (totalLines > 6) {
-                            alert("Sobrepasa los límites de la receta");
-                        } else {
-                            const printWindow = window.open('', '', 'width=800,height=600');
-                            printWindow.document.write(`
-                                <br><br><br><br><br><br><br>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
-                                    <div style="flex-basis: 40%; text-align: left; font-size: 15px; font-weight: normal;">${nombreCompleto}</div>
-                                    <div style="flex-basis: 20%; text-align: right; font-size: 15px; font-weight: normal;">${fechaActual}</div>
-                                    <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${peso}</div>
-                                    <div style="flex-basis: 10%; text-align: right; font-size: 15px; font-weight: normal;">${talla}</div>
-                                </div>
-                                <div style="padding: 20px 40px; font-size: 15px;">
-                                    ${recetaContent}
-                                </div>
-                            `);
-                            printWindow.document.write('</body></html>');
-                            printWindow.document.close();
-                            printWindow.focus();
-                            printWindow.print();
-                        }
-                    });
-                }
-
-
 
                 // Evento para cerrar el modal de visualización de la receta
                 document.getElementById('closeRecetaModal').addEventListener('click', function () {

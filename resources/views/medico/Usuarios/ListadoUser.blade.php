@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <!-- Modal Agregar -->
+    <!-- Modal Agregar Usuario -->
     <div id="modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
@@ -104,52 +104,58 @@
                     <div class="mt-2">
                         <form method="POST" action="{{ route('users.store') }}" id="addUserForm">
                             @csrf
-                            <!-- Nombres -->
-                            <div class="mt-4">
-                                <x-input-label for="nombres" :value="__('Nombres')" />
-                                <x-text-input id="nombres" class="block mt-1 w-full" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Nombres -->
+                                <div class="mt-4">
+                                    <x-input-label for="nombres" :value="__('Nombres')" />
+                                    <x-text-input id="nombres" class="block mt-1 w-full uppercase-input" type="text" name="nombres" :value="old('nombres')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('nombres')" class="mt-2" />
+                                </div>
+                                
+                                <!-- Apellido Paterno -->
+                                <div class="mt-4">
+                                    <x-input-label for="apepat" :value="__('Apellido Paterno')" />
+                                    <x-text-input id="apepat" class="block mt-1 w-full uppercase-input" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
+                                </div>
                             </div>
-                            
-                            <!-- Apellido Paterno -->
-                            <div class="mt-4">
-                                <x-input-label for="apepat" :value="__('Apellido Paterno')" />
-                                <x-text-input id="apepat" class="block mt-1 w-full" type="text" name="apepat" :value="old('apepat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apepat')" class="mt-2" />
-                            </div>
-                            
-                            <!-- Apellido Materno -->
-                            <div class="mt-4">
-                                <x-input-label for="apemat" :value="__('Apellido Materno')" />
-                                <x-text-input id="apemat" class="block mt-1 w-full" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
-                                <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
-                            </div>
-                            
-                            <!-- Fecha de Nacimiento -->
-                            <div class="mt-4">
-                                <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
-                                <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
-                                <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Apellido Materno -->
+                                <div class="mt-4">
+                                    <x-input-label for="apemat" :value="__('Apellido Materno')" />
+                                    <x-text-input id="apemat" class="block mt-1 w-full uppercase-input" type="text" name="apemat" :value="old('apemat')" required autofocus autocomplete="name" />
+                                    <x-input-error :messages="$errors->get('apemat')" class="mt-2" />
+                                </div>
+
+                                <!-- Fecha de Nacimiento -->
+                                <div class="mt-4">
+                                    <x-input-label for="fechanac" :value="__('Fecha de Nacimiento')" />
+                                    <x-text-input id="fechanac" class="block mt-1 w-full" type="date" name="fechanac" :value="old('fechanac')" required autofocus />
+                                    <x-input-error :messages="$errors->get('fechanac')" class="mt-2" />
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Teléfono -->
                                 <div class="mt-4">
                                     <x-input-label for="telefono" :value="__('Teléfono')" />
-                                    <x-text-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autofocus />
+                                    <x-text-input id="telefono" class="block mt-1 w-full uppercase-input" type="text" name="telefono" :value="old('telefono')" required autofocus />
                                     <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
                                 </div>
                             
                                 <!-- Sexo -->
                                 <div class="mt-4 md:col-span-1">
                                     <x-input-label for="sexo" :value="__('Sexo')" />
-                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="masculino" value="masculino" autocomplete="off" required> Masculino
-                                        </label>
-                                        <label class="btn btn-secondary">
-                                            <input type="radio" name="sexo" id="femenino" value="femenino" autocomplete="off" required> Femenino
-                                        </label>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex items-center">
+                                            <input type="radio" id="masculino" name="sexo" value="masculino" class="mr-2" required>
+                                            <label for="masculino" class="text-sm font-medium text-gray-700">Masculino</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="femenino" name="sexo" value="femenino" class="mr-2" required>
+                                            <label for="femenino" class="text-sm font-medium text-gray-700">Femenino</label>
+                                        </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('sexo')" class="mt-2" />
                                 </div>
@@ -168,12 +174,12 @@
                                 </x-primary-button>
                             </div>
                         </form>
-                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </x-app-layout>
 
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>

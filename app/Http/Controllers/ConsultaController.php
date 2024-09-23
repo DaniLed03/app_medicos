@@ -56,15 +56,14 @@ class ConsultaController extends Controller
             'hidden_peso' => 'nullable|string',
             'hidden_tension_arterial' => 'nullable|string',
             'motivoConsulta' => 'required|string',
-            'notas_padecimiento' => 'nullable|string',
-            'interrogatorio_por_aparatos' => 'nullable|string',
-            'examen_fisico' => 'nullable|string',
             'diagnostico' => 'required|string',
-            'plan' => 'nullable|string',
             'status' => 'required|string|in:en curso,Finalizada',
             'totalPagar' => 'nullable|numeric|min:1',
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
+            'años' => 'nullable|integer',  // Nuevo campo
+            'meses' => 'nullable|integer', // Nuevo campo
+            'dias' => 'nullable|integer',  // Nuevo campo
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
             'recetas.*.receta' => 'required|string'
@@ -111,8 +110,10 @@ class ConsultaController extends Controller
         $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
         $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
         $consultaData['status'] = 'Finalizada'; 
-        $consultaData['id'] = $nuevoId; // Asignar el nuevo ID
-
+        $consultaData['id'] = $nuevoId; 
+        $consultaData['años'] = $request->años;
+        $consultaData['meses'] = $request->meses;
+        $consultaData['dias'] = $request->dias;
         $consulta = Consultas::create($consultaData);
 
         // Obtener el correo y la CURP del paciente
@@ -120,21 +121,19 @@ class ConsultaController extends Controller
         $email = $paciente->email;
         $curp = $paciente->curp;
 
-        // Buscar persona que coincida con el paciente usando email y curp
-        $persona = Persona::where('correo', $email)
-                        ->orWhere('curp', $curp)
-                        ->first();
+        $paciente = Paciente::where('no_exp', $pacienteId)
+                            ->where('medico_id', $medicoId)
+                            ->first();
 
-        // Actualizar el estado de la cita si la persona coincide
-        if ($persona) {
-            $cita = Citas::where('persona_id', $persona->id)
-                        ->where('status', '!=', 'Finalizada')
-                        ->first();
+        // Actualizar el estado de la cita
+        $cita = Citas::where('no_exp', $pacienteId)
+                     ->where('medicoid', $medicoId)
+                     ->where('status', '!=', 'Finalizada')
+                     ->first();
 
-            if ($cita) {
-                $cita->status = 'Finalizada';
-                $cita->save();
-            }
+        if ($cita) {
+            $cita->status = 'Finalizada';
+            $cita->save();
         }
 
         if ($request->has('recetas')) {
@@ -160,8 +159,6 @@ class ConsultaController extends Controller
             }
         }
         
-
-
 
         Venta::create([
             'consulta_id' => $consulta->id,
@@ -192,12 +189,13 @@ class ConsultaController extends Controller
             ->where('activo', 'si')
             ->where('status', '!=', 'Finalizada') // Excluir las citas finalizadas
             ->whereBetween('fecha', [$startDate, $endDate])
-            ->with('persona') // Incluir relación con la persona
+            ->with('paciente') // Incluir relación con el paciente
             ->get()
             ->map(function($cita) {
                 $cita->isCita = true; // Marcar como consulta con cita
                 return $cita;
             });
+
 
         // Consultas sin cita
         $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
@@ -237,29 +235,28 @@ class ConsultaController extends Controller
 
     public function verificarPaciente(Request $request, $citaId)
     {
-        $cita = Citas::with('persona')->findOrFail($citaId);
-        $correo = $cita->persona->correo;
-        $curp = $cita->persona->curp;
-
-        $paciente = Paciente::where('correo', $correo)->orWhere('curp', $curp)->first();
+        $cita = Citas::with('paciente')->findOrFail($citaId);
+        $paciente = Paciente::where('no_exp', $cita->no_exp)
+                            ->where('medico_id', $cita->medicoid)
+                            ->first();
 
         if ($paciente) {
             // Si el paciente existe, redirige a la vista de agregarConsultaSinCita
-            return redirect()->route('consultas.createWithoutCita', $paciente->id);
+            return redirect()->route('consultas.createWithoutCita', $paciente->no_exp);
         } else {
             // Mostrar SweetAlert y redirigir
             session()->flash('alerta', true);
 
             return view('medico.pacientes.editarPaciente', [
                 'paciente' => new Paciente([
-                    'nombres' => $cita->persona->nombres,
-                    'apepat' => $cita->persona->apepat,
-                    'apemat' => $cita->persona->apemat,
-                    'fechanac' => $cita->persona->fechanac->format('Y-m-d'),
-                    'correo' => $correo,
-                    'curp' => $curp,
-                    'sexo' => $cita->persona->sexo,
-                    'telefono' => $cita->persona->telefono,
+                    'nombres' => $cita->paciente->nombres,
+                    'apepat' => $cita->paciente->apepat,
+                    'apemat' => $cita->paciente->apemat,
+                    'fechanac' => $cita->paciente->fechanac->format('Y-m-d'),
+                    'correo' => $cita->paciente->correo,
+                    'curp' => $cita->paciente->curp,
+                    'sexo' => $cita->paciente->sexo,
+                    'telefono' => $cita->paciente->telefono,
                     'no_exp' => Paciente::max('no_exp') ? Paciente::max('no_exp') + 1 : 1,
                 ])
             ]);
@@ -317,11 +314,10 @@ class ConsultaController extends Controller
             'peso' => 'nullable|string',
             'tension_arterial' => 'nullable|string',
             'motivoConsulta' => 'required|string',
-            'notas_padecimiento' => 'nullable|string',
-            'interrogatorio_por_aparatos' => 'nullable|string',
-            'examen_fisico' => 'nullable|string',
             'diagnostico' => 'required|string',
-            'plan' => 'nullable|string',
+            'años' => 'nullable|integer',  // Nuevo campo
+            'meses' => 'nullable|integer', // Nuevo campo
+            'dias' => 'nullable|integer',  // Nuevo campo
             'status' => 'required|string|in:en curso,Finalizada',
             'totalPagar' => 'required|numeric|min:0',
             'recetas' => 'array',

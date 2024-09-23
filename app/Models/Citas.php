@@ -9,27 +9,26 @@ class Citas extends Model
 {
     use HasFactory;
 
+    // Aquí especificamos los campos que pueden ser llenados
     protected $fillable = [
-        'fecha', 'hora', 'persona_id', 'medicoid', 'motivo_consulta', 'activo'
+        'fecha', 'hora', 'no_exp', 'medicoid', 'motivo_consulta', 'activo'
     ];
 
-    public function persona()
+    // Relación con el modelo Paciente usando no_exp
+    public function paciente()
     {
-        return $this->belongsTo(Persona::class, 'persona_id');
+        return $this->belongsTo(Paciente::class, 'no_exp', 'no_exp'); // Cambiado a la relación con Paciente usando no_exp
     }
 
+    // Relación con el modelo User para el médico
     public function medico()
     {
-        return $this->belongsTo(User::class, 'medicoid');
+        return $this->belongsTo(User::class, 'medicoid', 'id'); // Relación con el médico
     }
 
+    // Relación con las consultas
     public function consultas()
     {
         return $this->hasMany(Consultas::class, 'citai_id');
-    }
-
-    public function paciente()
-    {
-        return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 }

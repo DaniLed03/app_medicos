@@ -24,15 +24,14 @@ class Consultas extends Model
         'frecuencia_cardiaca',
         'peso',
         'tension_arterial',
+        'circunferencia_cabeza',
+        'años',   // Nuevo campo
+        'meses',  // Nuevo campo
+        'dias',   // Nuevo campo
         'motivoConsulta',
-        'notas_padecimiento',
-        'interrogatorio_por_aparatos',
-        'examen_fisico',
         'diagnostico',
-        'plan',
         'status',
         'totalPagar',
-        'circunferencia_cabeza',
     ];
 
     protected $casts = [

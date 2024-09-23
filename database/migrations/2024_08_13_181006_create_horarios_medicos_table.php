@@ -16,6 +16,7 @@ class CreateHorariosMedicosTable extends Migration
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->integer('duracion_sesion'); // Duración de cada sesión en minutos
+            $table->enum('turno', ['Matutino', 'Vespertino', 'Nocturno'])->nullable(); // Nuevo campo Turno
             $table->boolean('disponible')->default(true); // Indica si estará disponible o no
             $table->timestamps();
         });

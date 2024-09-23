@@ -191,8 +191,10 @@
                         </button>
                         <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
                             <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="absolute mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                @role('Administrador')
+                                    <a href="{{ route('colonias.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Colonias</a>
+                                @endrole
                                 <a href="{{ route('conceptos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Conceptos de cobro</a>
-                                <a href="{{ route('colonias.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Colonias</a>
                             </div>
                         </div>
                     </div>                    

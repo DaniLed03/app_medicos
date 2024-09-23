@@ -93,35 +93,33 @@ class MedicoController extends Controller
         return view('medico.pacientes.verPaciente', compact('paciente', 'consultas'));
     }
 
-    public function storePacientesDesdeModal(Request $request)
+    public function storeDesdeModal(Request $request)
     {
-        $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apepat' => 'required|string|max:255',
-            'apemat' => 'required|string|max:255',
+        $medicoId = Auth::id();
+
+        // Validar los datos del paciente
+        $validatedData = $request->validate([
+            'nombres' => 'required|string|max:100',
+            'apepat' => 'required|string|max:100',
+            'apemat' => 'required|string|max:100',
             'fechanac' => 'required|date',
-            'correo' => 'required|string|email|max:255|unique:pacientes',
-            'curp' => 'required|string|max:18|unique:pacientes',
-            'telefono' => 'required|string|max:18',
+            'telefono' => 'required|string|max:20',
+            'sexo' => 'required|in:masculino,femenino',
         ]);
 
-        // Obtener el último número de expediente y sumarle uno
-        $ultimoExpediente = Paciente::orderBy('no_exp', 'desc')->first();
-        $nuevoExpediente = $ultimoExpediente ? $ultimoExpediente->no_exp + 1 : 1;
+        // Asignar el ID del médico
+        $validatedData['medico_id'] = $medicoId;
 
-        $paciente = new Paciente();
-        $paciente->nombres = $request->nombres;
-        $paciente->apepat = $request->apepat;
-        $paciente->apemat = $request->apemat;
-        $paciente->fechanac = $request->fechanac;
-        $paciente->correo = $request->correo;
-        $paciente->curp = $request->curp;
-        $paciente->telefono = $request->telefono;
-        $paciente->no_exp = $nuevoExpediente;
-        $paciente->medico_id = Auth::id(); // Asigna el ID del médico autenticado
-        $paciente->save();
+        // Generar el número de expediente (no_exp) único
+        $validatedData['no_exp'] = Paciente::where('medico_id', $medicoId)->max('no_exp') + 1;
 
-        return redirect()->route('medico.dashboard')->with('success', 'Paciente registrado exitosamente');
+        // Crear paciente y guardar el resultado en una variable
+        $paciente = Paciente::create($validatedData);
+
+        // Redireccionar con un mensaje y el id del paciente recién creado
+        return redirect()->route('citas')
+            ->with('status', 'Paciente agregado')
+            ->with('paciente_id', $paciente->no_exp);
     }
 
     public function mostrarPacientes(Request $request)
@@ -377,31 +375,56 @@ class MedicoController extends Controller
 
     //////////////////////////////////    CITAS    /////////////////////////////////////////
 
+    public function searchPacientes(Request $request)
+    {
+        $searchTerm = $request->input('q');
+        $medicoId = Auth::id();
+
+        $pacientes = Paciente::where('activo', 'si')
+            ->where('medico_id', $medicoId)
+            ->where(function($query) use ($searchTerm) {
+                $query->where('nombres', 'like', "%{$searchTerm}%")
+                    ->orWhere('apepat', 'like', "%{$searchTerm}%")
+                    ->orWhere('apemat', 'like', "%{$searchTerm}%");
+            })
+            ->select('no_exp', DB::raw("CONCAT(nombres, ' ', apepat, ' ', apemat) AS full_name"))
+            ->limit(10)
+            ->get();
+
+        return response()->json($pacientes);
+    }
+
     // Muestra todas las citas activas
     public function mostrarCitas()
     {
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
-        $citas = Citas::select('citas.*', 'personas.nombres', 'personas.apepat', 'personas.apemat')
-                        ->join('personas', 'citas.persona_id', '=', 'personas.id')
-                        ->where('citas.activo', 'si')
-                        ->where('citas.status', '!=', 'Finalizada') // Excluir las citas finalizadas
-                        ->where(function($q) use ($medicoId, $currentUser) {
-                            $q->where('citas.medicoid', $medicoId)
+        $citas = Citas::select('citas.*', 'pacientes.nombres', 'pacientes.apepat', 'pacientes.apemat')
+                    ->join('pacientes', function($join) use ($medicoId) {
+                        // Cambiar a la columna correcta de la tabla citas
+                        $join->on('citas.no_exp', '=', 'pacientes.no_exp') // Reemplaza persona_id por no_exp
+                            ->where('pacientes.medico_id', '=', $medicoId);
+                    })
+                    ->where('citas.activo', 'si')
+                    ->where('citas.status', '!=', 'Finalizada') // Excluir las citas finalizadas
+                    ->where(function($q) use ($medicoId, $currentUser) {
+                        $q->where('citas.medicoid', $medicoId)
                             ->orWhere('citas.medicoid', $currentUser->id);
+                    })
+                    ->get();
+
+        
+        // Obtener los pacientes asociados al médico
+        $pacientes = Paciente::where(function($q) use ($medicoId, $currentUser) {
+                            $q->where('medico_id', $medicoId)
+                            ->orWhere('medico_id', $currentUser->id);
                         })
                         ->get();
         
-        // Obtener las personas asociadas al médico
-        $personas = Persona::where(function($q) use ($medicoId, $currentUser) {
-                            $q->where('medico_id', $medicoId)
-                            ->orWhere('medico_id', $currentUser->id);
-                        })->get();
-        
-        return view('medico.citas.citas', compact('citas', 'personas'));
+        return view('medico.citas.citas', compact('citas', 'pacientes'));
     }
-    
+
     // Guarda una nueva cita
     public function storeCitas(Request $request)
     {
@@ -409,7 +432,7 @@ class MedicoController extends Controller
         $request->validate([
             'fecha' => 'required|date|after_or_equal:today',
             'hora' => 'required|date_format:H:i',
-            'persona_id' => 'required|exists:personas,id',
+            'paciente_no_exp' => 'required|exists:pacientes,no_exp', // Cambiado de persona_id a paciente_no_exp
             'motivo_consulta' => 'nullable|string|max:255'
         ]);
 
@@ -430,7 +453,7 @@ class MedicoController extends Controller
         Citas::create([
             'fecha' => $request->fecha,
             'hora' => $request->hora,
-            'persona_id' => $request->persona_id,
+            'no_exp' => $request->paciente_no_exp, // Cambiado de persona_id a no_exp
             'medicoid' => $medicoId, // Guardar el ID del médico
             'motivo_consulta' => $request->motivo_consulta
         ]);
@@ -439,13 +462,14 @@ class MedicoController extends Controller
         return redirect()->route('citas')->with('status', 'Cita registrada correctamente');
     }
 
-
     // Muestra el formulario para agregar una nueva cita
     public function crearCita()
     {
         $medicoId = Auth::id();
-        $personas = Persona::where('activo', 'si')->where('medico_id', $medicoId)->get();
-        return view('medico.citas.agregarCita', compact('personas'));
+        $pacientes = Paciente::where('activo', 'si')
+                            ->where('medico_id', $medicoId)
+                            ->get();
+        return view('medico.citas.agregarCita', compact('pacientes'));
     }
 
     // Muestra el formulario de edición de una cita específica
@@ -487,34 +511,37 @@ class MedicoController extends Controller
     // Actualiza la información de una cita específica
     public function updateCita(Request $request, $id)
     {
+        // Validación de los datos
         $request->validate([
             'fecha' => 'required|date',
             'hora' => 'required|date_format:H:i',
-            'persona_id' => 'required|exists:personas,id',
+            'motivo_consulta' => 'nullable|string|max:255',
             'usuariomedicoid' => 'required|exists:users,id',
-            'motivo_consulta' => 'nullable|string|max:255'
+            'paciente_no_exp' => 'required|exists:pacientes,no_exp', // Validamos el no_exp
         ]);
 
-        // Verificar si ya existe una cita a la misma hora y fecha para el mismo médico
+        // Verifica si ya existe una cita en esa fecha y hora para evitar conflictos
         $exists = Citas::where('fecha', $request->fecha)
-                    ->where('hora', $request->hora)
-                    ->where('medicoid', $request->usuariomedicoid)
-                    ->where('id', '!=', $id) // Excluir la cita actual
-                    ->exists();
+            ->where('hora', $request->hora)
+            ->where('medicoid', $request->usuariomedicoid)
+            ->where('id', '!=', $id) // Excluir la cita actual
+            ->exists();
 
         if ($exists) {
             return redirect()->back()->with('error', 'La hora seleccionada ya está ocupada. Por favor, elija otra hora.')->withInput();
         }
 
+        // Encontrar la cita y actualizarla
         $cita = Citas::findOrFail($id);
         $cita->update([
             'fecha' => $request->fecha,
             'hora' => $request->hora,
-            'persona_id' => $request->persona_id,
-            'medicoid' => $request->usuariomedicoid,
-            'motivo_consulta' => $request->motivo_consulta
+            'motivo_consulta' => $request->motivo_consulta,
+            'usuariomedicoid' => $request->usuariomedicoid,
+            'no_exp' => $request->paciente_no_exp, // Usamos el no_exp en lugar de persona_id
         ]);
 
+        // Redirigir a la lista de citas con un mensaje de éxito
         return redirect()->route('citas')->with('status', 'Cita actualizada correctamente');
     }
 
@@ -537,88 +564,120 @@ class MedicoController extends Controller
         return redirect()->route('citas')->with('status', 'Cita borrada correctamente');
     }
 
-    public function obtenerHorasDisponibles(Request $request)
-    {
-        $fecha = $request->fecha;
-        $currentUser = Auth::user();
-        $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
-
-        // Determinar el día de la semana para la fecha dada
-        $diaSemana = Carbon::parse($fecha)->locale('es')->dayName;
-
-        // Buscar primero si hay un horario específico para la fecha
-        $horario = HorariosMedicos::where('medico_id', $medicoId)
-                                    ->where('fecha', $fecha)
-                                    ->first();
-
-        // Si no hay horario específico para la fecha, buscar por el día de la semana
-        if (!$horario) {
-            $horario = HorariosMedicos::where('medico_id', $medicoId)
-                                        ->where('dia_semana', $diaSemana)
-                                        ->first();
-        }
-
-        if ($horario && $horario->disponible) {
-            $horasOcupadas = Citas::where('fecha', $fecha)
-                                ->where('medicoid', $medicoId)
-                                ->pluck('hora')
-                                ->toArray();
-
-            $horasDisponibles = [];
-            $horaActual = Carbon::parse($horario->hora_inicio);
-
-            while ($horaActual->format('H:i') < $horario->hora_fin) {
-                if (!in_array($horaActual->format('H:i'), $horasOcupadas)) {
-                    $horasDisponibles[] = $horaActual->format('H:i');
-                }
-                $horaActual->addMinutes($horario->duracion_sesion);
-            }
-
-            return response()->json($horasDisponibles);
-        } else {
-            return response()->json([]);
-        }
-    }
-
-
     public function storeHorario(Request $request)
     {
+        // Validación de los datos recibidos
         $request->validate([
-            'fecha' => 'nullable|date',
-            'dia_semana' => 'nullable|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
+            'dia_semana' => 'required|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
             'duracion_sesion' => 'required|integer|min:1',
-            'disponible' => 'required|boolean',
+            'turno' => 'required|in:Matutino,Vespertino,Nocturno',
+        ], [
+            'dia_semana.required' => 'Debe seleccionar un día de la semana.',
+            'dia_semana.in' => 'Debe seleccionar un día válido.',
+            'turno.required' => 'Debe seleccionar un turno.',
+            'turno.in' => 'Debe seleccionar un turno válido.',
+            'hora_fin.after' => 'La hora de fin debe ser mayor que la hora de inicio.', // Mensaje personalizado
         ]);
 
-        if ($request->dia_semana) {
-            // Si se seleccionó un día de la semana, crea un horario recurrente para ese día
-            HorariosMedicos::updateOrCreate(
-                [
-                    'medico_id' => Auth::id(),
-                    'dia_semana' => $request->dia_semana
-                ],
-                [
-                    'hora_inicio' => $request->hora_inicio,
-                    'hora_fin' => $request->hora_fin,
-                    'duracion_sesion' => $request->duracion_sesion,
-                    'disponible' => $request->disponible
-                ]
-            );
-        } else if ($request->fecha) {
-            // Si se seleccionó una fecha específica, crea un horario para esa fecha
-            HorariosMedicos::create([
-                'medico_id' => Auth::id(),
-                'fecha' => $request->fecha,
-                'hora_inicio' => $request->hora_inicio,
-                'hora_fin' => $request->hora_fin,
-                'duracion_sesion' => $request->duracion_sesion,
-                'disponible' => $request->disponible
-            ]);
+        $medicoId = Auth::id();
+        $diaSemana = $request->dia_semana;
+        $turno = $request->turno;
+
+        // Verificar si el médico ya tiene un turno asignado para este día
+        $horariosDelDia = HorariosMedicos::where('medico_id', $medicoId)
+                                            ->where('dia_semana', $diaSemana)
+                                            ->where('turno', $turno)
+                                            ->first();
+
+        // Si ya existe el turno, redirigir con error
+        if ($horariosDelDia) {
+            return redirect()->back()->withErrors(['turno_repetido' => 'Ya tienes un horario configurado para el turno ' . $turno . ' en el día ' . $diaSemana . '.']);
         }
 
+        // Creación del horario si no hay errores
+        HorariosMedicos::create([
+            'medico_id' => $medicoId,
+            'dia_semana' => $diaSemana,
+            'turno' => $turno,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'duracion_sesion' => $request->duracion_sesion,
+            'disponible' => 1,
+        ]);
+
         return redirect()->route('citas.configurarHorario')->with('status', 'Horario guardado exitosamente.');
+    }
+
+    public function obtenerHorariosPorDia(Request $request)
+    {
+        $fecha = $request->input('fecha');
+        $medicoId = Auth::id();
+
+        // Determinar el día de la semana a partir de la fecha seleccionada
+        $diaSemana = Carbon::parse($fecha)->locale('es')->dayName;
+
+        // Buscar horarios para el día de la semana
+        $horarios = HorariosMedicos::where('medico_id', $medicoId)
+                                    ->where('dia_semana', $diaSemana)
+                                    ->get();
+
+        if ($horarios->isEmpty()) {
+            return response()->json(['mensaje' => 'No hay horarios configurados para este día.'], 404);
+        }
+
+        // Ordenar los turnos en el siguiente orden: Matutino, Vespertino, Nocturno
+        $horariosOrdenados = $horarios->sortBy(function($horario) {
+            return ['Matutino' => 1, 'Vespertino' => 2, 'Nocturno' => 3][$horario->turno];
+        });
+
+        // Crear los intervalos basados en la duración de la sesión
+        $horariosDivididos = [];
+
+        foreach ($horariosOrdenados as $horario) {
+            // Añadir el encabezado para el turno
+            $horariosDivididos[] = [
+                'inicio' => null, 
+                'fin' => null, 
+                'turno' => 'Horario ' . $horario->turno
+            ];
+
+            $horaInicio = Carbon::parse($horario->hora_inicio);
+            $horaFin = Carbon::parse($horario->hora_fin);
+            $duracionSesion = $horario->duracion_sesion;
+
+            while ($horaInicio->lessThan($horaFin)) {
+                $finIntervalo = $horaInicio->copy()->addMinutes($duracionSesion);
+                if ($finIntervalo->greaterThan($horaFin)) {
+                    $finIntervalo = $horaFin;
+                }
+
+                $horariosDivididos[] = [
+                    'inicio' => $horaInicio->format('H:i'),
+                    'fin' => $finIntervalo->format('H:i'),
+                    'turno' => null
+                ];
+
+                $horaInicio->addMinutes($duracionSesion);
+            }
+        }
+
+        return response()->json($horariosDivididos);
+    }
+
+    public function obtenerHorasOcupadas(Request $request)
+    {
+        $fecha = $request->input('fecha');
+        $medicoId = Auth::id(); // Obtener el ID del médico actual
+
+        // Obtener las horas ocupadas para la fecha seleccionada
+        $horasOcupadas = Citas::where('fecha', $fecha)
+                            ->where('medicoid', $medicoId)
+                            ->pluck('hora') // Obtenemos las horas ocupadas
+                            ->toArray(); // Convertimos la colección en un array
+
+        return response()->json($horasOcupadas);
     }
 
 
@@ -657,8 +716,10 @@ class MedicoController extends Controller
             'hora_inicio' => $request->hora_inicio,
             'hora_fin' => $request->hora_fin,
             'duracion_sesion' => $request->duracion_sesion,
+            'turno' => $request->turno, // Asegúrate de incluir el turno aquí también
             'disponible' => $request->disponible,
         ]);
+
 
         return redirect()->route('citas.configurarHorario')->with('status', 'Horario actualizado exitosamente.');
     }

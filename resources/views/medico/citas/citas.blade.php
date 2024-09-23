@@ -1,9 +1,9 @@
 <x-app-layout>
-    <div class="py-12" x-data="{ isModalOpen: false, isPersonaModalOpen: false }" x-init="
-        @if (session('persona_id'))
+    <div class="py-12" x-data="{ isModalOpen: false, isPacienteModalOpen: false }" x-init="
+        @if (session('paciente_id'))
             isModalOpen = true;
             setTimeout(() => {
-                document.getElementById('persona').value = '{{ session('persona_id') }}';
+                document.getElementById('paciente_no_exp').value = '{{ session('paciente_id') }}';
             }, 100);
         @endif
     ">
@@ -38,7 +38,7 @@
                                                             </svg>
                                                         </div>
                                                         <div class="flex-1">
-                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-lg font-semibold text-gray-900">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
+                                                            <a href="{{ route('citas.editar', $cita->id) }}" class="text-sm font-semibold text-gray-900">{{ $cita->nombres }} {{ $cita->apepat }} {{ $cita->apemat }}</a>
                                                             <div class="text-sm text-gray-600">{{ $cita->fecha }} - {{ $cita->hora }}</div>
                                                         </div>
                                                         <form action="{{ route('citas.eliminar', $cita->id) }}" method="POST" style="display:inline;">
@@ -68,10 +68,10 @@
             @include('medico.citas.agregarCita')
         </div>
 
-        <!-- Modal Agregar Persona -->
-        <div x-show="isPersonaModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isPersonaModalOpen = false"></div>
-            @include('medico.citas.agregarPersona')
+        <!-- Modal Agregar Paciente -->
+        <div x-show="isPacienteModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-black bg-opacity-50" @click="isPacienteModalOpen = false"></div>
+            @include('medico.citas.agregarPaciente')
         </div>
     </div>
 </x-app-layout> 
@@ -226,31 +226,56 @@
                 info.jsEvent.preventDefault();
             },
             eventDrop: function(info) {
-                Swal.fire({
-                    title: '¿Deseas cambiar la fecha de esta cita?',
-                    text: "Se actualizará la fecha de la cita con ajustes basados en la nueva selección.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, cambiar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const oldDate = new Date(info.oldEvent.start);
-                        const newDate = new Date(info.event.start);
-                        let adjustedDate;
+                const newDate = info.event.start.toISOString().split('T')[0]; // Obtener la nueva fecha
+                const eventId = info.event.id;
 
-                        // Formatear la fecha ajustada para enviarla
-                        const formattedDate = newDate.toISOString().split('T')[0];
-                        const newTime = info.event.start.toTimeString().split(' ')[0].substring(0, 5);
-                        
-                        // Redirigir con la fecha ajustada
-                        window.location.href = `${info.event.url}?newDate=${formattedDate}&newTime=${newTime}`;
-                    } else {
-                        info.revert();
-                    }
-                });
+                // Enviar solicitud AJAX para verificar si hay horarios configurados
+                fetch(`/obtener-horarios-por-dia?fecha=${encodeURIComponent(newDate)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.mensaje) {
+                            // Si no hay horarios configurados, mostrar alerta y revertir el cambio
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'No hay horarios configurados',
+                                text: 'No puedes mover una cita a un día que no tiene horarios configurados.',
+                                confirmButtonColor: '#007BFF',
+                            });
+                            info.revert(); // Revertir el movimiento de la cita
+                        } else {
+                            // Si hay horarios configurados, confirmar el cambio de fecha
+                            Swal.fire({
+                                title: '¿Deseas cambiar la fecha de esta cita?',
+                                text: "Se actualizará la fecha de la cita con la nueva selección.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Sí, cambiar',
+                                cancelButtonText: 'Cancelar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Formatear la fecha ajustada para enviarla
+                                    const formattedDate = newDate;
+                                    const newTime = info.event.start.toTimeString().split(' ')[0].substring(0, 5);
+                                    
+                                    // Redirigir con la fecha ajustada
+                                    window.location.href = `${info.event.url}?newDate=${formattedDate}&newTime=${newTime}`;
+                                } else {
+                                    info.revert();
+                                }
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hubo un problema al verificar los horarios.',
+                            confirmButtonColor: '#EBF2F4',
+                        });
+                        info.revert(); // Revertir el cambio en caso de error
+                    });
             },
             dayCellDidMount: function(info) {
                 var today = new Date();
@@ -265,6 +290,7 @@
 
         calendar.render();
     });
+
 
     document.addEventListener('DOMContentLoaded', function() {
         const fechaInput = document.getElementById('fecha');

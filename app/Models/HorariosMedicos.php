@@ -20,6 +20,7 @@ class HorariosMedicos extends Model
         'hora_fin',
         'duracion_sesion',
         'disponible',
+        'turno',  // Asegúrate de agregar 'turno' aquí
     ];
 
     // Relaciones
@@ -56,5 +57,20 @@ class HorariosMedicos extends Model
         }
 
         return $bloques;
+    }
+
+    // Accesor para formatear el turno
+    public function getFormattedTurnoAttribute()
+    {
+        switch ($this->turno) {
+            case 'Matutino':
+                return 'Matutino (mañana)';
+            case 'Vespertino':
+                return 'Vespertino (tarde)';
+            case 'Nocturno':
+                return 'Nocturno (noche)';
+            default:
+                return 'Turno no definido';
+        }
     }
 }

@@ -10,19 +10,14 @@
                 
                     <form id="horarioForm" method="POST" action="{{ route('horarios.store') }}">
                         @csrf
-                
+                    
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
-                            <!-- Fecha -->
-                            <div>
-                                <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha (Opcional)</label>
-                                <input type="date" name="fecha" id="fecha" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            </div>
-                
+
                             <!-- Día de la Semana -->
                             <div>
                                 <label for="dia_semana" class="block text-sm font-medium text-gray-700">Día de la Semana (Opcional)</label>
                                 <select name="dia_semana" id="dia_semana" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    <option value="">Seleccionar Día</option>
+                                    <option value="" disabled selected>Seleccionar Día</option>
                                     <option value="Lunes">Lunes</option>
                                     <option value="Martes">Martes</option>
                                     <option value="Miércoles">Miércoles</option>
@@ -32,36 +27,42 @@
                                     <option value="Domingo">Domingo</option>
                                 </select>
                             </div>
-                
+                    
                             <!-- Hora Inicio -->
                             <div>
                                 <label for="hora_inicio" class="block text-sm font-medium text-gray-700">Hora de Inicio</label>
                                 <input type="time" name="hora_inicio" id="hora_inicio" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
-                
+                    
                             <!-- Hora Fin -->
                             <div>
                                 <label for="hora_fin" class="block text-sm font-medium text-gray-700">Hora de Fin</label>
                                 <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
-                
+                    
                             <!-- Duración de la Sesión -->
                             <div>
                                 <label for="duracion_sesion" class="block text-sm font-medium text-gray-700">Duración de la Sesión (minutos)</label>
                                 <input type="number" name="duracion_sesion" id="duracion_sesion" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
-                
-                            <!-- Disponibilidad -->
+                    
+                            <!-- Turno -->
                             <div>
-                                <label for="disponible" class="block text-sm font-medium text-gray-700">¿Disponible?</label>
-                                <select name="disponible" id="disponible" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    <option value="1">Sí</option>
-                                    <option value="0">No</option>
+                                <label for="turno" class="block text-sm font-medium text-gray-700">Turno</label>
+                                <select name="turno" id="turno" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <option value="" disabled selected>Seleccionar Turno</option>
+                                    <option value="Matutino">Matutino</option>
+                                    <option value="Vespertino">Vespertino</option>
+                                    <option value="Nocturno">Nocturno</option>
                                 </select>
                             </div>
+                    
+                            <!-- Campo oculto de Disponible -->
+                            <input type="hidden" name="disponible" value="1">
                         </div>
                     </form>
-                
+                    
+                    <!-- Tabla de horarios configurados -->
                     <div class="mt-8">
                         <h1 class="text-lg font-semibold mb-4">Horarios Configurados para Días de la Semana</h1>
                         <div class="overflow-x-auto bg-white dark:bg-neutral-700">
@@ -71,6 +72,7 @@
                                         <th>Día</th>
                                         <th>Horario</th>
                                         <th>Duración</th>
+                                        <th>Turno</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -80,9 +82,10 @@
                                             <td>{{ $horario->dia_semana }}</td>
                                             <td>{{ \Carbon\Carbon::parse($horario->hora_inicio)->format('h:i A') }} - {{ \Carbon\Carbon::parse($horario->hora_fin)->format('h:i A') }}</td>
                                             <td>{{ $horario->duracion_sesion }} minutos</td>
+                                            <td>{{ $horario->turno }}</td>
                                             <td>
                                                 <button class="text-blue-500 hover:text-blue-700" 
-                                                        onclick="openEditModal('{{ $horario->id }}', '{{ $horario->dia_semana }}', '{{ $horario->hora_inicio }}', '{{ $horario->hora_fin }}', '{{ $horario->duracion_sesion }}', '{{ $horario->disponible }}')">
+                                                        onclick="openEditModal('{{ $horario->id }}', '{{ $horario->dia_semana }}', '{{ $horario->hora_inicio }}', '{{ $horario->hora_fin }}', '{{ $horario->duracion_sesion }}', '{{ $horario->disponible }}', '{{ $horario->turno }}')">
                                                     Editar
                                                 </button>
                                                 <button class="text-red-500 hover:text-red-700">Eliminar</button>
@@ -90,38 +93,6 @@
                                         </tr>
                                     @endforeach
                                 </tbody>                                
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="mt-8">
-                        <h1 class="text-lg font-semibold mb-4">Horarios Configurados para Fechas Particulares</h1>
-                        <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                            <table id="horariosFechasTable" class="display nowrap w-full" style="width:100%">
-                                <thead class="bg-table-header-color text-white">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Horario</th>
-                                        <th>Duración</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($horariosFechas as $horario)
-                                        <tr>
-                                            <td>{{ \Carbon\Carbon::parse($horario->fecha)->format('j F, Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($horario->hora_inicio)->format('h:i A') }} - {{ \Carbon\Carbon::parse($horario->hora_fin)->format('h:i A') }}</td>
-                                            <td>{{ $horario->duracion_sesion }} minutos</td>
-                                            <td>
-                                                <button class="text-blue-500 hover:text-blue-700" 
-                                                        onclick="openEditModal('{{ $horario->id }}', '', '{{ $horario->hora_inicio }}', '{{ $horario->hora_fin }}', '{{ $horario->duracion_sesion }}', '{{ $horario->disponible }}', '{{ \Carbon\Carbon::parse($horario->fecha)->format('Y-m-d') }}')">
-                                                    Editar
-                                                </button>
-                                                <button class="text-red-500 hover:text-red-700">Eliminar</button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -158,7 +129,7 @@
                     <div class="mb-4" id="diaSemanaField">
                         <label for="editDiaSemana" class="block text-sm font-medium text-gray-700">Día de la Semana</label>
                         <select name="dia_semana" id="editDiaSemana" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">Seleccionar Día</option>
+                            <option value="" disabled selected>Seleccionar Día</option>
                             <option value="Lunes">Lunes</option>
                             <option value="Martes">Martes</option>
                             <option value="Miércoles">Miércoles</option>
@@ -204,58 +175,128 @@
         </div>
     </div>
 
+    @if ($errors->has('turno_repetido'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Turno Repetido',
+                text: '{{ $errors->first('turno_repetido') }}',
+                confirmButtonColor: '#007BFF',
+            });
+        </script>
+    @endif
+
+    @if ($errors->has('hora_fin'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la Hora',
+                text: '{{ $errors->first('hora_fin') }}',
+                confirmButtonColor: '#007BFF',
+            });
+        </script>
+    @endif
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        
+        document.getElementById('horarioForm').addEventListener('submit', function(event) {
+            // Obtener los valores seleccionados
+            const diaSemana = document.getElementById('dia_semana').value;
+            const turno = document.getElementById('turno').value;
+
+            // Verificar si el valor seleccionado es el valor predeterminado
+            if (diaSemana === "" || turno === "") {
+                event.preventDefault(); // Prevenir el envío del formulario
+
+                // Mostrar SweetAlert si no se ha seleccionado día o turno
+                Swal.fire({
+                    icon: 'Error',
+                    title: 'Error',
+                    text: 'Por favor selecciona un Día de la Semana y un Turno.',
+                    confirmButtonColor: '#007BFF',
+                });
+
+                return false; // Detener el envío del formulario
+            }
+        });
+
         $(document).ready(function() {
-            $('#horariosSemanaTable').DataTable({
-                "pageLength": 7,
-                "lengthChange": false,
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "No hay horarios registrados",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
-                    "infoFiltered": "(filtrado de _MAX_ entradas en total)",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscar:",
-                    "zeroRecords": "No se encontraron resultados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
+            // Función de orden personalizada para los días de la semana
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "dayOfWeek-pre": function(value) {
+                    var daysOrder = {
+                        "Lunes": 1,
+                        "Martes": 2,
+                        "Miércoles": 3,
+                        "Jueves": 4,
+                        "Viernes": 5,
+                        "Sábado": 6,
+                        "Domingo": 7
+                    };
+                    return daysOrder[value] || 8;  // Devolver un número alto si el valor es indefinido
                 },
-                "scrollX": false,
-                "autoWidth": true
+                "dayOfWeek-asc": function(a, b) {
+                    return a - b;
+                },
+                "dayOfWeek-desc": function(a, b) {
+                    return b - a;
+                }
             });
 
-            $('#horariosFechasTable').DataTable({
-                "pageLength": 5,
-                "lengthChange": true,
-                "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "No hay horarios registrados",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
-                    "infoFiltered": "(filtrado de _MAX_ entradas en total)",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscar:",
-                    "zeroRecords": "No se encontraron resultados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
+            // Función de orden personalizada para los turnos (Matutino, Vespertino, Nocturno)
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "turnOrder-pre": function(value) {
+                    var turnOrder = {
+                        "Matutino": 1,
+                        "Vespertino": 2,
+                        "Nocturno": 3
+                    };
+                    return turnOrder[value] || 4;  // Devolver un número alto si el valor es indefinido
+                },
+                "turnOrder-asc": function(a, b) {
+                    return a - b;
+                },
+                "turnOrder-desc": function(a, b) {
+                    return b - a;
+                }
+            });
+
+            $('#horariosSemanaTable').DataTable({
+                columnDefs: [
+                    { type: "dayOfWeek", targets: 0 }, // Ordenar la columna del día de la semana
+                    { type: "turnOrder", targets: 3 }  // Ordenar la columna del turno
+                ],
+                language: {
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    lengthMenu: "Mostrar _MENU_ entradas",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron coincidencias",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
                     }
                 },
-                "scrollX": false,
-                "autoWidth": true
+                paging: true,
+                searching: true,
+                info: true,
+                autoWidth: false,
+                lengthMenu: [[5, 10, 15, -1], [5, 10, 15, "Todos"]],
+                order: [[0, 'asc'], [3, 'asc']]  // Ordenar primero por día y luego por turno
             });
         });
+
+
 
         function openEditModal(id, dia_semana, hora_inicio, hora_fin, duracion_sesion, disponible, fecha = '') {
             document.getElementById('editId').value = id;
@@ -290,6 +331,8 @@
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js" defer></script>
 
 <style>
+
+
     .bg-table-header-color {
         background-color: #2D7498;
     }
