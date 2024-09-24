@@ -132,7 +132,7 @@
                             @endcan
                             @can('Vista Consultas')
                                 <a href="{{ route('consultas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white relative">
-                                    Consultas
+                                    Consultas Agendadas
                                     <template x-if="dropdownOpen && {{ $consultasPendientes }} > 0">
                                         <span class="notification-badge absolute top-1/2 right-3 transform -translate-y-1/2 translate-x-[20%]">
                                             {{ $consultasPendientes }}

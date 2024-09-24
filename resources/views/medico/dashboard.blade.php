@@ -78,12 +78,15 @@
                                             <tr>
                                                 <td>{{ $paciente->no_exp }}</td>
                                                 <td>{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($paciente->fechanac)->format('j M, Y') }}</td>
+                                                <td>{{ strtoupper(\Carbon\Carbon::parse($paciente->fechanac)->locale('es')->isoFormat('DD MMM YYYY')) }}</td>
                                                 <td>{{ $paciente->sexo }}</td>
                                                 <td>{{ $paciente->telefono }}</td>
                                                 <td>
                                                     @can('Editar Paciente')
-                                                        <a href="{{ route('pacientes.editar', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                                        <a href="{{ route('pacientes.editar', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700">Expediente</a>
+                                                    @endcan
+                                                    @can('Consultar')
+                                                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
                                                     @endcan
                                                     @can('Eliminar Paciente')
                                                         <form action="{{ route('pacientes.eliminar', $paciente->no_exp) }}" method="POST" class="inline-block">
@@ -93,10 +96,6 @@
                                                                 Eliminar
                                                             </button>
                                                         </form>
-                                                    @endcan
-
-                                                    @can('Consultar')
-                                                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-green-500 hover:text-green-700 ml-4">Consultar</a>
                                                     @endcan
                                                 </td>
                                             </tr>

@@ -49,7 +49,7 @@
                             </li>
                         </ul>
 
-                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700 ml-4">Ir a Consultar</a>
+                        <a href="{{ route('consultas.createWithoutCita', $paciente->no_exp) }}" class="text-blue-500 hover:text-blue-700 ml-4">Nueva Consulta</a>
 
                     </div>
 
@@ -421,7 +421,7 @@
                                                     
                                                     <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
                                                     <td class="text-left py-3 px-4">
-                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
+                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Visualizar Historial</a>
                                                     </td>
                                                                                                    
                                                 </tr>
