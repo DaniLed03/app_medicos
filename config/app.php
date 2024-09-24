@@ -16,7 +16,7 @@ return [
 
     'fallback_locale' => 'en',
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'en_MX',
 
     'cipher' => 'AES-256-CBC',
 

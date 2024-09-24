@@ -275,20 +275,31 @@ class ConsultaController extends Controller
         }
     }
 
-    public function show($id)
+    public function show($id, $no_exp, $medico_id)
     {
-        $consulta = Consultas::with(['recetas', 'usuarioMedico'])
-    ->findOrFail($id);
+        // Encuentra la consulta y las recetas asociadas, filtrando por consulta, paciente y médico
+        $consulta = Consultas::with(['recetas' => function ($query) use ($id, $no_exp) {
+            $query->where('consulta_recetas.consulta_id', $id) // Filtrar por la consulta específica
+                ->where('consulta_recetas.no_exp', $no_exp); // Filtrar por paciente
+        }])
+        ->where('id', $id)  // Filtrar por el ID de la consulta
+        ->where('pacienteid', $no_exp)  // Filtrar por el paciente
+        ->where('usuariomedicoid', $medico_id)  // Filtrar por el médico
+        ->firstOrFail();
 
-    $paciente = Paciente::findOrFail($consulta->pacienteid);
+        // Obtener la información del paciente
+        $paciente = Paciente::where('no_exp', $no_exp)->firstOrFail();
 
+        // Calcular la edad del paciente
+        $fechaNacimiento = \Carbon\Carbon::parse($paciente->fechanac);
+        $edad = $fechaNacimiento->diff(\Carbon\Carbon::now());
 
         // Formatear la fecha de la consulta
         $fechaConsulta = \Carbon\Carbon::parse($consulta->fechaHora)->format('d-m-Y');
 
-        return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta'));
+        // Retornar la vista con los datos de la consulta y paciente
+        return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta', 'edad'));
     }
-
 
     public function print($id)
     {
@@ -353,51 +364,61 @@ class ConsultaController extends Controller
 
 
     public function navigate(Request $request)
-    {
-        $direction = $request->input('direction');
-        $currentConsultationId = $request->input('currentConsultationId');
-        $medicoId = Auth::id(); // ID del médico logueado
+{
+    $direction = $request->input('direction');
+    $currentConsultationId = $request->input('currentConsultationId');
+    $medicoId = Auth::id(); // ID del médico logueado
+    $pacienteId = $request->input('pacienteId'); // ID del paciente actual
 
-        // Obtener el paciente actual desde la consulta actual
-        $currentConsultation = Consultas::findOrFail($currentConsultationId);
-        $pacienteId = $currentConsultation->pacienteid;
+    // Obtener la consulta actual
+    $currentConsultation = Consultas::where('id', $currentConsultationId)
+                                    ->where('pacienteid', $pacienteId)
+                                    ->where('usuariomedicoid', $medicoId)
+                                    ->firstOrFail();
 
-        if ($direction == 'first') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)
-                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
-                ->orderBy('id', 'asc')
-                ->first();
-        } elseif ($direction == 'prev') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)
-                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
-                ->where('id', '<', $currentConsultationId)
-                ->orderBy('id', 'desc')
-                ->first();
-        } elseif ($direction == 'next') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)
-                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
-                ->where('id', '>', $currentConsultationId)
-                ->orderBy('id', 'asc')
-                ->first();
-        } elseif ($direction == 'last') {
-            $consulta = Consultas::where('usuariomedicoid', $medicoId)
-                ->where('pacienteid', $pacienteId) // Asegurarse de que sea el mismo paciente
-                ->orderBy('id', 'desc')
-                ->first();
-        }
-
-        if ($consulta) {
-            $consulta->load('recetas'); // Cargar recetas relacionadas
-            $paciente = $consulta->cita ? $consulta->cita->paciente : Paciente::findOrFail($consulta->pacienteid);
-
-            return response()->json([
-                'success' => true,
-                'redirectUrl' => route('consultas.show', $consulta->id)
-            ]);
-        } else {
-            return response()->json(['success' => false]);
-        }
+    if ($direction == 'first') {
+        $consulta = Consultas::where('usuariomedicoid', $medicoId)
+            ->where('pacienteid', $pacienteId)
+            ->orderBy('id', 'asc')
+            ->first();
+    } elseif ($direction == 'prev') {
+        $consulta = Consultas::where('usuariomedicoid', $medicoId)
+            ->where('pacienteid', $pacienteId)
+            ->where('id', '<', $currentConsultationId)
+            ->orderBy('id', 'desc')
+            ->first();
+    } elseif ($direction == 'next') {
+        $consulta = Consultas::where('usuariomedicoid', $medicoId)
+            ->where('pacienteid', $pacienteId)
+            ->where('id', '>', $currentConsultationId)
+            ->orderBy('id', 'asc')
+            ->first();
+    } elseif ($direction == 'last') {
+        $consulta = Consultas::where('usuariomedicoid', $medicoId)
+            ->where('pacienteid', $pacienteId)
+            ->orderBy('id', 'desc')
+            ->first();
     }
+
+    // Verificar si no se encontró más consultas
+    if (!$consulta) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No hay más consultas en esta dirección.'
+        ]);
+    }
+
+    // Si se encontró una consulta, devolverla
+    $consulta->load('recetas');
+    return response()->json([
+        'success' => true,
+        'consulta' => $consulta,
+        'redirectUrl' => route('consultas.show', ['id' => $consulta->id, 'no_exp' => $consulta->pacienteid, 'medico_id' => $medicoId])
+    ]);
+}
+
+
+
 
     
     public function iniciarConsulta($id)

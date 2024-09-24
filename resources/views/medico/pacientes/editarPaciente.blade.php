@@ -406,21 +406,24 @@
                                         @if(isset($consultas) && count($consultas) > 0)
                                             @foreach($consultas as $consulta)
                                                 <tr>
-                                                    <td class="text-left py-3 px-4">{{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d M, Y h:i A') }}</td>
+                                                    <td class="text-left py-3 px-4">{{ mb_strtoupper(\Carbon\Carbon::parse($consulta->fechaHora)->locale('es')->isoFormat('DD MMM YYYY hh:mm A')) }}</td>
                                                     <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
                                                         {!! $consulta->motivoConsulta !!}
-                                                    </td>                                                                                                        
+                                                    </td>
                                                     <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
                                                         {!! $consulta->diagnostico !!}
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        {{ $consulta->recetas->count() }} {{ Str::plural('Receta', $consulta->recetas->count()) }}
-                                                    </td>                                                                                                       
+                                                        <!-- Usar la nueva función recetasPorPaciente para filtrar las recetas del paciente y médico -->
+                                                        {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
+                                                        {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
+                                                    </td>
+                                                    
                                                     <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
                                                     <td class="text-left py-3 px-4">
-                                                        <a href="{{ route('consultas.show', $consulta->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
-                                                        <a href="{{ route('consultas.print', $consulta->id) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Imprimir</a>
-                                                    </td>                                                
+                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver</a>
+                                                    </td>
+                                                                                                   
                                                 </tr>
                                             @endforeach
                                         @else
@@ -428,7 +431,7 @@
                                                 <td colspan="6" class="text-center py-3 px-4">No hay consultas registradas.</td>
                                             </tr>
                                         @endif
-                                    </tbody>                                    
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -445,6 +448,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
     <!-- CKEditor -->
     <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
@@ -633,6 +637,27 @@
             event.currentTarget.className += " active-tab";
         }
 
+        // Plugin de moment.js para DataTables
+        $.fn.dataTable.moment = function (format) {
+            var types = $.fn.dataTable.ext.type;
+
+            // Detección de tipo
+            types.detect.unshift(function (d) {
+                return moment(d, format, true).isValid() ?
+                    'moment-' + format :
+                    null;
+            });
+
+            // Método de ordenación
+            types.order['moment-' + format + '-pre'] = function (d) {
+                return moment(d, format, true).unix();
+            };
+        };
+
+        // Llamar a la función para añadir el formato deseado
+        $.fn.dataTable.moment('DD MMM, YYYY hh:mm A');
+
+
         // Set default tab
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -643,7 +668,7 @@
                 $('#historialTable').DataTable({
                     "language": {
                         "decimal": "",
-                        "emptyTable": "No hay consultas registradas",  // Mensaje cuando no hay registros
+                        "emptyTable": "No hay consultas registradas",
                         "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
                         "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
                         "infoFiltered": "(Filtrado de _MAX_ total entradas)",
@@ -665,9 +690,11 @@
                     "scrollX": false,
                     "autoWidth": true,
                     "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+                    "order": [[0, 'desc']], // Ordena por la primera columna (fecha) de forma descendente
                     "columnDefs": [
                         {
                             "targets": 0,
+                            "type": "moment-DD MMM, YYYY hh:mm A", // Define que esta columna es de tipo fecha y hora
                             "width": "15%"
                         },
                         {
@@ -694,6 +721,8 @@
                     ]
                 });
             });
+
+
 
         });
 

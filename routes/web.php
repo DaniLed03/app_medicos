@@ -112,11 +112,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/recetas/store', [ConsultaController::class, 'storeReceta'])->name('recetas.store');
     Route::post('/medico/storeDesdeModal', [MedicoController::class, 'storeDesdeModal'])->name('medico.storeDesdeModal');
     Route::get('/search-pacientes', [MedicoController::class, 'searchPacientes'])->name('pacientes.search');
-
+    route::post('/consultas/navigate', [ConsultaController::class, 'navigate'])->name('consultas.navigate');    
     // Rutas de Usuarios
     Route::get('/consultas/verificarPaciente/{citaId}', [ConsultaController::class, 'verificarPaciente'])->name('consultas.verificarPaciente');
     Route::get('/pacientes/completar-registro/{citaId}', [MedicoController::class, 'completarRegistroPaciente'])->name('pacientes.completarRegistro');
     Route::post('/users/{id}/reset-password', [AsignarController::class, 'resetPassword'])->name('users.resetPassword');
+    route::get('/consultas/{id}/{no_exp}/{medico_id}', [ConsultaController::class, 'show'])->name('consultas.show');
 
     // Rutas para ventas (ya existente)
     Route::get('ventas/generate/{consulta}', [ConsultaController::class, 'generateVenta'])->name('ventas.generate');
