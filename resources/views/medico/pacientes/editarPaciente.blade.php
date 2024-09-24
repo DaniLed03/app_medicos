@@ -387,8 +387,8 @@
                         </form>
                     </div>
 
+                    <!-- Historial de Consultas -->
                     <div id="historial" class="tab-content hidden mt-3">
-                        <!-- Historial de Consultas -->
                         <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
                             <div class="overflow-x-auto">
                                 <table id="historialTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden display nowrap">
@@ -398,7 +398,6 @@
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Motivo</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Diagnóstico</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Recetas</th>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Doctor</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
                                         </tr>
                                     </thead>
@@ -414,28 +413,33 @@
                                                         {!! $consulta->diagnostico !!}
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        <!-- Usar la nueva función recetasPorPaciente para filtrar las recetas del paciente y médico -->
                                                         {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
                                                         {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
                                                     </td>
-                                                    
-                                                    <td class="text-left py-3 px-4">Dr. {{ $consulta->usuarioMedico->nombres }} {{ $consulta->usuarioMedico->apepat }} {{ $consulta->usuarioMedico->apemat }}</td>
                                                     <td class="text-left py-3 px-4">
-                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Visualizar Historial</a>
+                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" 
+                                                           class="text-blue-500 hover:text-blue-700 ">
+                                                           Visualizar Historial
+                                                        </a>
+                                                    
+                                                        <a href="" 
+                                                           class="text-green-500 hover:text-green-700 ml-4">
+                                                           Editar
+                                                        </a>
                                                     </td>
-                                                                                                   
+                                                    
                                                 </tr>
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center py-3 px-4">No hay consultas registradas.</td>
+                                                <td colspan="5" class="text-center py-3 px-4">No hay consultas registradas.</td>
                                             </tr>
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>                    
+                    </div>                     
                 </div>
             </div>
         </div>
@@ -711,16 +715,13 @@
                         },
                         {
                             "targets": 4,
-                            "width": "15%"
-                        },
-                        {
-                            "targets": 5,
                             "width": "10%",
                             "orderable": false
                         }
                     ]
                 });
             });
+
 
 
 
