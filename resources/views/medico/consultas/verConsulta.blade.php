@@ -243,6 +243,40 @@
                 });
             }
         });
+        // Función para manejar la apertura de tabs
+        window.openTab = function(event, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-pane");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active-tab");
+            }
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active-tab");
+        }
+
+        // Set default tab
+        document.addEventListener("DOMContentLoaded", function() {
+            openTab({currentTarget: document.querySelector(`[href="#consultaTab"]`)}, 'consultaTab');
+        });
+
+        // Ver receta modal
+        $('.ver-receta').on('click', function(event) {
+            event.preventDefault();
+            var index = $(this).data('receta-index');
+            var receta = {!! json_encode($consulta->recetas->pluck('receta')) !!}[index];
+            $('#recetaModalTitle').text('Receta');
+            $('#recetaModalContent').html('<div class="bg-gray-100 p-4 rounded-lg">' + receta + '</div>');
+            $('#recetaModal').removeClass('hidden');
+        });
+
+        // Cerrar el Modal de Receta
+        $('#closeRecetaModal').on('click', function() {
+            $('#recetaModal').addClass('hidden');
+        });
     </script>
     <style>
         .tab-link {
