@@ -5,7 +5,7 @@
                 <div class="p-6 text-gray-900">
                     <div class="flex justify-between items-center mb-6">
                         <h1 class="text-xl font-bold text-gray-900 uppercase">Configuracion de Horario</h1>
-                        <button type="submit" form="horarioForm" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar Horario</button>
+                        <button type="submit" form="horarioForm" id="guardarHorario" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar Horario</button>
                     </div>
                 
                     <form id="horarioForm" method="POST" action="{{ route('horarios.store') }}">
@@ -84,12 +84,12 @@
                                             <td>{{ $horario->duracion_sesion }} minutos</td>
                                             <td>{{ $horario->turno }}</td>
                                             <td>
-                                                <button class="text-blue-500 hover:text-blue-700" 
-                                                        onclick="openEditModal('{{ $horario->id }}', '{{ $horario->dia_semana }}', '{{ $horario->hora_inicio }}', '{{ $horario->hora_fin }}', '{{ $horario->duracion_sesion }}', '{{ $horario->disponible }}', '{{ $horario->turno }}')">
-                                                    Editar
-                                                </button>
-                                                <button class="text-red-500 hover:text-red-700">Eliminar</button>
-                                            </td>
+                                                <form action="{{ route('horarios.destroy', $horario->id) }}" method="POST" class="delete-form">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" class="text-red-500 hover:text-red-700 delete-button">Eliminar</button>
+                                                </form>
+                                            </td>                                            
                                         </tr>
                                     @endforeach
                                 </tbody>                                
@@ -97,80 +97,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Editar Horario -->
-    <div id="editModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="bg-gray-900 bg-opacity-50 fixed inset-0"></div>
-            <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative z-20">
-                <!-- Icono para cerrar el modal -->
-                <button onclick="closeEditModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">
-                    &times;
-                </button>
-                <!-- Título centrado con color personalizado -->
-                <h2 class="text-xl font-bold mb-4 text-center" style="color: #2D7498;">Editar Horario</h2>
-                <!-- Línea de separación -->
-                <hr class="border-gray-300 mb-4">
-                <form id="editHorarioForm" method="POST" action="">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="id" id="editId">
-                    
-                    <!-- Fecha (Opcional) -->
-                    <div class="mb-4" id="fechaField">
-                        <label for="editFecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                        <input type="date" name="fecha" id="editFecha" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    </div>
-
-                    <!-- Día de la Semana (Opcional) -->
-                    <div class="mb-4" id="diaSemanaField">
-                        <label for="editDiaSemana" class="block text-sm font-medium text-gray-700">Día de la Semana</label>
-                        <select name="dia_semana" id="editDiaSemana" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="" disabled selected>Seleccionar Día</option>
-                            <option value="Lunes">Lunes</option>
-                            <option value="Martes">Martes</option>
-                            <option value="Miércoles">Miércoles</option>
-                            <option value="Jueves">Jueves</option>
-                            <option value="Viernes">Viernes</option>
-                            <option value="Sábado">Sábado</option>
-                            <option value="Domingo">Domingo</option>
-                        </select>
-                    </div>
-
-                    <!-- Hora Inicio -->
-                    <div class="mb-4">
-                        <label for="editHoraInicio" class="block text-sm font-medium text-gray-700">Hora de Inicio</label>
-                        <input type="time" name="hora_inicio" id="editHoraInicio" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    </div>
-
-                    <!-- Hora Fin -->
-                    <div class="mb-4">
-                        <label for="editHoraFin" class="block text-sm font-medium text-gray-700">Hora de Fin</label>
-                        <input type="time" name="hora_fin" id="editHoraFin" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    </div>
-
-                    <!-- Duración de la Sesión -->
-                    <div class="mb-4">
-                        <label for="editDuracionSesion" class="block text-sm font-medium text-gray-700">Duración de la Sesión (minutos)</label>
-                        <input type="number" name="duracion_sesion" id="editDuracionSesion" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    </div>
-
-                    <!-- Disponibilidad -->
-                    <div class="mb-4">
-                        <label for="editDisponible" class="block text-sm font-medium text-gray-700">¿Disponible?</label>
-                        <select name="disponible" id="editDisponible" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="1">Sí</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar Cambios</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -296,32 +222,42 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleccionar todos los botones de eliminar
+            const deleteButtons = document.querySelectorAll('.delete-button');
 
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
 
-        function openEditModal(id, dia_semana, hora_inicio, hora_fin, duracion_sesion, disponible, fecha = '') {
-            document.getElementById('editId').value = id;
-            document.getElementById('editFecha').value = fecha;
-            document.getElementById('editDiaSemana').value = dia_semana;
-            document.getElementById('editHoraInicio').value = hora_inicio;
-            document.getElementById('editHoraFin').value = hora_fin;
-            document.getElementById('editDuracionSesion').value = duracion_sesion;
-            document.getElementById('editDisponible').value = disponible;
+                    // Mostrar SweetAlert para confirmar la eliminación
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "No podrás revertir esta acción.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, se envía el formulario
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
 
-            if (fecha) { // Si hay una fecha, mostrar solo el campo de fecha
-                document.getElementById('fechaField').style.display = 'block';
-                document.getElementById('diaSemanaField').style.display = 'none';
-            } else { // Si no hay fecha, mostrar solo el campo de día de la semana
-                document.getElementById('fechaField').style.display = 'none';
-                document.getElementById('diaSemanaField').style.display = 'block';
-            }
-
-            document.getElementById('editHorarioForm').action = `/horarios/update/${id}`;
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desactiva el botón de "Guardar Horario" al enviar el formulario
+            document.getElementById('horarioForm').addEventListener('submit', function() {
+                const submitButton = document.getElementById('guardarHorario');
+                submitButton.disabled = true;
+                submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se guarda
+            });
+        });
     </script>
 </x-app-layout>
 

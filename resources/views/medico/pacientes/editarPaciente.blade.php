@@ -16,7 +16,6 @@
                         </div>
 
                         <!-- Número de Expediente -->
-                        <!-- Número de Expediente y botón de Consultar -->
                         <div class="text-right">
                             <x-input-label for="no_expEditar" :value="__('No. Expediente')" />
                             <x-text-input id="no_expEditar" class="block mt-1 w-full" type="text" name="no_exp" value="{{ $paciente->no_exp ?? '' }}" readonly />
@@ -25,7 +24,6 @@
 
                     </div>
 
-                    <!-- Tabs -->
                     <!-- Tabs y enlace de Ir a Consultar -->
                     <div class="flex items-center justify-between mb-4">
                         <ul class="flex border-b" id="tabs">
@@ -175,7 +173,7 @@
                                     <x-primary-button class="ml-4" id="contacto-update" onclick="submitForm('editPacienteFormNew')">
                                         {{ __('Actualizar Informacion') }}                                            
                                     </x-primary-button>
-                                </div>                                
+                                </div>                                                                
                             </form>
                         </div>
                     </div>
@@ -252,6 +250,7 @@
                                     {{ __('Actualizar Informacion') }}
                                 </x-primary-button>
                             </div>
+                            
                         </form>
                     </div>
                     
@@ -303,10 +302,11 @@
                                 </div> 
                             </div>
                             <div class="flex justify-end mt-4">
-                                <x-primary-button class="ml-4" id="emergencias-update" onclick="submitForm('padresForm')">
+                                <x-primary-button class="ml-4" id="padres-update" onclick="submitForm('padresForm')">
                                     {{ __('Actualizar Informacion') }}
                                 </x-primary-button>
                             </div>
+                            
                         </form>
                     </div>
 
@@ -331,6 +331,7 @@
                                     {{ __('Actualizar Informacion') }}
                                 </x-primary-button>
                             </div>
+                            
                         </form>
                     </div>
 
@@ -384,6 +385,7 @@
                                     {{ __('Actualizar Información') }}
                                 </x-primary-button>
                             </div>
+                            
                         </form>
                     </div>
 
@@ -422,10 +424,9 @@
                                                            Visualizar Historial
                                                         </a>
                                                     
-                                                        <a href="" 
-                                                           class="text-green-500 hover:text-green-700 ml-4">
-                                                           Editar
-                                                        </a>
+                                                        <a href="" class="text-green-500 hover:text-green-700 ml-4">
+                                                            Editar
+                                                         </a>                                                              
                                                     </td>
                                                     
                                                 </tr>
@@ -577,6 +578,26 @@
     </style>
 
     <script>
+        function submitForm(formId) {
+            const buttonId = formId + '-update'; // Obtén el ID del botón de enviar
+            const submitButton = document.getElementById(buttonId);
+
+            // Desactiva el botón y cambia su texto mientras se envía el formulario
+            submitButton.disabled = true;
+            submitButton.innerText = 'Guardando...';
+
+            // Verificar si el formulario es válido antes de enviarlo
+            const form = document.getElementById(formId);
+            if (form.checkValidity()) {
+                form.submit(); // Enviar formulario si todo está correcto
+            } else {
+                // Si el formulario no es válido, mostrar mensajes de error
+                submitButton.disabled = false;
+                submitButton.innerText = 'Actualizar Información';
+                alert('Por favor, rellena todos los campos requeridos.');
+            }
+        }
+
         $(document).ready(function() {
             $('.select2').select2({
                 theme: 'bootstrap4',  // Asegúrate de que Select2 use el tema de Bootstrap
@@ -786,8 +807,6 @@
             }
         }
 
-
-
     </script>
 
     @if(session('alerta'))
@@ -802,6 +821,4 @@
             });
         </script>
     @endif
-
-    
 </x-app-layout>

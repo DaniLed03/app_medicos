@@ -129,24 +129,27 @@ class MedicoController extends Controller
 
         // Obtén todos los pacientes para los cálculos de totales
         $totalPacientes = Paciente::where('activo', 'si')
-                        ->where(function($q) use ($medicoId, $currentUser) {
-                            $q->where('medico_id', $medicoId)
-                            ->orWhere('medico_id', $currentUser->id);
-                        })->count();
+            ->where(function($q) use ($medicoId, $currentUser) {
+                $q->where('medico_id', $medicoId)
+                ->orWhere('medico_id', $currentUser->id);
+            })
+            ->count();
 
         $totalMujeres = Paciente::where('activo', 'si')
-                        ->where('sexo', 'femenino')
-                        ->where(function($q) use ($medicoId, $currentUser) {
-                            $q->where('medico_id', $medicoId)
-                            ->orWhere('medico_id', $currentUser->id);
-                        })->count();
+            ->where('sexo', 'femenino')
+            ->where(function($q) use ($medicoId, $currentUser) {
+                $q->where('medico_id', $medicoId)
+                ->orWhere('medico_id', $currentUser->id);
+            })
+            ->count();
 
         $totalHombres = Paciente::where('activo', 'si')
-                        ->where('sexo', 'masculino')
-                        ->where(function($q) use ($medicoId, $currentUser) {
-                            $q->where('medico_id', $medicoId)
-                            ->orWhere('medico_id', $currentUser->id);
-                        })->count();
+            ->where('sexo', 'masculino')
+            ->where(function($q) use ($medicoId, $currentUser) {
+                $q->where('medico_id', $medicoId)
+                ->orWhere('medico_id', $currentUser->id);
+            })
+            ->count();
 
         $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
         $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
@@ -155,19 +158,33 @@ class MedicoController extends Controller
         $pacientes = collect(); // Inicia vacío
         if ($request->has('name') && $request->name != '') {
             $searchTerm = $request->name;
+            $searchTerms = explode(' ', $searchTerm); // Divide el término en palabras clave
+
+            // Construir la consulta dinámica para cada combinación de términos
             $pacientes = Paciente::where('activo', 'si')
-                        ->where(function ($query) use ($searchTerm, $medicoId, $currentUser) {
-                            $query->where(DB::raw("CONCAT(nombres, ' ', apepat, ' ', apemat)"), 'like', '%' . $searchTerm . '%')
-                                ->where(function($q) use ($medicoId, $currentUser) {
-                                    $q->where('medico_id', $medicoId)
+                ->where(function ($query) use ($searchTerms, $medicoId, $currentUser) {
+                    foreach ($searchTerms as $term) {
+                        $query->where(function ($q) use ($term, $medicoId, $currentUser) {
+                            $q->where(DB::raw("CONCAT(nombres, ' ', apepat, ' ', apemat)"), 'like', '%' . $term . '%')
+                            ->orWhere(DB::raw("CONCAT(apepat, ' ', apemat, ' ', nombres)"), 'like', '%' . $term . '%')
+                            ->orWhere(DB::raw("CONCAT(nombres, ' ', apepat)"), 'like', '%' . $term . '%')
+                            ->orWhere(DB::raw("CONCAT(apepat, ' ', nombres)"), 'like', '%' . $term . '%')
+                            ->orWhere(DB::raw("CONCAT(nombres, ' ', apemat)"), 'like', '%' . $term . '%')
+                            ->orWhere(DB::raw("CONCAT(apemat, ' ', nombres)"), 'like', '%' . $term . '%')
+                            // Agregar condición para buscar por teléfono
+                            ->orWhere('telefono', 'like', '%' . $term . '%')
+                            ->where(function($q) use ($medicoId, $currentUser) {
+                                $q->where('medico_id', $medicoId)
                                     ->orWhere('medico_id', $currentUser->id);
-                                });
-                        })->get();
+                            });
+                        });
+                    }
+                })
+                ->get();
         }
 
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
-
 
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($noExp)
@@ -731,5 +748,6 @@ class MedicoController extends Controller
 
         return redirect()->route('citas.configurarHorario')->with('status', 'Horario eliminado exitosamente.');
     }
+
 
 }

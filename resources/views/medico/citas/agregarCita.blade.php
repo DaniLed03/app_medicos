@@ -12,7 +12,7 @@
         </div>
         <h2 class="font-bold text-center w-full" style="color:#2D7498">Agregar Cita</h2>
     </div>
-    <form method="POST" action="{{ route('citas.store') }}" class="space-y-4">
+    <form method="POST" action="{{ route('citas.store') }}" class="space-y-4" id="addCitaForm">
         @csrf
         <div class="form-group flex space-x-4">
             <div class="w-1/2">
@@ -39,8 +39,8 @@
         </div>
         
         <div class="modal-footer text-right">
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded-md shadow-md">Registrar Cita</button>
-        </div>
+            <button type="submit" id="guardarCita" class="bg-blue-500 text-white p-2 rounded-md shadow-md">Registrar Cita</button>
+        </div>        
     </form>   
 </div>
 
@@ -82,8 +82,15 @@
                 html: '<ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
             });
         @endif
-    });
 
+        // Desactivar el botón después de hacer clic en "Registrar Cita"
+        document.getElementById('addCitaForm').addEventListener('submit', function() {
+            const submitButton = document.getElementById('guardarCita');
+            submitButton.disabled = true;
+            submitButton.innerText = 'Guardando...'; // Cambiar el texto del botón mientras se guarda
+        });
+    });
+    
     document.addEventListener('DOMContentLoaded', function() {
         const fechaInput = document.getElementById('fecha');
         const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
@@ -155,7 +162,6 @@
                 });
         });
     });
-
 </script>
 <style>
     select#hora {

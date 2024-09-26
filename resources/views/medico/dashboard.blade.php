@@ -223,11 +223,13 @@
                             <input type="hidden" name="correo" value="null">
                             <input type="hidden" name="curp" value="null">
                             
+                            <!-- Botón para guardar paciente -->
                             <div class="flex items-center justify-end mt-4">
-                                <x-primary-button class="ml-4">
+                                <x-primary-button id="guardarPaciente" class="ml-4">
                                     {{ __('Registrar Usuario') }}
                                 </x-primary-button>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -252,6 +254,12 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
 
 <script>
+    document.getElementById('addPacienteForm').addEventListener('submit', function() {
+        // Desactivar el botón después de hacer clic
+        document.getElementById('guardarPaciente').disabled = true;
+        document.getElementById('guardarPaciente').innerText = 'Guardando...'; // Cambiar el texto del botón mientras se guarda
+    });
+    
     document.querySelectorAll('.eliminar-paciente').forEach(function(button) {
         button.addEventListener('click', function(event) {
             event.preventDefault(); // Evitar el envío inmediato del formulario

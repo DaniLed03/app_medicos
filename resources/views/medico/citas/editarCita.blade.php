@@ -57,10 +57,10 @@
                                                     <textarea name="motivo_consulta" id="motivo_consulta" rows="6" class="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" style="resize: none;">{{ $cita->motivo_consulta }}</textarea>
                                                 </div>
                                                 <div class="flex justify-end space-x-2 mb-4">
-                                                    <button type="button" class="bg-blue-500 text-white p-2 rounded-md" onclick="confirmUpdate()">Actualizar Cita</button>
-                                                    <button type="button" class="bg-red-500 text-white p-2 rounded-md" onclick="confirmDelete()">Borrar Cita</button>
+                                                    <button type="button" id="actualizarCita" class="bg-blue-500 text-white p-2 rounded-md" onclick="confirmUpdate()">Actualizar Cita</button>
+                                                    <button type="button" id="borrarCita" class="bg-red-500 text-white p-2 rounded-md" onclick="confirmDelete()">Borrar Cita</button>
                                                     <a href="{{ route('citas') }}" class="bg-gray-500 text-white p-2 rounded-md">Regresar a la agenda</a>
-                                                </div>                                             
+                                                </div>                                                                                            
                                             </form>
                                             <form id="delete-cita-form" action="{{ route('citas.borrar', $cita->id) }}" method="POST" style="display:none;">
                                                 @csrf
@@ -100,6 +100,10 @@
                 confirmButtonText: "Sí, ¡actualízala!"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const actualizarButton = document.getElementById('actualizarCita');
+                    actualizarButton.disabled = true;
+                    actualizarButton.innerText = 'Actualizando...'; // Cambiar texto mientras se procesa
+
                     document.getElementById('update-cita-form').submit();
                 }
             });
@@ -116,15 +120,15 @@
                 confirmButtonText: "Sí, ¡bórralo!"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const borrarButton = document.getElementById('borrarCita');
+                    borrarButton.disabled = true;
+                    borrarButton.innerText = 'Borrando...'; // Cambiar texto mientras se procesa
+
                     document.getElementById('delete-cita-form').submit();
-                    Swal.fire({
-                        title: "¡Borrado!",
-                        text: "La cita ha sido borrada.",
-                        icon: "success"
-                    });
                 }
             });
         }
+
 
         document.addEventListener('DOMContentLoaded', function() {
         const fechaInput = document.getElementById('fecha');

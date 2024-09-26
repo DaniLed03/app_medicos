@@ -62,10 +62,10 @@
                                         <td>
                                             <a href="{{ route('users.edit', $user->id) }}" class="text-blue-500 hover:text-blue-700">Editar</a>
                                             @if(!$user->roles->contains('name', 'Administrador'))
-                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline-block">
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline-block delete-user-form">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+                                                    <button type="button" class="text-red-500 hover:text-red-700 ml-4 delete-user-button">Eliminar</button>
                                                 </form>
                                             @endif
                                             <form action="{{ route('users.resetPassword', $user->id) }}" method="POST" class="inline-block reset-password-form">
@@ -169,9 +169,9 @@
                             </div>
 
                             <div class="flex items-center justify-end mt-4">
-                                <x-primary-button class="ml-4">
+                                <x-primary-button id="registrarUsuarioButton" class="ml-4">
                                     {{ __('Registrar Usuario') }}
-                                </x-primary-button>
+                                </x-primary-button>                                
                             </div>
                         </form>
                     </div>
@@ -199,6 +199,26 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
 
 <script>
+    document.querySelectorAll('.delete-user-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.delete-user-form');
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esta acción!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        });
+    });
+
     document.querySelectorAll('.reset-password-button').forEach(button => {
         button.addEventListener('click', function() {
             const form = this.closest('.reset-password-form');
@@ -297,6 +317,15 @@
 
         document.getElementById('closeModal').addEventListener('click', function() {
             document.getElementById('modal').classList.add('hidden');
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Desactiva el botón de "Registrar Usuario" al enviar el formulario
+        document.getElementById('addUserForm').addEventListener('submit', function() {
+            const submitButton = document.getElementById('registrarUsuarioButton');
+            submitButton.disabled = true; // Desactiva el botón
+            submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se guarda
         });
     });
 </script>

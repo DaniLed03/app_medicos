@@ -154,8 +154,9 @@
                                 </div>
                             </div>
                             <div class="flex items-center justify-end mt-4">
-                                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Actualizar Concepto</button>
+                                <button type="submit" id="guardarEditConcepto" class="bg-blue-500 text-white px-4 py-2 rounded-md">Actualizar Concepto</button>
                             </div>
+                            
                         </form>
                     </div>
                 </div>
@@ -294,6 +295,13 @@
 
         document.getElementById('closeEditModal').addEventListener('click', function() {
             document.getElementById('editModal').classList.add('hidden');
+        });
+
+        // Desactiva el botón de "Actualizar Concepto" al enviar el formulario
+        document.getElementById('editConceptoForm').addEventListener('submit', function() {
+            const submitButton = document.getElementById('guardarEditConcepto');
+            submitButton.disabled = true;
+            submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se guarda
         });
     });
 </script>

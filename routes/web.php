@@ -75,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/medico/pacientes/{id}/editarPaciente', [MedicoController::class, 'editarPaciente'])->name('medico.pacientes.editarPaciente');
     Route::get('/medico/pacientes/pdf', [MedicoController::class, 'generatePatientListPdf'])->name('pacientes.pdf');
     Route::get('/dashboard', [MedicoController::class, 'mostrarPacientes'])->name('dashboard');
+    Route::delete('/horarios/{id}', [MedicoController::class, 'destroyHorario'])->name('horarios.destroy');
 
     // Rutas de Citas
     Route::get('/medico/citas', [MedicoController::class, 'mostrarCitas'])->name('citas');

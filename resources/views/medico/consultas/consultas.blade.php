@@ -99,10 +99,6 @@
                                 @endforelse
                             </tbody>
                         </table>
-                        <!-- Paginación -->
-                        <div class="my-4">
-                            {{ $consultas->links() }}
-                        </div>
                     </div>
                 </div>
             </div>

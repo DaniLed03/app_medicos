@@ -4,15 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Consultas;
 use App\Models\Paciente;
-use App\Models\User;
 use App\Models\Citas;
-use App\Models\Persona;
 use App\Models\ConsultaReceta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
-use App\Models\Consulta;
 use App\Models\Venta;
 use App\Models\Concepto;
 use App\Models\TipoDeReceta;
@@ -178,59 +174,47 @@ class ConsultaController extends Controller
     {
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
+    
+        // Get today's date
         $today = Carbon::today();
-
-        // Obtener las fechas de inicio y fin del filtro
+    
+        // Retrieve the start and end date from the request, defaulting to today's date
         $startDate = $request->input('start_date', $today->format('Y-m-d'));
         $endDate = $request->input('end_date', $today->format('Y-m-d'));
-
-        // Consultas con cita que no están finalizadas
+    
+        // Retrieve consultations with appointments (citas)
         $consultasConCita = Citas::where('medicoid', $medicoId)
             ->where('activo', 'si')
-            ->where('status', '!=', 'Finalizada') // Excluir las citas finalizadas
+            ->where('status', '!=', 'Finalizada')
             ->whereBetween('fecha', [$startDate, $endDate])
-            ->with('paciente') // Incluir relación con el paciente
+            ->with('paciente')  // Include the patient data
             ->get()
             ->map(function($cita) {
-                $cita->isCita = true; // Marcar como consulta con cita
+                $cita->isCita = true; // Mark as a consultation with an appointment
                 return $cita;
             });
-
-
-        // Consultas sin cita
+    
+        // Retrieve consultations without appointments
         $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
-            ->where('status', 'Finalizada') // Solo mostrar las consultas que ya están finalizadas
-            ->whereBetween('fechaHora', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']) // Asegurarse de que la fecha y hora estén dentro del rango
+            ->whereBetween('fechaHora', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->get()
             ->map(function($consulta) {
-                $consulta->isCita = false; // Marcar como consulta sin cita
+                $consulta->isCita = false; // Mark as a consultation without an appointment
                 return $consulta;
             });
-
-        // Concatenar ambas colecciones
+    
+        // Combine both types of consultations
         $consultas = $consultasConCita->concat($consultasSinCita);
-
-        // Ordenar por fecha y hora (opcional)
-        $consultas = $consultas->sortBy(function($consulta) {
-            return $consulta->isCita ? $consulta->fecha . ' ' . $consulta->hora : $consulta->fechaHora;
-        });
-
-        // Paginación manual
-        $perPage = 10;
-        $page = $request->input('page', 1);
-        $paginatedConsultas = $consultas->slice(($page - 1) * $perPage, $perPage)->values();
-
+    
         // Cantidad de ventas "Por pagar"
         $ventasPorPagar = Venta::where('status', 'Por pagar')->count();
-
+    
         return view('medico.consultas.consultas', [
-            'consultas' => new \Illuminate\Pagination\LengthAwarePaginator($paginatedConsultas, $consultas->count(), $perPage, $page, [
-                'path' => $request->url(),
-                'query' => $request->query()
-            ]),
+            'consultas' => $consultas, // No paginar, se maneja en DataTables
             'ventasPorPagar' => $ventasPorPagar, // Enviamos el conteo de ventas por pagar
         ]);
     }
+    
 
 
     public function verificarPaciente(Request $request, $citaId)
@@ -264,17 +248,6 @@ class ConsultaController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-        $consulta = Consultas::findOrFail($id);
-
-        if ($consulta->cita) {
-            return view('medico.consultas.editarConsulta', compact('consulta'));
-        } else {
-            return view('medico.consultas.editarConsultaSinCita', compact('consulta'));
-        }
-    }
-
     public function show($id, $no_exp, $medico_id)
     {
         // Encuentra la consulta y las recetas asociadas, filtrando por consulta, paciente y médico
@@ -301,58 +274,6 @@ class ConsultaController extends Controller
         return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta', 'edad'));
     }
 
-    public function print($id)
-    {
-        $consulta = Consultas::with(['recetas', 'usuarioMedico', 'cita.paciente'])
-            ->findOrFail($id);
-
-        if ($consulta->cita) {
-            $paciente = $consulta->cita->paciente;
-        } else {
-            $paciente = Paciente::findOrFail($consulta->pacienteid);
-        }
-
-        return view('medico.consultas.print', compact('consulta', 'paciente'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'talla' => 'nullable|string',
-            'temperatura' => 'nullable|string',
-            'saturacion_oxigeno' => 'nullable|string',
-            'frecuencia_cardiaca' => 'nullable|string',
-            'peso' => 'nullable|string',
-            'tension_arterial' => 'nullable|string',
-            'motivoConsulta' => 'required|string',
-            'diagnostico' => 'required|string',
-            'años' => 'nullable|integer',  // Nuevo campo
-            'meses' => 'nullable|integer', // Nuevo campo
-            'dias' => 'nullable|integer',  // Nuevo campo
-            'status' => 'required|string|in:en curso,Finalizada',
-            'totalPagar' => 'required|numeric|min:0',
-            'recetas' => 'array',
-            'recetas.*.tipo_de_receta' => 'required|string',
-            'recetas.*.receta' => 'required|string'
-        ]);
-
-        $consulta = Consultas::findOrFail($id);
-        $consulta->update($request->all());
-
-        $consulta->recetas()->delete();
-        if ($request->has('recetas')) {
-            foreach ($request->recetas as $recetaData) {
-                ConsultaReceta::create([
-                    'consulta_id' => $consulta->id,
-                    'tipo_de_receta' => $recetaData['tipo_de_receta'],
-                    'receta' => $recetaData['receta']
-                ]);
-            }
-        }
-
-        return redirect()->route('consultas.index')->with('status', 'Consulta actualizada correctamente');
-    }
-
     public function terminate($id)
     {
         $consulta = Consultas::findOrFail($id);
@@ -362,65 +283,60 @@ class ConsultaController extends Controller
         return response()->json(['success' => true]);
     }
 
-
     public function navigate(Request $request)
-{
-    $direction = $request->input('direction');
-    $currentConsultationId = $request->input('currentConsultationId');
-    $medicoId = Auth::id(); // ID del médico logueado
-    $pacienteId = $request->input('pacienteId'); // ID del paciente actual
+    {
+        $direction = $request->input('direction');
+        $currentConsultationId = $request->input('currentConsultationId');
+        $medicoId = Auth::id(); // ID del médico logueado
+        $pacienteId = $request->input('pacienteId'); // ID del paciente actual
 
-    // Obtener la consulta actual
-    $currentConsultation = Consultas::where('id', $currentConsultationId)
-                                    ->where('pacienteid', $pacienteId)
-                                    ->where('usuariomedicoid', $medicoId)
-                                    ->firstOrFail();
+        // Obtener la consulta actual
+        $currentConsultation = Consultas::where('id', $currentConsultationId)
+                                        ->where('pacienteid', $pacienteId)
+                                        ->where('usuariomedicoid', $medicoId)
+                                        ->firstOrFail();
 
-    if ($direction == 'first') {
-        $consulta = Consultas::where('usuariomedicoid', $medicoId)
-            ->where('pacienteid', $pacienteId)
-            ->orderBy('id', 'asc')
-            ->first();
-    } elseif ($direction == 'prev') {
-        $consulta = Consultas::where('usuariomedicoid', $medicoId)
-            ->where('pacienteid', $pacienteId)
-            ->where('id', '<', $currentConsultationId)
-            ->orderBy('id', 'desc')
-            ->first();
-    } elseif ($direction == 'next') {
-        $consulta = Consultas::where('usuariomedicoid', $medicoId)
-            ->where('pacienteid', $pacienteId)
-            ->where('id', '>', $currentConsultationId)
-            ->orderBy('id', 'asc')
-            ->first();
-    } elseif ($direction == 'last') {
-        $consulta = Consultas::where('usuariomedicoid', $medicoId)
-            ->where('pacienteid', $pacienteId)
-            ->orderBy('id', 'desc')
-            ->first();
-    }
+        if ($direction == 'first') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId)
+                ->orderBy('id', 'asc')
+                ->first();
+        } elseif ($direction == 'prev') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId)
+                ->where('id', '<', $currentConsultationId)
+                ->orderBy('id', 'desc')
+                ->first();
+        } elseif ($direction == 'next') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId)
+                ->where('id', '>', $currentConsultationId)
+                ->orderBy('id', 'asc')
+                ->first();
+        } elseif ($direction == 'last') {
+            $consulta = Consultas::where('usuariomedicoid', $medicoId)
+                ->where('pacienteid', $pacienteId)
+                ->orderBy('id', 'desc')
+                ->first();
+        }
 
-    // Verificar si no se encontró más consultas
-    if (!$consulta) {
+        // Verificar si no se encontró más consultas
+        if (!$consulta) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No hay más consultas en esta dirección.'
+            ]);
+        }
+
+        // Si se encontró una consulta, devolverla
+        $consulta->load('recetas');
         return response()->json([
-            'success' => false,
-            'message' => 'No hay más consultas en esta dirección.'
+            'success' => true,
+            'consulta' => $consulta,
+            'redirectUrl' => route('consultas.show', ['id' => $consulta->id, 'no_exp' => $consulta->pacienteid, 'medico_id' => $medicoId])
         ]);
     }
 
-    // Si se encontró una consulta, devolverla
-    $consulta->load('recetas');
-    return response()->json([
-        'success' => true,
-        'consulta' => $consulta,
-        'redirectUrl' => route('consultas.show', ['id' => $consulta->id, 'no_exp' => $consulta->pacienteid, 'medico_id' => $medicoId])
-    ]);
-}
-
-
-
-
-    
     public function iniciarConsulta($id)
     {
         $cita = Citas::findOrFail($id);
@@ -472,7 +388,6 @@ class ConsultaController extends Controller
 
         return ['success' => true, 'venta' => $venta];
     }
-
 
     public function consultasPendientesHoy()
     {

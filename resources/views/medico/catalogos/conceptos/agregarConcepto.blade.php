@@ -32,6 +32,17 @@
         </div>
     </div>
     <div class="flex items-center justify-end mt-4">
-        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Guardar Concepto</button>
+        <button type="submit" id="guardarConcepto" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar Concepto</button>
     </div>
+    
 </form>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Desactivar el botón después de hacer clic en "Guardar Concepto"
+        document.getElementById('addConceptoForm').addEventListener('submit', function() {
+            const submitButton = document.getElementById('guardarConcepto');
+            submitButton.disabled = true;  // Desactiva el botón
+            submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se procesa
+        });
+    });
+</script>

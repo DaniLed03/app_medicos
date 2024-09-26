@@ -64,7 +64,14 @@
         </div>
 
         <div class="modal-footer">
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded-md">Registrar Paciente</button>
-        </div>
+            <button type="submit" id="guardarPaciente" class="bg-blue-500 text-white p-2 rounded-md">Registrar Paciente</button>
+        </div>        
     </form>
 </div>
+<script>
+    document.getElementById('addPacienteForm').addEventListener('submit', function() {
+        // Desactivar el botón después de hacer clic
+        document.getElementById('guardarPaciente').disabled = true;
+        document.getElementById('guardarPaciente').innerText = 'Guardando...'; // Cambiar el texto del botón mientras se guarda
+    });
+</script>

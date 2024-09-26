@@ -47,7 +47,7 @@ class AsignarController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
         ]);
 
-        $defaultPassword = 'ContraseñaPrueba'; // Define aquí la contraseña por defecto
+        $defaultPassword = 'Temporal2024'; // Define aquí la contraseña por defecto
         $currentUser = Auth::user(); // Obtener el usuario autenticado
         $userRoles = $currentUser->roles->pluck('name'); // Obtener los roles del usuario autenticado
 
@@ -112,7 +112,7 @@ class AsignarController extends Controller
     public function resetPassword($id)
     {
         $user = User::findOrFail($id);
-        $defaultPassword = 'ContraseñaPrueba'; // Define aquí la contraseña por defecto que quieres asignar
+        $defaultPassword = 'Temporal2024'; // Define aquí la contraseña por defecto que quieres asignar
         $user->password = Hash::make($defaultPassword);
         $user->save();
 

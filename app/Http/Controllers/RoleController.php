@@ -82,16 +82,31 @@ class RoleController extends Controller
         $currentUser = Auth::user();
         $userRoles = $currentUser->roles->pluck('name');
 
+        // Verificar si el usuario tiene permiso para actualizar este rol
         if (!$userRoles->contains('Administrador') && in_array($role->name, ['Administrador', 'Medico'])) {
             return redirect()->route('roles.index')->with('error', 'No tienes permiso para actualizar este rol.');
         }
 
+        // Actualizar el nombre del rol
         $role->update($request->only('name'));
 
-        // Sync permissions
-        $role->permissions()->sync($request->permissions);
+        // Recuperar los permisos seleccionados en la página actual
+        $selectedPermissions = $request->permissions ?? [];
+
+        // Obtener todos los permisos actuales del rol
+        $existingPermissions = $role->permissions->pluck('id')->toArray();
+
+        // Diferenciar entre los permisos seleccionados (visibles) y los no visibles
+        $toDetach = array_diff($existingPermissions, $selectedPermissions);
+
+        // Desactivar solo los permisos visibles que fueron deseleccionados
+        if (!empty($toDetach)) {
+            $role->permissions()->detach($toDetach);
+        }
+
+        // Sincronizar los permisos seleccionados sin eliminar los ya asignados
+        $role->permissions()->syncWithoutDetaching($selectedPermissions);
 
         return redirect()->route('roles.edit', $role)->with('success', 'Rol actualizado con éxito.');
     }
-
 }

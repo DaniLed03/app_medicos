@@ -62,12 +62,15 @@
 
 <script>
     $(document).ready(function() {
-        $('#permissionsTable').DataTable({
+        let checkboxStates = JSON.parse(localStorage.getItem('checkboxStates')) || {};
+
+        // Inicializar DataTables
+        var table = $('#permissionsTable').DataTable({
             "language": {
                 "decimal": "",
                 "emptyTable": "No hay permisos disponibles",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Entradas",
                 "infoFiltered": "(Filtrado de _MAX_ total entradas)",
                 "infoPostFix": "",
                 "thousands": ",",
@@ -88,7 +91,28 @@
             "info": true,
             "scrollX": false,
             "autoWidth": true,
-            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]]
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]],
+            "drawCallback": function(settings) {
+                // Al cambiar de página, restaurar el estado de los checkboxes
+                $('#permissionsTable input[type="checkbox"]').each(function() {
+                    var id = $(this).val();
+                    if (checkboxStates[id]) {
+                        $(this).prop('checked', checkboxStates[id]);
+                    }
+                });
+            }
+        });
+
+        // Guardar el estado de los checkboxes en localStorage al cambiar su valor
+        $('#permissionsTable').on('change', 'input[type="checkbox"]', function() {
+            var id = $(this).val();
+            checkboxStates[id] = $(this).prop('checked');
+            localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates));
+        });
+
+        // Al enviar el formulario, envía los estados de los checkboxes al backend (si es necesario)
+        $('form').on('submit', function() {
+            localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates));
         });
     });
 </script>

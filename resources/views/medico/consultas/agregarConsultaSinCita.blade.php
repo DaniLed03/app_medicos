@@ -20,7 +20,7 @@
                 </p>
             </div>
 
-            <!-- Estructura de Tabs, Total a Pagar y Botón Terminar Consulta en la misma línea -->
+            <!-- Estructura de Tabs, Fecha de Hoy, Total a Pagar y Botón Terminar Consulta en la misma línea -->
             <div class="flex justify-between items-center mb-4">
                 <!-- Estructura de Tabs -->
                 <ul class="flex border-b mb-0" id="tabs">
@@ -32,15 +32,21 @@
                     </li>
                 </ul>
 
+                <div class="flex items-center space-x-2">
+                    <label for="fechaActual" class="block text-sm font-medium text-gray-700" style="margin-bottom: 0;">Fecha de Consulta:</label>
+                    <div id="fechaActual" class="font-semibold" style="margin-bottom: 0; align-self: center;"></div>
+                </div>
+
                 <!-- Total a Pagar y Botón Terminar Consulta -->
                 <div class="flex items-center space-x-4">
                     <label for="totalPagar" class="block text-sm font-medium text-gray-700">Precio de la Consulta:</label>
                     <input type="number" id="totalPagar" name="totalPagar" class="mt-1 p-2 w-24 border rounded-md" value="{{ $precioConsulta }}" {{ $precioConsulta ? '' : 'required' }}>
                     
                     <!-- Botón Terminar Consulta -->
-                    <button type="submit" form="consultasForm" class="bg-[#33AD9B] text-white px-4 py-2 rounded-md">Guardar Consulta</button>                
+                    <button type="submit" id="guardarConsulta" form="consultasForm" class="bg-[#33AD9B] text-white px-4 py-2 rounded-md">Guardar Consulta</button>
                 </div>
             </div>
+
 
             <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px;">
                 <div id="consultaTab" class="tab-pane active">
@@ -367,6 +373,8 @@
 
                 // Declarar una variable de contador fuera de la función para que mantenga el valor entre ejecuciones
                 let recetaCounter = 0;
+                let recetaNumbers = []; // Para rastrear los números de receta
+                let deletedNumbers = []; // Números de recetas eliminados que pueden ser reutilizados
 
                 document.getElementById('saveReceta').addEventListener('click', function () {
                     let tipoRecetaId = document.getElementById('modalTipoReceta').value;
@@ -391,8 +399,7 @@
                             existingRow.querySelector('.previsualizar-receta').setAttribute('data-receta', encodeURIComponent(receta));
                             existingRow.querySelector('.imprimir-receta').setAttribute('data-receta', encodeURIComponent(receta));
                         } else {
-                            // Incrementar el contador de recetas
-                            recetaCounter++;
+                            let recetaNumber = deletedNumbers.length > 0 ? deletedNumbers.shift() : ++recetaCounter;
 
                             // Agregar nueva receta
                             recetasDiv.innerHTML += `
@@ -421,7 +428,7 @@
                                 
                                 // Extraemos el nombre, fecha, talla y peso
                                 const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
-                                const fechaActual = new Date().toLocaleDateString();
+                                const fechaActual = formatDate(new Date());
                                 const talla = document.getElementById('hidden_talla').value || 'N/A';
                                 const peso = document.getElementById('hidden_peso').value || 'N/A';
                                 
@@ -465,10 +472,14 @@
                                 }
                             });
 
-
                             // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
                             newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
+                                // Al eliminar, agregar el número de la receta al array de números eliminados
+                                let recetaNumber = parseInt(newRecetaRow.querySelector('td').textContent);
+                                deletedNumbers.push(recetaNumber); // Guardar el número para su reutilización
                                 newRecetaRow.remove();
+
+                                // Si no hay más recetas, mostrar el mensaje de "No hay recetas"
                                 if (recetasDiv.getElementsByClassName('receta').length === 0) {
                                     recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
                                 }
@@ -504,6 +515,13 @@
                         alert('Por favor, complete todos los campos.');
                     }
                 });
+
+                function formatDate(date) {
+                    let day = ('0' + date.getDate()).slice(-2); // Asegura dos dígitos
+                    let month = ('0' + (date.getMonth() + 1)).slice(-2); // Asegura dos dígitos
+                    let year = date.getFullYear();
+                    return `${day}/${month}/${year}`; // Cambia el orden a día/mes/año
+                }
 
                 // Evento para cerrar el modal de visualización de la receta
                 document.getElementById('closeRecetaModal').addEventListener('click', function () {
@@ -573,6 +591,23 @@
                         });
                     }
                 });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var today = new Date();
+                    var options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    var formattedDate = today.toLocaleDateString('es-ES', options); // Cambia 'es-ES' según tu formato de idioma preferido
+                    document.getElementById('fechaActual').innerText = formattedDate;
+                });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Desactiva el botón de "Guardar Consulta" al enviar el formulario
+                    document.getElementById('consultasForm').addEventListener('submit', function() {
+                        const submitButton = document.getElementById('guardarConsulta');
+                        submitButton.disabled = true; // Desactiva el botón
+                        submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se guarda
+                    });
+                });
+
             </script>
 
             <style>
