@@ -132,7 +132,7 @@
                             @endcan
                             @can('Vista Consultas')
                                 <a href="{{ route('consultas.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white relative">
-                                    Consultas Agendadas
+                                    Consultas por Fecha
                                     <template x-if="dropdownOpen && {{ $consultasPendientes }} > 0">
                                         <span class="notification-badge absolute top-1/2 right-3 transform -translate-y-1/2 translate-x-[20%]">
                                             {{ $consultasPendientes }}
@@ -194,7 +194,7 @@
                                 @role('Administrador')
                                     <a href="{{ route('colonias.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Colonias</a>
                                 @endrole
-                                <a href="{{ route('conceptos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Conceptos de cobro</a>
+                                <a href="{{ route('conceptos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Conceptos de Cobro</a>
                             </div>
                         </div>
                     </div>                    
