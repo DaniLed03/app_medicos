@@ -116,12 +116,13 @@
 
                         <!-- Campos de la consulta -->
                         <div class="mb-6 grid md:grid-cols-3 gap-4">
-                            <div class="bg-gray-100 p-4 rounded-lg ">
-                                <h3 class="text-lg font-medium mb-4">Antecedentes</h3>
-                                <textarea id="antecedentes" class="mt-1 p-2 w-full border rounded-md resize-none opacity-50" style="height: 300px;" readonly>
+                            <!-- Campo de Antecedentes editable -->
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <label for="antecedentes" class="block text-sm font-medium text-gray-700">Antecedentes</label>
+                                <textarea id="antecedentes" name="antecedentes" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">
                                     {{ $paciente->antecedentes }}
                                 </textarea>
-                            </div>
+                            </div>                            
 
                             <div class="bg-gray-100 p-4 rounded-lg">
                                 <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
@@ -360,6 +361,21 @@
                     ],
                     removePlugins: 'exportpdf' // Remover el plugin 'exportpdf'
                 });
+
+                CKEDITOR.replace('antecedentes', {
+                    versionCheck: false,
+                    enterMode: CKEDITOR.ENTER_P, // Salto de línea con interlineado
+                    shiftEnterMode: CKEDITOR.ENTER_BR, // Salto de línea sin interlineado
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                        { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                        { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                        { name: 'insert', items: ['HorizontalRule'] },
+                        { name: 'justify', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+                    ],
+                    removePlugins: 'exportpdf'
+                });
+
                 CKEDITOR.extraPlugins = "justify"
                 CKEDITOR.extraPlugins = "font"
                 CKEDITOR.extraPlugins = "size"
@@ -393,7 +409,7 @@
                             document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value = tipoRecetaId;
                             document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value = receta;
 
-                            let existingRow = recetasTableBody.querySelectorAll('tr')[recetaIndex - 1]; // Cambiamos aquí para ajustar el índice
+                            let existingRow = recetasTableBody.querySelector(`tr[data-receta-id="${recetaIndex}"]`);
                             existingRow.querySelector('td:nth-child(2)').innerText = tipoRecetaNombre; // Mostrar el nombre en lugar del ID
                             // Actualizar los atributos `data-receta` en los botones de Previsualizar e Imprimir
                             existingRow.querySelector('.previsualizar-receta').setAttribute('data-receta', encodeURIComponent(receta));
@@ -409,79 +425,87 @@
                             // Agregar la receta a la tabla en la interfaz
                             let newRecetaRow = document.createElement('tr');
                             newRecetaRow.classList.add('receta');
+                            newRecetaRow.setAttribute('data-receta-id', recetaCounter); // Agrega un atributo para identificar la receta
                             newRecetaRow.innerHTML = `
-                                <td>${recetaCounter}</td> <!-- Incrementar el número de receta correctamente -->
-                                <td>${tipoRecetaNombre}</td> <!-- Mostrar el nombre en lugar del ID -->
+                                <td>${recetaCounter}</td> <!-- Número de receta -->
+                                <td>${tipoRecetaNombre}</td> <!-- Nombre de la receta -->
                                 <td>
                                     <button type="button" class="text-blue-500 hover:text-blue-700 previsualizar-receta" data-receta="${receta}">Previsualizar</button>
                                     <button type="button" class="text-yellow-500 hover:text-yellow-700 editar-receta ml-2" data-receta-index="${recetaCounter}">Editar</button>
                                     <button type="button" class="text-red-500 hover:text-red-700 eliminar-receta ml-2">Eliminar</button>
                                     <button type="button" class="text-green-500 hover:text-green-700 imprimir-receta ml-2" data-receta="${encodeURIComponent(receta)}">Imprimir</button>
-
                                 </td>`;
 
                             recetasTableBody.appendChild(newRecetaRow);
 
                             // Añadir eventos a los botones de previsualizar, editar, eliminar e imprimir
                             newRecetaRow.querySelector('.imprimir-receta').addEventListener('click', function () {
-                                const recetaContent = decodeURIComponent(this.dataset.receta);
-                                
-                                // Extraemos el nombre, fecha, talla y peso
-                                const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
-                                const fechaActual = formatDate(new Date());
-                                const talla = document.getElementById('hidden_talla').value || 'N/A';
-                                const peso = document.getElementById('hidden_peso').value || 'N/A';
-                                
-                                // Crear un elemento temporal para calcular el número de líneas
-                                const tempDiv = document.createElement('div');
-                                tempDiv.style.position = 'absolute';
-                                tempDiv.style.visibility = 'hidden';
-                                tempDiv.style.width = '800px';
-                                tempDiv.style.lineHeight = '1.5em';
-                                tempDiv.innerHTML = recetaContent;
-                                document.body.appendChild(tempDiv);
-                                
-                                // Calcular la altura y determinar cuántas líneas hay
-                                const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
-                                const totalLines = tempDiv.offsetHeight / lineHeight;
-                                
-                                // Remover el elemento temporal
-                                document.body.removeChild(tempDiv);
+                                                const recetaContent = decodeURIComponent(this.dataset.receta);
+                                                                
+                                                // Extraemos el nombre, fecha, talla y peso
+                                                const nombreCompleto = "{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}";
+                                                const fechaActual = formatDate(new Date());
+                                                const talla = document.getElementById('hidden_talla').value || 'N/A';
+                                                const peso = document.getElementById('hidden_peso').value || 'N/A';
+                                                                
+                                                // Crear un elemento temporal para calcular el número de líneas
+                                                const tempDiv = document.createElement('div');
+                                                tempDiv.style.position = 'absolute';
+                                                tempDiv.style.visibility = 'hidden';
+                                                tempDiv.style.width = '800px';
+                                                tempDiv.style.lineHeight = '1.5em';
+                                                tempDiv.innerHTML = recetaContent;
+                                                document.body.appendChild(tempDiv);
+                                                                
+                                                // Calcular la altura y determinar cuántas líneas hay
+                                                const lineHeight = parseFloat(window.getComputedStyle(tempDiv).lineHeight);
+                                                const totalLines = tempDiv.offsetHeight / lineHeight;
+                                                                
+                                                // Remover el elemento temporal
+                                                document.body.removeChild(tempDiv);
 
-                                // Verificar si excede el límite de 8 líneas
-                                if (totalLines > 6) {
-                                    alert("Sobrepasa los límites de la receta");
-                                } else {
-                                    const printWindow = window.open('', '', 'width=800,height=600');
-                                    printWindow.document.write(`
-                                        <br><br><br><br><br><br><br>
-                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
-                                            <div style="flex-basis: 40%; text-align: left; font-size: 12px; font-weight: normal;">${nombreCompleto}</div>
-                                            <div style="flex-basis: 20%; text-align: right; font-size: 12px; font-weight: normal;">${fechaActual}</div>
-                                            <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${peso}</div>
-                                            <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${talla}</div>
-                                        </div>
-                                        <div style="padding: 20px 40px; font-size: 15px;">
-                                            ${recetaContent}
-                                        </div>
-                                    `);
-                                    printWindow.document.write('</body></html>');
-                                    printWindow.document.close();
-                                    printWindow.focus();
-                                    printWindow.print();
-                                }
-                            });
+                                                // Verificar si excede el límite de 8 líneas
+                                                if (totalLines > 6) {
+                                                    alert("Sobrepasa los límites de la receta");
+                                                } else {
+                                                    const printWindow = window.open('', '', 'width=800,height=600');
+                                                        printWindow.document.write(`
+                                                            <br><br><br><br><br><br><br>
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
+                                                                <div style="flex-basis: 40%; text-align: left; font-size: 12px; font-weight: normal;">${nombreCompleto}</div>
+                                                                <div style="flex-basis: 20%; text-align: right; font-size: 12px; font-weight: normal;">${fechaActual}</div>
+                                                                <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${peso}</div>
+                                                                <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${talla}</div>
+                                                            </div>
+                                                            <div style="padding: 20px 40px; font-size: 15px;">
+                                                                ${recetaContent}
+                                                            </div>
+                                                        `);
+                                                        printWindow.document.write('</body></html>');
+                                                        printWindow.document.close();
+                                                        printWindow.focus();
+                                                        printWindow.print();
+                                                    }
+                                            });
 
-                            // Aquí debes asegurar que se agrega correctamente el event listener a cada nueva fila
+
+                            // Añadir eventos a los botones de previsualizar, editar, eliminar e imprimir
                             newRecetaRow.querySelector('.eliminar-receta').addEventListener('click', function () {
-                                // Al eliminar, agregar el número de la receta al array de números eliminados
-                                let recetaNumber = parseInt(newRecetaRow.querySelector('td').textContent);
-                                deletedNumbers.push(recetaNumber); // Guardar el número para su reutilización
+                                // Eliminar receta del DOM y los inputs
+                                let recetaId = parseInt(newRecetaRow.getAttribute('data-receta-id'));
+                                
+                                // Eliminar la receta en los inputs ocultos
+                                let hiddenRecetas = recetasDiv.querySelectorAll(`input[name^="recetas[${recetaId}]"]`);
+                                hiddenRecetas.forEach(function (input) {
+                                    input.remove();
+                                });
+
+                                // Eliminar la fila visualmente
                                 newRecetaRow.remove();
 
                                 // Si no hay más recetas, mostrar el mensaje de "No hay recetas"
-                                if (recetasDiv.getElementsByClassName('receta').length === 0) {
-                                    recetasDiv.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
+                                if (recetasTableBody.getElementsByClassName('receta').length === 0) {
+                                    recetasTableBody.innerHTML = '<tr id="noRecetasMessage"><td colspan="3" class="text-center py-3">No hay recetas</td></tr>';
                                 }
                             });
 
@@ -495,7 +519,7 @@
                                 const recetaIndex = this.dataset.recetaIndex;
                                 const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
                                 const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
-                                
+
                                 document.getElementById('modalTipoReceta').value = tipoRecetaInput;
                                 CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
                                 document.getElementById('modalReceta').classList.remove('hidden');

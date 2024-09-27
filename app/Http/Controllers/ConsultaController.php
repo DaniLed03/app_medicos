@@ -62,7 +62,8 @@ class ConsultaController extends Controller
             'dias' => 'nullable|integer',  // Nuevo campo
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
-            'recetas.*.receta' => 'required|string'
+            'recetas.*.receta' => 'required|string',
+            'antecedentes' => 'nullable|string' // Validación para antecedentes
         ]);
 
         $medicoId = $request->input('usuariomedicoid');
@@ -97,6 +98,7 @@ class ConsultaController extends Controller
         $nuevoId = $ultimoId ? $ultimoId + 1 : 1;
 
         // Creación de la consulta
+        $consultaData = $request->except('antecedentes'); // Excluimos los antecedentes de la consulta
         $consultaData = $request->except('recetas'); 
         $consultaData['talla'] = $request->hidden_talla;
         $consultaData['temperatura'] = $request->hidden_temperatura;
@@ -116,6 +118,13 @@ class ConsultaController extends Controller
         $paciente = Paciente::find($pacienteId);
         $email = $paciente->email;
         $curp = $paciente->curp;
+
+        // Actualizamos los antecedentes en la tabla pacientes
+        $paciente = Paciente::where('no_exp', $request->input('pacienteid'))->first();
+        if ($paciente) {
+            $paciente->antecedentes = $request->input('antecedentes');
+            $paciente->save(); // Guardamos los cambios en la tabla `pacientes`
+        }
 
         $paciente = Paciente::where('no_exp', $pacienteId)
                             ->where('medico_id', $medicoId)
