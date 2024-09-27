@@ -205,7 +205,7 @@ class ConsultaController extends Controller
     
         // Retrieve consultations without appointments
         $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
-            ->whereBetween('fechaHora', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->get()
             ->map(function($consulta) {
                 $consulta->isCita = false; // Mark as a consultation without an appointment

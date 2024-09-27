@@ -44,8 +44,7 @@
                             <!-- Table head -->
                             <thead class="uppercase tracking-wider border-b-2 bg-table-header-color text-white">
                                 <tr>
-                                    <th scope="col" class="px-6 py-4 font-bold">Fecha</th>
-                                    <th scope="col" class="px-6 py-4 font-bold">Hora</th>
+                                    <th scope="col" class="px-6 py-4 font-bold">Fecha y Hora</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Paciente</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Estado</th>
                                     <th scope="col" class="px-6 py-4 font-bold">Acciones</th>
@@ -57,18 +56,7 @@
                                 @forelse($consultas as $consulta)
                                     <tr>
                                         <td class="px-6 py-4">
-                                            @if($consulta->isCita)
-                                                {{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}
-                                            @else
-                                                {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d/m/Y') }}
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if($consulta->isCita)
-                                                {{ \Carbon\Carbon::parse($consulta->hora)->format('H:i') }}
-                                            @else
-                                                {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('H:i') }}
-                                            @endif
+                                            {{ \Carbon\Carbon::parse($consulta->created_at)->format('d/m/Y H:i A') }}
                                         </td>
                                         <td class="px-6 py-4">
                                             @if($consulta->paciente)
@@ -94,7 +82,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4">No se encontraron consultas por realizar.</td>
+                                        <td colspan="4" class="px-6 py-4">No se encontraron consultas por realizar.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
