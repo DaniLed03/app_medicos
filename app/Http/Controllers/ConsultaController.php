@@ -24,9 +24,16 @@ class ConsultaController extends Controller
         $tiposDeReceta = TipoDeReceta::all();
 
         $recetas = ConsultaReceta::join('tipo_de_receta', 'consulta_recetas.id_tiporeceta', '=', 'tipo_de_receta.id')
-                                ->where('no_exp', $paciente->no_exp)
-                                ->select('consulta_recetas.*', 'tipo_de_receta.nombre as tipo_receta_nombre')
-                                ->get();
+                                    ->where('no_exp', $paciente->no_exp)
+                                    ->select('consulta_recetas.*', 'tipo_de_receta.nombre as tipo_receta_nombre')
+                                    ->get();
+
+        // Obtener las consultas pasadas del paciente
+        $consultasPasadas = Consultas::where('pacienteid', $paciente->no_exp)
+                                    ->where('usuariomedicoid', $medicoId)
+                                    ->where('status', 'Finalizada')
+                                    ->orderBy('fechaHora', 'desc')
+                                    ->get();
 
         $conceptoConsulta = Concepto::where('medico_id', $medicoId)
             ->where(function($query) {
@@ -38,8 +45,53 @@ class ConsultaController extends Controller
         $showAlert = !$conceptoConsulta;
         $precioConsulta = $conceptoConsulta ? $conceptoConsulta->precio_unitario : 0;
 
-        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert', 'tiposDeReceta', 'recetas'));
+        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert', 'tiposDeReceta', 'recetas', 'consultasPasadas'));
     }
+
+    public function getConsultaDetails($id, $pacienteId, $medicoId, Request $request)
+    {
+        // Obtener la consulta específica usando los tres parámetros
+        $consulta = Consultas::where('id', $id)
+                            ->where('pacienteid', $pacienteId)
+                            ->where('usuariomedicoid', $medicoId)
+                            ->firstOrFail();
+
+        // Obtener las recetas de la consulta para el paciente usando la relación recetasPorPaciente
+        $recetas = $consulta->recetasPorPaciente($pacienteId)
+                            ->join('tipo_de_receta', 'consulta_recetas.id_tiporeceta', '=', 'tipo_de_receta.id') // Une la tabla de tipos de recetas
+                            ->select('consulta_recetas.*', 'tipo_de_receta.nombre as tipo_receta_nombre') // Selecciona el nombre del tipo de receta
+                            ->get();
+
+        // Formatear los datos que quieres devolver
+        $responseData = [
+            'fechaHora' => $consulta->fechaHora,
+            'motivoConsulta' => $consulta->motivoConsulta,
+            'diagnostico' => $consulta->diagnostico,
+            'talla' => $consulta->talla,
+            'peso' => $consulta->peso,
+            'frecuencia_cardiaca' => $consulta->frecuencia_cardiaca,
+            'temperatura' => $consulta->temperatura,
+            'saturacion_oxigeno' => $consulta->saturacion_oxigeno,
+            'tension_arterial' => $consulta->tension_arterial,
+            'circunferencia_cabeza' => $consulta->circunferencia_cabeza,
+            'recetas' => $recetas,  // Aquí añadimos las recetas obtenidas
+        ];
+
+        // Verificar si la solicitud es una petición AJAX (normalmente usada para JSON)
+        if ($request->ajax()) {
+            return response()->json($responseData);
+        }
+
+        // Si no es una solicitud AJAX, retornar la vista como en la función show
+        $paciente = Paciente::where('no_exp', $pacienteId)->firstOrFail();
+        $fechaNacimiento = \Carbon\Carbon::parse($paciente->fechanac);
+        $edad = $fechaNacimiento->diff(\Carbon\Carbon::now());
+        $fechaConsulta = \Carbon\Carbon::parse($consulta->fechaHora)->format('d-m-Y');
+
+        // Retornar la vista con los datos de la consulta y paciente
+        return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta', 'edad'));
+    }
+
 
     public function storeWithoutCita(Request $request)
     {
@@ -411,4 +463,17 @@ class ConsultaController extends Controller
 
         return $consultasPendientes;
     }
+
+    public function obtenerConsultasPasadas($pacienteId)
+    {
+        $medicoId = Auth::id();
+        $consultas = Consultas::where('pacienteid', $pacienteId)
+                            ->where('usuariomedicoid', $medicoId)
+                            ->where('status', 'Finalizada')
+                            ->orderBy('fechaHora', 'desc')
+                            ->get();
+
+        return response()->json($consultas);
+    }
+
 }

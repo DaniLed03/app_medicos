@@ -30,6 +30,9 @@
                     <li class="mr-1">
                         <a class="tab-link" href="#recetasTab" onclick="openTab(event, 'recetasTab')">Recetas</a>
                     </li>
+                    <li class="mr-1">
+                        <a class="tab-link" href="#historialTab" onclick="openTab(event, 'historialTab')">Historial</a>
+                    </li>
                 </ul>
 
                 <div class="flex items-center space-x-2">
@@ -197,7 +200,124 @@
                             </div>
                         </div>
                     </div> 
-                </div>    
+                </div> 
+                
+                <div id="historialTab" class="tab-pane hidden">
+                    <h3 class="text-lg font-medium mb-4">Historial de Consultas</h3>
+                    <table id="historialConsultasTable" class="min-w-full bg-white border rounded-lg">
+                        <thead>
+                            <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">Fecha</th>
+                                <th class="py-3 px-6 text-left">Motivo</th>
+                                <th class="py-3 px-6 text-left">Diagnóstico</th>
+                                <th class="py-3 px-6 text-left">Recetas</th>
+                                <th class="py-3 px-6 text-left">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialConsultas">
+                            @foreach ($consultasPasadas as $consulta)
+                            <tr class="border-b">
+                                <td class="py-3 px-6">{{ $consulta->fechaHora->format('d/m/Y') }}</td>
+                                <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
+                                <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
+                                <td class="text-left py-3 px-4">
+                                    {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
+                                    {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
+                                </td>
+                                <td class="py-3 px-6">
+                                    <!-- Pasa el id de la consulta, el no_exp y el medico_id al hacer clic -->
+                                    <button class="bg-blue-500 text-white px-4 py-2 rounded" 
+                                        onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
+                                        Ver
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <!-- Modal -->
+                    <div id="modalConsulta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden z-50">
+                        <div class="bg-white rounded-lg shadow-lg w-3/4 h-auto p-6 relative" style="max-height: 80vh; overflow-y: auto;">
+                            <!-- Botón de cierre con "X" en la esquina superior derecha -->
+                            <button id="closeModalConsulta" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
+                            <!-- Título del modal con la fecha de la consulta -->
+                            <h2 class="text-xl font-semibold mb-4">CONSULTA DEL <span id="fechaConsultaTitulo"></span></h2>                            
+                            <div id="consultaDetalles" class="overflow-y-auto" style="max-height: 60vh;">
+                                
+                                <!-- Contenedor principal con dos columnas: Signos Vitales + Motivo y Diagnóstico (2/3) y Recetas (1/3) -->
+                                <div class="grid grid-cols-3 gap-4">
+                                    
+                                    <!-- Contenedor de Signos Vitales, Motivo de Consulta y Diagnóstico (2/3) -->
+                                    <div class="col-span-2">
+                                        <!-- Contenedor de Signos Vitales -->
+                                        <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                                            <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
+                                            <div class="grid grid-cols-7 gap-4 text-sm">
+                                                <!-- Campos de Signos Vitales -->
+                                                <div>
+                                                    <label for="detalleTalla" class="block text-xs font-medium text-gray-700">Talla</label>
+                                                    <input type="text" id="detalleTalla" name="detalleTalla" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="m" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detalleTemperatura" class="block text-xs font-medium text-gray-700">Temperatura</label>
+                                                    <input type="text" id="detalleTemperatura" name="detalleTemperatura" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="°C" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detalleFrecuencia" class="block text-xs font-medium text-gray-700">Frec. Cardiaca</label>
+                                                    <input type="text" id="detalleFrecuencia" name="detalleFrecuencia" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="bpm" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detallePeso" class="block text-xs font-medium text-gray-700">Peso</label>
+                                                    <input type="text" id="detallePeso" name="detallePeso" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="kg" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detalleTension" class="block text-xs font-medium text-gray-700">Tensión Art.</label>
+                                                    <input type="text" id="detalleTension" name="detalleTension" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="mmHg" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detallePerimetro" class="block text-xs font-medium text-gray-700">Per. Cefálico</label>
+                                                    <input type="text" id="detallePerimetro" name="detallePerimetro" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="cm" readonly>
+                                                </div>
+                                                <div>
+                                                    <label for="detalleSaturacion" class="block text-xs font-medium text-gray-700">Sat. Oxígeno</label>
+                                                    <input type="text" id="detalleSaturacion" name="detalleSaturacion" class="mt-1 p-2 w-full border rounded-md text-xs" placeholder="%" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Contenedor para Motivo de la Consulta y Diagnóstico -->
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <!-- Motivo de la Consulta -->
+                                            <div class="bg-gray-100 p-4 rounded-lg">
+                                                <h3 class="text-lg font-medium mb-4">Motivo de la Consulta</h3>
+                                                <p id="detalleMotivo" class="border p-2 rounded-md">N/A</p>
+                                            </div>
+                        
+                                            <!-- Diagnóstico -->
+                                            <div class="bg-gray-100 p-4 rounded-lg">
+                                                <h3 class="text-lg font-medium mb-4">Diagnóstico</h3>
+                                                <p id="detalleDiagnostico" class="border p-2 rounded-md">N/A</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                        
+                                    <!-- Contenedor de Recetas (1/3) -->
+                                    <div>
+                                        <div class="bg-gray-100 p-4 rounded-lg">
+                                            <h3 class="text-lg font-medium mb-4">Recetas</h3>
+                                            <ul id="detalleRecetas" class="border p-2 rounded-md">
+                                                <li>No hay recetas asociadas a esta consulta.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
 
             @if (old('recetas'))
@@ -269,8 +389,102 @@
             <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+            <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+            
             <script>
+                $(document).ready(function() {
+                    $('#historialConsultasTable').DataTable({
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay consultas registradas",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                            "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                            "infoFiltered": "(filtrado de _MAX_ entradas en total)",
+                            "lengthMenu": "Mostrar _MENU_ entradas",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "No se encontraron coincidencias",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        },
+                        "paging": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": true,
+                        "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todo"]],
+                        "order": [[0, 'desc']],  // Ordena por la primera columna (fecha) en orden descendente
+                        "columnDefs": [
+                            {
+                                "targets": 0,
+                                "render": function (data, type, row) {
+                                    // Convierte la fecha a formato YYYYMMDD para que se ordene correctamente por año, mes y día
+                                    var dateParts = data.split('/');
+                                    return type === 'sort' ? dateParts[2] + dateParts[1] + dateParts[0] : data;
+                                }
+                            }
+                        ]
+                    });
+                });
+
+
+                function verConsulta(consultaId, pacienteId, medicoId) {
+                    const url = `/consultas/${consultaId}/${pacienteId}/${medicoId}`;
+
+                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Asignar la fecha de la consulta al título del modal
+                            const fechaConsulta = new Date(data.fechaHora);
+                            const dia = ('0' + fechaConsulta.getDate()).slice(-2); // Asegura dos dígitos en el día
+                            const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+                            const mes = meses[fechaConsulta.getMonth()]; // Obtiene el mes en mayúsculas
+                            const año = fechaConsulta.getFullYear();
+                            const fechaFormateada = `${dia} ${mes} ${año}`; // Formato "10 ABR 2024"
+
+                            document.getElementById('fechaConsultaTitulo').innerText = fechaFormateada;
+
+                            // Asignar otros datos al modal
+                            document.getElementById('detalleTalla').value = data.talla;
+                            document.getElementById('detallePeso').value = data.peso;
+                            document.getElementById('detalleFrecuencia').value = data.frecuencia_cardiaca;
+                            document.getElementById('detalleTemperatura').value = data.temperatura;
+                            document.getElementById('detalleSaturacion').value = data.saturacion_oxigeno;
+                            document.getElementById('detalleTension').value = data.tension_arterial;
+                            document.getElementById('detallePerimetro').value = data.circunferencia_cabeza;
+                            document.getElementById('detalleMotivo').innerHTML = data.motivoConsulta;
+                            document.getElementById('detalleDiagnostico').innerHTML = data.diagnostico;
+
+                            // Manejar recetas
+                            const recetasContainer = document.getElementById('detalleRecetas');
+                            recetasContainer.innerHTML = ''; // Limpia el contenido previo
+                            if (data.recetas && data.recetas.length > 0) {
+                                data.recetas.forEach(receta => {
+                                    const recetaItem = document.createElement('li');
+                                    recetaItem.innerHTML = `<strong>${receta.tipo_receta_nombre}:</strong> ${receta.receta}`;
+                                    recetasContainer.appendChild(recetaItem);
+                                });
+                            } else {
+                                recetasContainer.innerHTML = '<li>No hay recetas asociadas a esta consulta.</li>';
+                            }
+
+                            document.getElementById('modalConsulta').classList.remove('hidden');
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+
+                // Cerrar el modal
+                document.getElementById('closeModalConsulta').addEventListener('click', function () {
+                    document.getElementById('modalConsulta').classList.add('hidden');
+                });
+
                 // Función para calcular la edad en años, meses y días
                 function calcularEdad(fechaNacimiento) {
                     var hoy = new Date();

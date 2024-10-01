@@ -77,7 +77,7 @@
                                         @foreach($pacientes as $paciente)
                                             <tr>
                                                 <td>{{ $paciente->no_exp }}</td>
-                                                <td>{{ $paciente->nombres }} {{ $paciente->apepat }} {{ $paciente->apemat }}</td>
+                                                <td>{{ $paciente->apepat }} {{ $paciente->apemat }} {{ $paciente->nombres }}</td>
                                                 <td>{{ strtoupper(\Carbon\Carbon::parse($paciente->fechanac)->locale('es')->isoFormat('DD MMM YYYY')) }}</td>
                                                 <td>{{ $paciente->sexo }}</td>
                                                 <td>{{ $paciente->telefono }}</td>

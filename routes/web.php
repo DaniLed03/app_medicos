@@ -114,6 +114,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/medico/storeDesdeModal', [MedicoController::class, 'storeDesdeModal'])->name('medico.storeDesdeModal');
     Route::get('/search-pacientes', [MedicoController::class, 'searchPacientes'])->name('pacientes.search');
     route::post('/consultas/navigate', [ConsultaController::class, 'navigate'])->name('consultas.navigate');    
+    Route::get('/consultas/{id}/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails']);
+    Route::get('consultas/{id}/detalles/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails'])->name('consultas.getConsultaDetails');
+
     // Rutas de Usuarios
     Route::get('/consultas/verificarPaciente/{citaId}', [ConsultaController::class, 'verificarPaciente'])->name('consultas.verificarPaciente');
     Route::get('/pacientes/completar-registro/{citaId}', [MedicoController::class, 'completarRegistroPaciente'])->name('pacientes.completarRegistro');

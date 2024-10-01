@@ -161,7 +161,6 @@
 
                 <!-- Tab de Recetas -->
                 <div id="recetasTab" class="tab-pane hidden">
-                    <!-- Tabla de Recetas -->
                     <div class="mb-6">
                         <div class="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
                             <h3 class="text-lg font-medium mb-2">Recetas</h3>
@@ -178,19 +177,18 @@
                                 <tbody id="modalRecetas">
                                     @foreach($consulta->recetas as $index => $receta)
                                     <tr>
-                                        <td class="py-3 px-6 text-left whitespace-nowrap">{{ $index + 1 }}</td>
-                                        <td class="py-3 px-6 text-left">{{ $receta->tipoDeReceta->nombre }}</td> <!-- Mostrar el tipo de receta -->
-                                        <td class="py-3 px-6 text-left">
-                                            <!-- Mostrar la receta ya transformada -->
-                                            {!! $receta->receta !!}
-                                        </td>                                                
+                                        <td class="py-3 px-6 text-left">{{ $index + 1 }}</td>
+                                        <td class="py-3 px-6 text-left">{{ $receta->tipo_receta_nombre ?? 'No especificado' }}</td> <!-- Mostrar el tipo de medicamento -->
+                                        <td class="py-3 px-6 text-left">{!! $receta->receta !!}</td> <!-- Mostrar la receta -->
                                     </tr>
                                     @endforeach
-                                </tbody>                                            
+                                </tbody>
+                                                                          
                             </table>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -277,6 +275,48 @@
         $('#closeRecetaModal').on('click', function() {
             $('#recetaModal').addClass('hidden');
         });
+
+        $(document).ready(function () {
+            // Función para obtener detalles de la consulta incluyendo recetas
+            function obtenerDetallesConsulta() {
+                var consultaId = {{ $consulta->id }}; // ID de la consulta actual
+                var pacienteId = {{ $paciente->no_exp }}; // ID del paciente
+                var medicoId = {{ Auth::id() }}; // ID del médico logueado
+
+                $.ajax({
+                    url: "{{ route('consultas.getConsultaDetails', ['id' => $consulta->id, 'pacienteId' => $paciente->no_exp, 'medicoId' => Auth::id()]) }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        // Verificamos si la respuesta tiene éxito y contiene recetas
+                        if (response.recetas && response.recetas.length > 0) {
+                            // Limpiamos la tabla de recetas actual
+                            $('#modalRecetas').empty();
+
+                            // Iteramos sobre las recetas y las mostramos en la tabla
+                            $.each(response.recetas, function (index, receta) {
+                                $('#modalRecetas').append(`
+                                    <tr>
+                                        <td class="py-3 px-6 text-left">${index + 1}</td>
+                                        <td class="py-3 px-6 text-left">${receta.tipo_receta_nombre}</td>
+                                        <td class="py-3 px-6 text-left">${receta.receta}</td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            $('#modalRecetas').html('<tr><td colspan="3" class="text-center">No hay recetas registradas.</td></tr>');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Error al obtener los detalles de la consulta:", xhr.responseText);
+                    }
+                });
+            }
+
+            // Llamamos a la función cuando se carga la página para obtener los detalles de la consulta
+            obtenerDetallesConsulta();
+        });
+
     </script>
     <style>
         .tab-link {
