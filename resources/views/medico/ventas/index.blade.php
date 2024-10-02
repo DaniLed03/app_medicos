@@ -54,7 +54,7 @@
                                     </svg>
                                 </div>
                                 <div class="text-center">
-                                    <h2 class="text-lg font-bold">Total facturación: ${{ number_format($totalFacturacion, 2) }}</h2>
+                                    <h2 class="text-lg font-bold">Total Cobrado: ${{ number_format($totalFacturacion, 2) }}</h2>
                                     <p class="text-gray-600">Período: 
                                         @if($startDate && $endDate && $startDate != $endDate)
                                             {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}

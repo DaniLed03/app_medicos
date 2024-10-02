@@ -407,7 +407,9 @@
                                         @if(isset($consultas) && count($consultas) > 0)
                                             @foreach($consultas as $consulta)
                                                 <tr>
-                                                    <td class="text-left py-3 px-4">{{ mb_strtoupper(\Carbon\Carbon::parse($consulta->fechaHora)->locale('es')->isoFormat('DD MMM YYYY hh:mm A')) }}</td>
+                                                    <td class="text-left py-3 px-4">
+                                                        {{ mb_strtoupper(\Carbon\Carbon::parse($consulta->created_at ?? $consulta->fechaHora)->locale('es')->isoFormat('DD MMM YYYY hh:mm A')) }}
+                                                    </td>
                                                     <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
                                                         {!! $consulta->motivoConsulta !!}
                                                     </td>

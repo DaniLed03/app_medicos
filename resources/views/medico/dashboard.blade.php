@@ -52,14 +52,17 @@
                         </div>
                     </div>
 
-                    <!-- Formulario de búsqueda -->
-                    <form method="GET" action="{{ route('medico.dashboard') }}" class="mb-4">
-                        <input type="text" name="name" placeholder="Buscar por nombre completo" class="border rounded p-2 w-96 uppercase-input"> <!-- w-96 hace que el campo sea más largo -->
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Buscar</button>
-                    </form>
+
+
 
                     <!-- Tabla de pacientes (siempre visible) -->
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
+                        <!-- Formulario de búsqueda -->
+                        <form method="GET" action="{{ route('medico.dashboard') }}" class="mb-4 float-right">
+                            <input type="text" name="name" placeholder="Buscar por nombre completo" class="border rounded p-2 w-96 uppercase-input"> <!-- w-96 hace que el campo sea más largo -->
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Buscar</button>
+                        </form>
+                        
                         <table id="pacientesTable" class="display nowrap" style="width:100%">
                             <thead>
                                 <tr>
@@ -346,7 +349,7 @@
                 }
             },
             "paging": true,
-            "searching": true,
+            "searching": false,
             "info": true,
             "scrollX": false,
             "autoWidth": true,
