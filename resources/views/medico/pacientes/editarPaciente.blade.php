@@ -426,9 +426,10 @@
                                                            Visualizar Historial
                                                         </a>
                                                     
-                                                        <a href="" class="text-green-500 hover:text-green-700 ml-4">
+                                                        <a href="{{ route('consultas.editWithoutCita', ['pacienteId' => $paciente->no_exp, 'medicoId' => $consulta->usuariomedicoid, 'consultaId' => $consulta->id]) }}" 
+                                                            class="text-green-500 hover:text-green-700 ml-4">
                                                             Editar
-                                                         </a>                                                              
+                                                        </a>                                                             
                                                     </td>
                                                     
                                                 </tr>

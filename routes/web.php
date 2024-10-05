@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\ConceptoController;
 use App\Http\Controllers\ColoniaController;
+use App\Http\Controllers\ActualizarConsultaSinCitaController;
 
 // Ruta de la página de bienvenida
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -116,6 +117,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     route::post('/consultas/navigate', [ConsultaController::class, 'navigate'])->name('consultas.navigate');    
     Route::get('/consultas/{id}/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails']);
     Route::get('consultas/{id}/detalles/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails'])->name('consultas.getConsultaDetails');
+    Route::get('/consultas/{pacienteId}/{medicoId}/{consultaId}/editar', [ActualizarConsultaSinCitaController::class, 'editWithoutCita'])
+    ->name('consultas.editWithoutCita');
+    Route::put('consultas/{pacienteId}/{medicoId}/{consultaId}/actualizar', [ActualizarConsultaSinCitaController::class, 'updateWithoutCita'])->name('consultas.updateWithoutCita');
 
     // Rutas de Usuarios
     Route::get('/consultas/verificarPaciente/{citaId}', [ConsultaController::class, 'verificarPaciente'])->name('consultas.verificarPaciente');
