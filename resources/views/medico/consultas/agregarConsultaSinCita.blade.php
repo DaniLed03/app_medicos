@@ -686,7 +686,7 @@
                                                         printWindow.document.write(`
                                                             <br><br><br><br><br><br><br>
                                                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 40px;">
-                                                                <div style="flex-basis: 40%; text-align: left; font-size: 12px; font-weight: normal;">${nombreCompleto}</div>
+                                                                <div style="flex-basis: 40%; text-align: left; font-size: 10px; font-weight: normal;">${nombreCompleto}</div>
                                                                 <div style="flex-basis: 20%; text-align: right; font-size: 12px; font-weight: normal;">${fechaActual}</div>
                                                                 <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${peso}</div>
                                                                 <div style="flex-basis: 10%; text-align: right; font-size: 12px; font-weight: normal;">${talla}</div>
