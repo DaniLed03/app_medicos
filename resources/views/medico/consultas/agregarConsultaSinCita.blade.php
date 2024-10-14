@@ -143,7 +143,7 @@
                 <div id="recetasTab" class="tab-pane hidden">
                     <div class="mb-6">
                         <div class="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
-                            <h3 class="text-lg font-medium mb-2">Recetas</h3>
+                            <h3 class="text-lg font-medium">Recetas</h3>
                             <button type="button" id="addReceta" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agregar Receta</button>
                         </div>
                         <div class="overflow-x-auto">
@@ -168,6 +168,33 @@
                     <div id="modalReceta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
                         <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
                             <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
+                            <!-- Aquí se agregan las etiquetas de los signos vitales -->
+                            <div class="flex justify-center space-x-2 mb-4 flex-wrap">
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Talla:
+                                    <span id="modalTalla" class="text-black">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Temperatura:
+                                    <span id="modalTemperatura" class="text-black">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Peso:
+                                    <span id="modalPeso" class="text-black">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Tensión Arterial:
+                                    <span id="modalTension" class="text-black">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Frecuencia Cardíaca:
+                                    <span id="modalFrecuencia" class="text-black">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col">
+                                    Saturación de Oxígeno:
+                                    <span id="modalSaturacion" class="text-black">N/A</span>
+                                </span>
+                            </div>
                             <div class="mb-4">
                                 <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
                                 <select id="modalTipoReceta" name="recetas[0][tipo_de_receta]" class="mt-1 p-2 w-full border rounded-md">
@@ -395,6 +422,50 @@
             <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
             
             <script>
+                // Función para actualizar los signos vitales dentro del modal
+                function updateModalVitalSigns() {
+                    const talla = document.getElementById('hidden_talla').value || 'N/A';
+                    const temperatura = document.getElementById('hidden_temperatura').value || 'N/A';
+                    const peso = document.getElementById('hidden_peso').value || 'N/A';
+                    const tension = document.getElementById('hidden_tension_arterial').value || 'N/A';
+                    const frecuencia = document.getElementById('hidden_frecuencia_cardiaca').value || 'N/A';
+                    const saturacion = document.getElementById('hidden_saturacion_oxigeno').value || 'N/A';
+
+                    document.getElementById('modalTalla').textContent = talla;
+                    document.getElementById('modalTemperatura').textContent = temperatura;
+                    document.getElementById('modalPeso').textContent = peso;
+                    document.getElementById('modalTension').textContent = tension;
+                    document.getElementById('modalFrecuencia').textContent = frecuencia;
+                    document.getElementById('modalSaturacion').textContent = saturacion;
+                }
+
+                // Mostrar el modal al hacer clic en el botón "Agregar Receta"
+                document.getElementById('addReceta').addEventListener('click', function() {
+                    updateModalVitalSigns(); // Actualiza los signos vitales en el modal
+                    document.getElementById('modalReceta').classList.remove('hidden'); // Mostrar el modal
+                });
+
+                // Mostrar el modal al hacer clic en el botón "Editar Receta"
+                document.querySelectorAll('.editar-receta').forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        // Código para cargar los datos de la receta actual (puedes ajustar según tu implementación)
+                        const recetaIndex = this.getAttribute('data-receta-index');
+                        const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
+                        const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
+                        
+                        document.getElementById('modalTipoReceta').value = tipoRecetaInput;
+                        CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
+
+                        updateModalVitalSigns(); // Actualizar los signos vitales dentro del modal
+                        document.getElementById('modalReceta').classList.remove('hidden'); // Mostrar el modal
+                    });
+                });
+
+                // Cerrar el modal
+                document.getElementById('closeModal').addEventListener('click', function() {
+                    document.getElementById('modalReceta').classList.add('hidden');
+                });
+
                 $(document).ready(function() {
                     $('#historialConsultasTable').DataTable({
                         "language": {

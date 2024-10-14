@@ -191,6 +191,34 @@
                     <div id="modalReceta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden">
                         <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
                             <h2 class="text-xl font-semibold mb-4">Agregar Receta</h2>
+                            <!-- Signos Vitales en el modal de Editar Receta -->
+                            <div class="flex justify-center space-x-2 mb-4 flex-wrap">
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Talla:
+                                    <span id="modalEditTalla">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Temperatura:
+                                    <span id="modalEditTemperatura">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Peso:
+                                    <span id="modalEditPeso">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Tensión Arterial:
+                                    <span id="modalEditTension">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Frecuencia Cardíaca:
+                                    <span id="modalEditFrecuencia">N/A</span>
+                                </span>
+                                <span class="bg-gray-200 text-gray-700 text-sm font-semibold px-2 py-1 rounded flex flex-col items-center">
+                                    Saturación de Oxígeno:
+                                    <span id="modalEditSaturacion">N/A</span>
+                                </span>
+                            </div>
+
                             <div class="mb-4">
                                 <label for="modalTipoReceta" class="block text-sm font-medium text-gray-700">Tipo de Receta</label>
                                 <select id="modalTipoReceta" name="recetas[0][tipo_de_receta]" class="mt-1 p-2 w-full border rounded-md">
@@ -735,18 +763,41 @@
                     });
                 });
 
+                // Evento para abrir el modal de edición con valores actuales de los signos vitales
                 document.querySelectorAll('.editar-receta').forEach(button => {
                     button.addEventListener('click', function () {
                         const recetaIndex = this.dataset.recetaIndex;
+                        
+                        // Asegúrate de que los signos vitales estén capturados correctamente desde el DOM
+                        const talla = document.getElementById('hidden_talla').value || 'N/A';
+                        const temperatura = document.getElementById('hidden_temperatura').value || 'N/A';
+                        const peso = document.getElementById('hidden_peso').value || 'N/A';
+                        const tension = document.getElementById('hidden_tension_arterial').value || 'N/A';
+                        const frecuencia = document.getElementById('hidden_frecuencia_cardiaca').value || 'N/A';
+                        const saturacion = document.getElementById('hidden_saturacion_oxigeno').value || 'N/A';
+
+                        // Asignar estos valores a los campos dentro del modal de edición
+                        document.getElementById('modalEditTalla').innerText = talla;
+                        document.getElementById('modalEditTemperatura').innerText = temperatura;
+                        document.getElementById('modalEditPeso').innerText = peso;
+                        document.getElementById('modalEditTension').innerText = tension;
+                        document.getElementById('modalEditFrecuencia').innerText = frecuencia;
+                        document.getElementById('modalEditSaturacion').innerText = saturacion;
+
+                        // Cargar los datos de la receta actual en los campos
                         const tipoRecetaInput = document.querySelector(`input[name="recetas[${recetaIndex}][tipo_de_receta]"]`).value;
                         const recetaInput = decodeURIComponent(document.querySelector(`input[name="recetas[${recetaIndex}][receta]"]`).value);
-
+                        
+                        // Mostrar los datos de la receta en el modal
                         document.getElementById('modalTipoReceta').value = tipoRecetaInput;
                         CKEDITOR.instances['modalRecetaInput'].setData(recetaInput);
+
+                        // Mostrar el modal
                         document.getElementById('modalReceta').classList.remove('hidden');
                         document.getElementById('saveReceta').setAttribute('data-edit-index', recetaIndex);
                     });
                 });
+
 
                 document.querySelectorAll('.eliminar-receta').forEach(button => {
                     button.addEventListener('click', function () {
@@ -825,6 +876,30 @@
                     });
                 });
 
+// Actualizar dinámicamente los signos vitales en el modal de edición
+document.getElementById('hidden_talla').addEventListener('input', function () {
+    document.getElementById('modalEditTalla').innerText = this.value || 'N/A';
+});
+
+document.getElementById('hidden_temperatura').addEventListener('input', function () {
+    document.getElementById('modalEditTemperatura').innerText = this.value || 'N/A';
+});
+
+document.getElementById('hidden_peso').addEventListener('input', function () {
+    document.getElementById('modalEditPeso').innerText = this.value || 'N/A';
+});
+
+document.getElementById('hidden_tension_arterial').addEventListener('input', function () {
+    document.getElementById('modalEditTension').innerText = this.value || 'N/A';
+});
+
+document.getElementById('hidden_frecuencia_cardiaca').addEventListener('input', function () {
+    document.getElementById('modalEditFrecuencia').innerText = this.value || 'N/A';
+});
+
+document.getElementById('hidden_saturacion_oxigeno').addEventListener('input', function () {
+    document.getElementById('modalEditSaturacion').innerText = this.value || 'N/A';
+});
 
 
                 function formatDate(date) {
