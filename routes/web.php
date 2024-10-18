@@ -162,4 +162,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-municipios/{entidad_id}', [ProfileController::class, 'getMunicipios']);
     Route::get('/get-localidades/{municipio_id}', [ProfileController::class, 'getLocalidades']);
     Route::get('/get-colonias/{municipio_id}', [ProfileController::class, 'getColonias']);
+
+    Route::get('/medico/catalogos/configuracion/configSistema', [MedicoController::class, 'mostrarConfiguracion'])->name('configuracion.mostrar');
+    Route::post('/medico/catalogos/configuracion/guardar', [MedicoController::class, 'guardarConfiguracion'])->name('configuracion.guardar');
+
 });

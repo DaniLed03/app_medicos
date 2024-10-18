@@ -78,4 +78,11 @@ class User extends Authenticatable implements MustVerifyEmail
             : asset('images/default-profile.png'); // Imagen por defecto si no hay foto
     }
 
+    public function userSetting()
+    {
+        return $this->hasOne(UserSetting::class, 'user_id');
+    }
+
+
+    
 }

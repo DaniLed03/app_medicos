@@ -41,14 +41,20 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             // Verificar si el usuario está autenticado
             if (Auth::check()) {
-                // Obtener el ID del usuario autenticado
                 $currentUser = Auth::user();
+                $userSetting = $currentUser->userSetting;
         
-                // Filtrar las ventas pendientes basadas en el ID del médico desde la tabla de consultas
-                $ventasPorPagar = Venta::whereHas('consulta', function($query) use ($currentUser) {
-                    $query->where('usuariomedicoid', $currentUser->id);
-                })->where('status', 'Por pagar')->count();
-                
+                // Verificar si la configuración de "mostrar_caja" está habilitada para el usuario
+                if ($userSetting && $userSetting->mostrar_caja) {
+                    // Filtrar las ventas pendientes basadas en el ID del médico desde la tabla de consultas
+                    $ventasPorPagar = Venta::whereHas('consulta', function($query) use ($currentUser) {
+                        $query->where('usuariomedicoid', $currentUser->id);
+                    })->where('status', 'Por pagar')->count();
+                } else {
+                    // Si "mostrar_caja" no está habilitado, no contar las ventas
+                    $ventasPorPagar = 0;
+                }
+        
                 // Compartir las ventas pendientes con la vista
                 $view->with('ventasPorPagar', $ventasPorPagar);
             } else {
@@ -56,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('ventasPorPagar', 0);
             }
         });
+        
         
     }
 }

@@ -876,30 +876,30 @@
                     });
                 });
 
-// Actualizar dinámicamente los signos vitales en el modal de edición
-document.getElementById('hidden_talla').addEventListener('input', function () {
-    document.getElementById('modalEditTalla').innerText = this.value || 'N/A';
-});
+                // Actualizar dinámicamente los signos vitales en el modal de edición
+                document.getElementById('hidden_talla').addEventListener('input', function () {
+                    document.getElementById('modalEditTalla').innerText = this.value || 'N/A';
+                });
 
-document.getElementById('hidden_temperatura').addEventListener('input', function () {
-    document.getElementById('modalEditTemperatura').innerText = this.value || 'N/A';
-});
+                document.getElementById('hidden_temperatura').addEventListener('input', function () {
+                    document.getElementById('modalEditTemperatura').innerText = this.value || 'N/A';
+                });
 
-document.getElementById('hidden_peso').addEventListener('input', function () {
-    document.getElementById('modalEditPeso').innerText = this.value || 'N/A';
-});
+                document.getElementById('hidden_peso').addEventListener('input', function () {
+                    document.getElementById('modalEditPeso').innerText = this.value || 'N/A';
+                });
 
-document.getElementById('hidden_tension_arterial').addEventListener('input', function () {
-    document.getElementById('modalEditTension').innerText = this.value || 'N/A';
-});
+                document.getElementById('hidden_tension_arterial').addEventListener('input', function () {
+                    document.getElementById('modalEditTension').innerText = this.value || 'N/A';
+                });
 
-document.getElementById('hidden_frecuencia_cardiaca').addEventListener('input', function () {
-    document.getElementById('modalEditFrecuencia').innerText = this.value || 'N/A';
-});
+                document.getElementById('hidden_frecuencia_cardiaca').addEventListener('input', function () {
+                    document.getElementById('modalEditFrecuencia').innerText = this.value || 'N/A';
+                });
 
-document.getElementById('hidden_saturacion_oxigeno').addEventListener('input', function () {
-    document.getElementById('modalEditSaturacion').innerText = this.value || 'N/A';
-});
+                document.getElementById('hidden_saturacion_oxigeno').addEventListener('input', function () {
+                    document.getElementById('modalEditSaturacion').innerText = this.value || 'N/A';
+                });
 
 
                 function formatDate(date) {

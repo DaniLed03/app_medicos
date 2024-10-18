@@ -15,10 +15,9 @@
                         <div class="row">
                             <div class="col-md-4 d-flex justify-content-center">
                                 <!-- Profile picture card-->
-                                <div class="card mb-4 text-center">
+                                <div class="card mb-4 text-center" style="width: 100%;">
                                     <div class="card-header">Foto de Perfil</div>
                                     <div class="card-body">
-                                        <!-- Profile picture image-->
                                         <img id="profile-pic-preview" src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/default-profile.png') }}" alt="Foto de perfil" class="img-account-profile rounded-circle mb-2">
                                     </div>
                                 </div>
@@ -31,9 +30,11 @@
                                     <!-- Campo de carga de imagen y botón -->
                                     <div class="mb-3">
                                         <input type="file" id="foto" name="foto" accept="image/*" class="form-control d-none" onchange="previewImage(event)">
-                                        <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('foto').click()">Subir nueva imagen</button>
+                                        <div class="d-flex justify-between">
+                                            <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('foto').click()">Subir nueva imagen</button>
+                                            <x-primary-button class="ml-auto mt-2">{{ __('ACTUALIZAR INFORMACION') }}</x-primary-button>
+                                        </div>
                                         <x-input-error class="mt-2" :messages="$errors->get('foto')" />
-                                        <!-- Profile picture help block-->
                                         <div class="small font-italic text-muted mt-2">JPG o PNG no mayor a 2 MB</div>
                                     </div>
 
@@ -76,37 +77,7 @@
                                         </div>
                                     </div>
 
-                                    @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                                        <div class="mt-3">
-                                            <p class="text-sm text-gray-800">
-                                                {{ __('Tu dirección de correo electrónico no está verificada.') }}
-
-                                                <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                    {{ __('Haz clic aquí para reenviar el correo de verificación.') }}
-                                                </button>
-                                            </p>
-
-                                            @if (session('status') === 'verification-link-sent')
-                                                <p class="mt-2 font-medium text-sm text-green-600">
-                                                    {{ __('Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.') }}
-                                                </p>
-                                            @endif
-                                        </div>
-                                    @endif
-
-                                    <div class="mt-3">
-                                        <x-primary-button>{{ __('Guardar') }}</x-primary-button>
-
-                                        @if (session('status') === 'profile-updated')
-                                            <p
-                                                x-data="{ show: true }"
-                                                x-show="show"
-                                                x-transition
-                                                x-init="setTimeout(() => show = false, 2000)"
-                                                class="text-sm text-gray-600"
-                                            >{{ __('Guardado.') }}</p>
-                                        @endif
-                                    </div>
+                                    
                                 </form>
                             </div>
                         </div>
@@ -115,11 +86,10 @@
                     <!-- Update Password Form -->
                     <div class="tab-pane fade" id="password">
                         <div class="row">
-                            <div class="col-md-8 offset-md-2">
+                            <div class="col-md-12">
                                 <form method="post" action="{{ route('password.update') }}" class="mt-3">
                                     @csrf
                                     @method('put')
-                                
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <x-input-label for="current_password" :value="__('Contraseña Actual')" />
@@ -132,7 +102,7 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password')" />
                                         </div>
                                     </div>
-                                
+
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <x-input-label for="new_password_confirmation" :value="__('Confirmar Contraseña')" />
@@ -140,11 +110,10 @@
                                             <x-input-error class="mt-2" :messages="$errors->get('new_password_confirmation')" />
                                         </div>
                                         <div class="col-md-6 d-flex align-items-end">
-                                            <x-primary-button class="w-100 text-center">{{ __('Actualizar Contraseña') }}</x-primary-button>                                        </div>
+                                            <x-primary-button class="w-100 text-center flex justify-center items-center">{{ __('Actualizar Contraseña') }}</x-primary-button>
                                         </div>
                                     </div>
                                 </form>
-                                <br>
                             </div>
                         </div>
                     </div>
@@ -168,21 +137,28 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-8" style="padding-right: 20px;">
                                 <form method="post" action="{{ route('profile.updateConsultorio') }}" class="mt-3" enctype="multipart/form-data">
                                     @csrf
                                     @method('patch')
                                     
                                     <!-- Campo de carga de imagen y botón -->
-                                    <div class="mb-3">
-                                        <input type="file" id="logo" name="logo" accept="image/*" class="form-control d-none" onchange="previewConsultorioLogo(event)">
-                                        <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('logo').click()">Subir nuevo logo</button>
-                                        <x-input-error class="mt-2" :messages="$errors->get('logo')" />
-                                        <!-- Logo help block-->
-                                        <div class="small font-italic text-muted mt-2">JPG o PNG no mayor a 2 MB</div>
+                                    <div class="row mb-3 d-flex align-items-center justify-content-between">
+                                        <div class="col-md-6 d-flex align-items-center">
+                                            <!-- Botón de Subir nuevo logo -->
+                                            <input type="file" id="logo" name="logo" accept="image/*" class="form-control d-none" onchange="previewConsultorioLogo(event)">
+                                            <button class="btn btn-primary mt-2" type="button" onclick="document.getElementById('logo').click()">Subir nuevo logo</button>
+                                            <x-input-error class="mt-2" :messages="$errors->get('logo')" />
+                                        </div>
+                                    
+                                        <div class="col-md-6 d-flex justify-content-end">
+                                            <!-- Botón de Guardar Consultorio con margen derecho -->
+                                            <x-primary-button class="me-3">{{ __('Guardar Consultorio') }}</x-primary-button>
+                                        </div>
                                     </div>
+                                                                       
 
-                                    <div class="row mb-3">
+                                    <div class="row mb-3" style="margin-right: 1.5rem !important;">
                                         <div class="col-md-6">
                                             <x-input-label for="nombre" :value="__('Nombre del Consultorio')" />
                                             <x-text-input id="nombre" name="nombre" type="text" class="form-control" :value="old('nombre', $user->consultorio->nombre ?? '')" />
@@ -202,7 +178,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row mb-3" style="margin-right: 1.5rem !important;">
                                         <div class="col-md-6">
                                             <x-input-label for="municipio_id" :value="__('Municipio')" />
                                             <select id="municipio_id" name="municipio_id" class="form-select select2" onchange="updateLocalidades(this.value)">
@@ -229,7 +205,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row mb-3" style="margin-right: 1.5rem !important;">
                                         <div class="col-md-6">
                                             <x-input-label for="calle" :value="__('Calle')" />
                                             <x-text-input id="calle" name="calle" type="text" class="form-control" :value="old('calle', $user->consultorio->calle ?? '')" />
@@ -249,7 +225,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row mb-3" style="margin-right: 1.5rem !important;">
                                         <div class="col-md-6">
                                             <x-input-label for="telefono" :value="__('Teléfono del Consultorio')" />
                                             <x-text-input id="telefono" name="telefono" type="text" class="form-control" :value="old('telefono', $user->consultorio->telefono ?? '')" />
@@ -262,7 +238,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row mb-3" style="margin-right: 1.5rem !important;">
                                         <div class="col-md-6">
                                             <x-input-label for="especialidad" :value="__('Especialidad')" />
                                             <x-text-input id="especialidad" name="especialidad" type="text" class="form-control" :value="old('especialidad', $user->consultorio->especialidad ?? '')" />
@@ -276,7 +252,6 @@
                                     </div>
                                     
                                     <div class="mt-3">
-                                        <x-primary-button>{{ __('Guardar Consultorio') }}</x-primary-button>
 
                                         @if (session('status') === 'consultorio-updated')
                                             <p
@@ -307,6 +282,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 
 <style>
+    
     body { 
         background-color: #f2f6fc; 
         color: #69707a; 

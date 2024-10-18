@@ -18,6 +18,7 @@ use App\Models\HorariosMedicos;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserSetting;
 
 class MedicoController extends Controller
 {
@@ -748,6 +749,30 @@ class MedicoController extends Controller
 
         return redirect()->route('citas.configurarHorario')->with('status', 'Horario eliminado exitosamente.');
     }
+
+
+    public function mostrarConfiguracion()
+    {
+        return view('medico.catalogos.configuracion.configSistema');
+    }
+
+    public function guardarConfiguracion(Request $request)
+    {
+        $user = Auth::user();
+
+        $settings = UserSetting::firstOrCreate(
+            ['user_id' => $user->id],
+            ['mostrar_agenda' => true, 'mostrar_caja' => true]
+        );
+
+        $settings->update([
+            'mostrar_agenda' => $request->has('mostrar_agenda'),
+            'mostrar_caja' => $request->has('mostrar_caja'),
+        ]);
+
+        return back()->with('success', 'Configuración guardada con éxito.');
+    }
+
 
 
 }

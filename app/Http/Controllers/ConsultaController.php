@@ -216,16 +216,19 @@ class ConsultaController extends Controller
             }
         }
         
-
-        Venta::create([
-            'consulta_id' => $consulta->id,
-            'precio_consulta' => $precioConsulta,
-            'iva' => $impuesto,
-            'total' => $totalPagar,
-            'no_exp' => $paciente->no_exp,
-            'medico_id' => $paciente->medico_id,
-            'status' => 'Por pagar',
-        ]);
+        // Verificar si la opción de 'mostrar_caja' está activada para el usuario autenticado
+        $userSetting = Auth::user()->userSetting;
+        if ($userSetting && $userSetting->mostrar_caja) {
+            Venta::create([
+                'consulta_id' => $consulta->id,
+                'precio_consulta' => $precioConsulta,
+                'iva' => $impuesto,
+                'total' => $totalPagar,
+                'no_exp' => $paciente->no_exp,
+                'medico_id' => $paciente->medico_id,
+                'status' => 'Por pagar',
+            ]);
+        }
         
     
         return redirect()->route('vistaInicio')->with('success', 'Consulta guardada exitosamente.');
@@ -411,9 +414,10 @@ class ConsultaController extends Controller
     {
         $consulta = Consultas::findOrFail($consultaId);
         $pacienteId = $consulta->pacienteid;
+        $medicoId = Auth::id();
 
         // Obtener el concepto de la consulta
-        $conceptoConsulta = Concepto::where('medico_id', Auth::id())
+        $conceptoConsulta = Concepto::where('medico_id', $medicoId)
             ->where(function($query) {
                 $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
                     ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
@@ -431,24 +435,31 @@ class ConsultaController extends Controller
         // Calcular el total basado en el impuesto
         $total = $precioConsulta + ($precioConsulta * ($impuesto / 100));
 
-        // Crear la venta con los datos calculados
-        $venta = Venta::create([
-            'consulta_id' => $consulta->id,
-            'precio_consulta' => $precioConsulta,
-            'iva' => $impuesto,
-            'total' => $total,
-            'no_exp' => $pacienteId, // Asegúrate de que esto sea correcto
-            'medico_id' => $consulta->usuariomedicoid, // Usar el ID del médico de la consulta
-            'status' => 'Por pagar',
-        ]);
+        // Verificar si la opción de 'mostrar_caja' está activada para el usuario autenticado
+        $userSetting = Auth::user()->userSetting;
+        if ($userSetting && $userSetting->mostrar_caja) {
+            $venta = Venta::create([
+                'consulta_id' => $consulta->id,
+                'precio_consulta' => $precioConsulta,
+                'iva' => $impuesto,
+                'total' => $total,
+                'no_exp' => $pacienteId,
+                'medico_id' => $consulta->usuariomedicoid,
+                'status' => 'Por pagar',
+            ]);
 
-        // Verifica que la venta se haya creado correctamente
-        if (!$venta) {
-            return ['success' => false, 'message' => 'No se pudo crear la venta.'];
+            // Verifica que la venta se haya creado correctamente
+            if (!$venta) {
+                return ['success' => false, 'message' => 'No se pudo crear la venta.'];
+            }
+
+            return ['success' => true, 'venta' => $venta];
+        } else {
+            // Si la opción de 'mostrar_caja' no está activada, no se crea la venta
+            return ['success' => false, 'message' => 'La opción de Caja está desactivada. No se generó la venta.'];
         }
-
-        return ['success' => true, 'venta' => $venta];
     }
+
 
     public function consultasPendientesHoy()
     {
