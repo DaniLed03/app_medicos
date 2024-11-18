@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('telefono');
             $table->string('telefono2')->nullable();
             $table->enum('sexo', ['masculino', 'femenino']);
-            $table->string('curp')->unique()->nullable();
+            $table->string('curp')->nullable(); // Elimina la restricción única de esta columna
             $table->enum('activo', ['si', 'no'])->default('si');
             $table->string('Nombre_fact')->nullable();
             $table->string('Direccion_fact')->nullable();
@@ -43,8 +43,9 @@ return new class extends Migration
             $table->string('CFDI')->nullable();
             $table->timestamps();
 
-            // Índice único para las dos columnas
-            $table->unique(['no_exp', 'medico_id']);
+            // Índice único para las combinaciones de columnas
+            $table->unique(['curp', 'medico_id'], 'unique_curp_medico');
+            $table->unique(['no_exp', 'medico_id'], 'unique_no_exp_medico');
             
             // Foreign Keys
             $table->foreign('medico_id')->references('id')->on('users')->onDelete('cascade');
@@ -69,4 +70,3 @@ return new class extends Migration
         Schema::dropIfExists('pacientes');
     }
 };
-

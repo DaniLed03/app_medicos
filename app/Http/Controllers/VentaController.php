@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\Paciente;    
 use App\Models\VentaConcepto;
+use Illuminate\Support\Facades\DB; // Importar la clase DB
 
 class VentaController extends Controller
 {
@@ -44,21 +45,26 @@ class VentaController extends Controller
         $startDate = $request->input('start_date', $today->format('Y-m-d'));
         $endDate = $request->input('end_date', $today->format('Y-m-d'));
 
-        // Filtrar las ventas para el médico
-        $ventas = Venta::whereHas('consulta', function($query) use ($medicoId) {
-            $query->where('medico_id', $medicoId);
-        })
-        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-        ->orderByRaw("CASE WHEN status = 'Por pagar' THEN 0 ELSE 1 END")
-        ->get();
+        // Consulta clásica para filtrar las ventas por médico y fechas
+        $ventas = DB::select(
+            'SELECT v.id, v.created_at, v.precio_consulta, v.iva, v.total, v.status, 
+                    v.updated_at AS fecha_pago, 
+                    p.nombres, p.apepat, p.apemat
+            FROM ventas v
+            JOIN pacientes p ON p.no_exp = v.no_exp
+            WHERE p.medico_id = ? 
+            AND v.created_at BETWEEN ? AND ?
+            ORDER BY CASE WHEN v.status = "Por pagar" THEN 0 ELSE 1 END, v.created_at DESC',
+            [$medicoId, $startDate . ' 00:00:00', $endDate . ' 23:59:59']
+        );
 
         // Calcular el total de facturación solo de las ventas con estado "Pagado"
-        $totalFacturacion = Venta::whereHas('consulta', function($query) use ($medicoId) {
-                $query->where('medico_id', $medicoId);
-            })
-            ->where('status', 'Pagado')
-            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->sum('total');
+        $totalFacturacion = DB::table('ventas')
+            ->join('pacientes', 'pacientes.no_exp', '=', 'ventas.no_exp')
+            ->where('pacientes.medico_id', $medicoId)
+            ->where('ventas.status', 'Pagado')
+            ->whereBetween('ventas.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->sum('ventas.total');
 
         return view('medico.ventas.index', compact('ventas', 'totalFacturacion'));
     }

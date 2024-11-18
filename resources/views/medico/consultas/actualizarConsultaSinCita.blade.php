@@ -133,10 +133,10 @@
                             <div class="bg-gray-100 p-4 rounded-lg">
                                 <label for="antecedentes" class="block text-sm font-medium text-gray-700">Antecedentes</label>
                                 <textarea id="antecedentes" name="antecedentes" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 300px;">
-                                    {{ $paciente->antecedentes }}
+                                    {{ old('antecedentes', $paciente->antecedentes) }}
                                 </textarea>
-                            </div>                            
-
+                            </div>
+                    
                             <div class="bg-gray-100 p-4 rounded-lg">
                                 <label for="motivoConsulta" class="block text-sm font-medium text-gray-700">Motivo de la Consulta</label>
                                 <textarea id="motivoConsulta" name="motivoConsulta" class="mt-1 p-2 w-full border rounded-md resize-none" style="height: 230px;">{{ $consulta->motivoConsulta }}</textarea>
@@ -598,7 +598,7 @@
                 });
 
                 // Declarar una variable de contador fuera de la función para que mantenga el valor entre ejecuciones
-                let recetaCounter = 0;
+                let recetaCounter = {{ count($recetas) }};
                 let recetaNumbers = []; // Para rastrear los números de receta
                 let deletedNumbers = []; // Números de recetas eliminados que pueden ser reutilizados
 

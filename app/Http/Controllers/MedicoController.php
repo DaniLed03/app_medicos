@@ -128,64 +128,69 @@ class MedicoController extends Controller
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
 
-        // Obtén todos los pacientes para los cálculos de totales
-        $totalPacientes = Paciente::where('activo', 'si')
-            ->where(function($q) use ($medicoId, $currentUser) {
-                $q->where('medico_id', $medicoId)
-                ->orWhere('medico_id', $currentUser->id);
-            })
+        // Cálculo de totales
+        $totalPacientes = DB::table('pacientes')
+            ->where('activo', 'si')
+            ->where('medico_id', $medicoId)
             ->count();
 
-        $totalMujeres = Paciente::where('activo', 'si')
+        $totalMujeres = DB::table('pacientes')
+            ->where('activo', 'si')
             ->where('sexo', 'femenino')
-            ->where(function($q) use ($medicoId, $currentUser) {
-                $q->where('medico_id', $medicoId)
-                ->orWhere('medico_id', $currentUser->id);
-            })
+            ->where('medico_id', $medicoId)
             ->count();
 
-        $totalHombres = Paciente::where('activo', 'si')
+        $totalHombres = DB::table('pacientes')
+            ->where('activo', 'si')
             ->where('sexo', 'masculino')
-            ->where(function($q) use ($medicoId, $currentUser) {
-                $q->where('medico_id', $medicoId)
-                ->orWhere('medico_id', $currentUser->id);
-            })
+            ->where('medico_id', $medicoId)
             ->count();
 
         $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
         $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
 
-        // Pacientes filtrados solo cuando hay búsqueda
+        // Búsqueda de pacientes
         $pacientes = collect(); // Inicia vacío
         if ($request->has('name') && $request->name != '') {
             $searchTerm = $request->name;
-            $searchTerms = explode(' ', $searchTerm); // Divide el término en palabras clave
+            $wildcardTerm = "%{$searchTerm}%";
 
-            // Construir la consulta dinámica para cada combinación de términos
-            $pacientes = Paciente::where('activo', 'si')
-                ->where(function ($query) use ($searchTerms, $medicoId, $currentUser) {
-                    foreach ($searchTerms as $term) {
-                        $query->where(function ($q) use ($term, $medicoId, $currentUser) {
-                            $q->where(DB::raw("CONCAT(nombres, ' ', apepat, ' ', apemat)"), 'like', '%' . $term . '%')
-                            ->orWhere(DB::raw("CONCAT(apepat, ' ', apemat, ' ', nombres)"), 'like', '%' . $term . '%')
-                            ->orWhere(DB::raw("CONCAT(nombres, ' ', apepat)"), 'like', '%' . $term . '%')
-                            ->orWhere(DB::raw("CONCAT(apepat, ' ', nombres)"), 'like', '%' . $term . '%')
-                            ->orWhere(DB::raw("CONCAT(nombres, ' ', apemat)"), 'like', '%' . $term . '%')
-                            ->orWhere(DB::raw("CONCAT(apemat, ' ', nombres)"), 'like', '%' . $term . '%')
-                            // Agregar condición para buscar por teléfono
-                            ->orWhere('telefono', 'like', '%' . $term . '%')
-                            ->where(function($q) use ($medicoId, $currentUser) {
-                                $q->where('medico_id', $medicoId)
-                                    ->orWhere('medico_id', $currentUser->id);
-                            });
-                        });
-                    }
-                })
-                ->get();
+            // Consulta SQL para buscar pacientes
+            $query = "
+                SELECT *
+                FROM pacientes
+                WHERE activo = 'si'
+                AND medico_id = ?
+                AND (
+                    no_exp LIKE ?
+                    OR nombres LIKE ?
+                    OR apepat LIKE ?
+                    OR apemat LIKE ?
+                    OR CONCAT(nombres, ' ', apepat, ' ', apemat) LIKE ?
+                    OR CONCAT(apepat, ' ', apemat, ' ', nombres) LIKE ?
+                    OR telefono LIKE ?
+                )
+            ";
+
+            // Valores de los parámetros
+            $bindings = [
+                $medicoId,
+                $wildcardTerm,
+                $wildcardTerm,
+                $wildcardTerm,
+                $wildcardTerm,
+                $wildcardTerm,
+                $wildcardTerm,
+                $wildcardTerm,
+            ];
+
+            // Convertir el resultado en una colección
+            $pacientes = collect(DB::select($query, $bindings));
         }
 
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
     }
+
 
     // Muestra el formulario de edición de un paciente específico
     public function editarPaciente($noExp)
@@ -289,11 +294,11 @@ class MedicoController extends Controller
             'municipio_id' => 'nullable|exists:municipios,id_municipio',
             'localidad_id' => 'nullable|exists:localidades,id_localidad',
             'colonia_id' => 'nullable|exists:colonias,id_asentamiento',
-            'correo' => 'nullable|string|email|max:255|unique:pacientes,correo,' . $noExp . ',no_exp,medico_id,' . $medicoId,
+            'correo' => 'nullable|string|email|max:255',
             'telefono' => 'nullable|string|max:20',
             'telefono2' => 'nullable|string|max:20',
             'sexo' => 'nullable|in:masculino,femenino',
-            'curp' => 'nullable|string|max:18|unique:pacientes,curp,' . $noExp . ',no_exp,medico_id,' . $medicoId,
+            'curp' => 'nullable|string|max:18',
             'Nombre_fact' => 'nullable|string|max:255',
             'Direccion_fact' => 'nullable|string|max:255',
             'RFC' => 'nullable|string|max:255',
@@ -301,77 +306,113 @@ class MedicoController extends Controller
             'CFDI' => 'nullable|string|max:255',
         ]);
 
-        // Obtener el ID del médico autenticado
-        $medicoId = Auth::id();
+        // Verificar si la CURP ya existe dentro del mismo médico
+        if ($request->filled('curp')) {
+            $curpExistsSameDoctor = DB::selectOne("
+                SELECT * FROM pacientes
+                WHERE curp = ? AND medico_id = ? AND no_exp != ?
+            ", [$request->curp, $medicoId, $noExp]);
 
-        // Verifica si el paciente existe
-        $paciente = Paciente::where('no_exp', $noExp)
-                            ->where('medico_id', $medicoId)
-                            ->first();
+            if ($curpExistsSameDoctor) {
+                // Mostrar alerta si la CURP ya existe dentro del mismo médico
+                return redirect()->back()->with('curp_error', 'La CURP ya está registrada para otro paciente.')->withInput();
+            }
+        }
 
+        // Verificar si el paciente existe
+        $paciente = DB::selectOne("
+            SELECT * FROM pacientes
+            WHERE no_exp = ? AND medico_id = ?
+        ", [$noExp, $medicoId]);
 
         if ($paciente) {
-            $data = array_filter($request->all(), function($value) {
+            // Filtrar los datos no nulos y excluir '_token', '_method', y 'tab'
+            $data = array_filter($request->except(['_token', '_method', 'tab']), function ($value) {
                 return !is_null($value);
             });
-                        
-            $paciente->fill($data);
-            if (!is_null($request->localidad_id)) {
-                $paciente->localidad_id = $request->localidad_id;
-            }
 
-            $paciente->save();
-            
+            // Construir la consulta SQL para actualizar
+            $setClauses = [];
+            $bindings = [];
+            foreach ($data as $key => $value) {
+                $setClauses[] = "$key = ?";
+                $bindings[] = $value;
+            }
+            $bindings[] = $noExp; // Agregar el no_exp para el WHERE
+            $bindings[] = $medicoId;
+
+            $setQuery = implode(', ', $setClauses);
+
+            // Actualizar al paciente
+            DB::update("
+                UPDATE pacientes
+                SET $setQuery
+                WHERE no_exp = ? AND medico_id = ?
+            ", $bindings);
         } else {
-            // Si el paciente es nuevo, genera el siguiente número de expediente
-            $medicoId = Auth::id();
-            $lastPaciente = Paciente::where('medico_id', $medicoId)->orderBy('no_exp', 'desc')->first();
+            // Si el paciente no existe, crear uno nuevo
+            $lastPaciente = DB::selectOne("
+                SELECT no_exp FROM pacientes
+                WHERE medico_id = ?
+                ORDER BY no_exp DESC
+                LIMIT 1
+            ", [$medicoId]);
+
             $nextNoExp = $lastPaciente ? $lastPaciente->no_exp + 1 : 1;
 
-            // Crear el nuevo paciente manualmente
-            $paciente = new Paciente();
-            $paciente->no_exp = $nextNoExp;
-            $paciente->nombres = $request->nombres;
-            $paciente->apepat = $request->apepat;
-            $paciente->apemat = $request->apemat ?? '';
-            $paciente->fechanac = $request->fechanac ?? null;
-            $paciente->curp = $request->curp ?? '';
-            $paciente->correo = $request->correo ?? '';
-            $paciente->sexo = $request->sexo ?? '';
-            $paciente->entidad_federativa_id = $request->entidad_federativa_id ?? null;
-            $paciente->municipio_id = $request->municipio_id ?? null;
-            $paciente->localidad_id = $request->localidad_id ?? null;
-            $paciente->calle = $request->calle ?? '';
-            $paciente->colonia_id = $request->colonia_id ?? null;
-            $paciente->telefono = $request->telefono ?? '';
-            $paciente->telefono2 = $request->telefono2 ?? null;
-            $paciente->Nombre_fact = $request->Nombre_fact ?? '';
-            $paciente->Direccion_fact = $request->Direccion_fact ?? '';
-            $paciente->RFC = $request->RFC ?? '';
-            $paciente->Regimen_fiscal = $request->Regimen_fiscal ?? '';
-            $paciente->CFDI = $request->CFDI ?? '';
-            $paciente->hospital = $request->hospital ?? '';
-            $paciente->tipoparto = $request->tipoparto ?? '';
-            $paciente->tiposangre = $request->tiposangre ?? '';
-            $paciente->lugar_naci = $request->lugar_naci ?? '';
-            $paciente->hora = $request->hora ?? null;
-            $paciente->peso = $request->peso ?? null;
-            $paciente->talla = $request->talla ?? null;
-            $paciente->padre = $request->padre ?? '';
-            $paciente->madre = $request->madre ?? '';
-            $paciente->antecedentes = $request->antecedentes ?? '';
-            $paciente->medico_id = $medicoId;
-            $paciente->activo = 'si';
-            $paciente->save();
+            // Insertar un nuevo paciente
+            DB::insert("
+                INSERT INTO pacientes (
+                    no_exp, nombres, apepat, apemat, fechanac, curp, correo, sexo,
+                    entidad_federativa_id, municipio_id, localidad_id, calle, colonia_id, telefono,
+                    telefono2, Nombre_fact, Direccion_fact, RFC, Regimen_fiscal, CFDI, hospital,
+                    tipoparto, tiposangre, lugar_naci, hora, peso, talla, padre, madre, antecedentes,
+                    medico_id, activo
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'si'
+                )
+            ", [
+                $nextNoExp,
+                $request->input('nombres', ''),
+                $request->input('apepat', ''),
+                $request->input('apemat', ''),
+                $request->input('fechanac', null),
+                $request->input('curp', ''),
+                $request->input('correo', ''),
+                $request->input('sexo', ''),
+                $request->input('entidad_federativa_id', null),
+                $request->input('municipio_id', null),
+                $request->input('localidad_id', null),
+                $request->input('calle', ''),
+                $request->input('colonia_id', null),
+                $request->input('telefono', ''),
+                $request->input('telefono2', null),
+                $request->input('Nombre_fact', ''),
+                $request->input('Direccion_fact', ''),
+                $request->input('RFC', ''),
+                $request->input('Regimen_fiscal', ''),
+                $request->input('CFDI', ''),
+                $request->input('hospital', ''),
+                $request->input('tipoparto', ''),
+                $request->input('tiposangre', ''),
+                $request->input('lugar_naci', ''),
+                $request->input('hora', null),
+                $request->input('peso', null),
+                $request->input('talla', null),
+                $request->input('padre', ''),
+                $request->input('madre', ''),
+                $request->input('antecedentes', ''),
+                $medicoId,
+            ]);
 
-            $mensaje = 'Paciente creado correctamente';
+            $noExp = $nextNoExp; // Actualizar $noExp para la redirección
         }
 
         // Redirecciona a la vista de edición de paciente con un mensaje de éxito
         $tab = $request->has('antecedentes') ? 'antecedentes' : $request->input('tab', 'datos');
-        return redirect()->route('pacientes.editar', ['no_exp' => $paciente->no_exp, 'tab' => $tab])->with('status');
-
+        return redirect()->route('pacientes.editar', ['no_exp' => $noExp, 'tab' => $tab])->with('status', 'Paciente actualizado correctamente');
     }
+
 
     public function eliminarPaciente($no_exp)
     {

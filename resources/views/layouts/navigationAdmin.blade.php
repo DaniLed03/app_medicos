@@ -194,7 +194,8 @@
                                 <a href="{{ route('conceptos.index') }}" class="block text-gray-700 px-4 py-2 text-sm dropdown-item hover:text-white">Conceptos de Cobro</a>
                             </div>
                         </div>
-                    </div>                    
+                    </div>    
+                                    
                     <div x-data="{ dropdownOpen: false }" class="relative">
                         <button @click="dropdownOpen = !dropdownOpen" class="flex items-center text-white hover:bg-[#33AD9B] px-3 py-2 rounded-md text-sm font-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill mr-2" viewBox="0 0 16 16">

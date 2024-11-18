@@ -12,41 +12,87 @@ use Carbon\Carbon;
 use App\Models\Venta;
 use App\Models\Concepto;
 use App\Models\TipoDeReceta;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+
 
 class ConsultaController extends Controller
 {
     public function createWithoutCita($pacienteId)
     {
-        $paciente = Paciente::where('no_exp', $pacienteId)->firstOrFail();
         $medicoId = Auth::id(); 
-        $medico = Auth::user(); 
 
-        $tiposDeReceta = TipoDeReceta::all();
+        // Obtener datos del paciente y filtrar también por médico, incluyendo los antecedentes
+        $paciente = DB::select("
+            SELECT no_exp, nombres, apepat, apemat, fechanac, antecedentes 
+            FROM pacientes 
+            WHERE no_exp = ? 
+            AND medico_id = ? 
+            LIMIT 1
+        ", [$pacienteId, $medicoId]);
 
-        $recetas = ConsultaReceta::join('tipo_de_receta', 'consulta_recetas.id_tiporeceta', '=', 'tipo_de_receta.id')
-                                    ->where('no_exp', $paciente->no_exp)
-                                    ->select('consulta_recetas.*', 'tipo_de_receta.nombre as tipo_receta_nombre')
-                                    ->get();
+        if (empty($paciente)) {
+            abort(404, 'Paciente no encontrado para este médico');
+        }
 
-        // Obtener las consultas pasadas del paciente
-        $consultasPasadas = Consultas::where('pacienteid', $paciente->no_exp)
-                                    ->where('usuariomedicoid', $medicoId)
-                                    ->where('status', 'Finalizada')
-                                    ->orderBy('fechaHora', 'desc')
-                                    ->get();
+        $paciente = $paciente[0];
 
-        $conceptoConsulta = Concepto::where('medico_id', $medicoId)
-            ->where(function($query) {
-                $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
-                    ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
-            })
-            ->first();
+        $medico = Auth::user();
+
+        // Obtener tipos de receta
+        $tiposDeReceta = DB::select("SELECT * FROM tipo_de_receta");
+
+        // Obtener recetas del paciente con JOIN
+        $recetas = DB::select("
+            SELECT cr.*, tdr.nombre as tipo_receta_nombre 
+            FROM consulta_recetas cr
+            JOIN tipo_de_receta tdr ON cr.id_tiporeceta = tdr.id
+            WHERE cr.no_exp = ? 
+            AND cr.id_medico = ?
+        ", [$paciente->no_exp, $medicoId]);
+
+        // Obtener consultas pasadas del paciente
+        $consultasPasadas = DB::select("
+            SELECT c.*, 
+                (SELECT COUNT(*) 
+                    FROM consulta_recetas cr 
+                    WHERE cr.consulta_id = c.id 
+                    AND cr.no_exp = ? 
+                    AND cr.id_medico = c.usuariomedicoid
+                ) as total_recetas
+            FROM consultas c
+            WHERE c.pacienteid = ? 
+            AND c.usuariomedicoid = ? 
+            AND c.status = 'Finalizada'
+            ORDER BY c.fechaHora DESC
+        ", [$paciente->no_exp, $paciente->no_exp, $medicoId]);
+
+        // Verificar si existe el concepto de consulta
+        $conceptoConsulta = DB::select("
+            SELECT * 
+            FROM conceptos 
+            WHERE medico_id = ? 
+            AND (LOWER(concepto) LIKE '%consulta%' OR LOWER(concepto) LIKE '%consultas%')
+            LIMIT 1
+        ", [$medicoId]);
+
+        $conceptoConsulta = !empty($conceptoConsulta) ? $conceptoConsulta[0] : null;
 
         $showAlert = !$conceptoConsulta;
         $precioConsulta = $conceptoConsulta ? $conceptoConsulta->precio_unitario : 0;
 
-        return view('medico.consultas.agregarConsultaSinCita', compact('paciente', 'medico', 'precioConsulta', 'showAlert', 'tiposDeReceta', 'recetas', 'consultasPasadas'));
+        return view('medico.consultas.agregarConsultaSinCita', compact(
+            'paciente', 
+            'medico', 
+            'precioConsulta', 
+            'showAlert', 
+            'tiposDeReceta', 
+            'recetas', 
+            'consultasPasadas'
+        ));
     }
+
+
 
     public function getConsultaDetails($id, $pacienteId, $medicoId, Request $request)
     {
@@ -109,25 +155,25 @@ class ConsultaController extends Controller
             'totalPagar' => 'nullable|numeric|min:1',
             'usuariomedicoid' => 'required|exists:users,id',
             'circunferencia_cabeza' => 'nullable|string',
-            'años' => 'nullable|integer',  // Nuevo campo
-            'meses' => 'nullable|integer', // Nuevo campo
-            'dias' => 'nullable|integer',  // Nuevo campo
+            'años' => 'nullable|integer',
+            'meses' => 'nullable|integer',
+            'dias' => 'nullable|integer',
             'recetas' => 'array',
             'recetas.*.tipo_de_receta' => 'required|string',
             'recetas.*.receta' => 'required|string',
-            'antecedentes' => 'nullable|string' // Validación para antecedentes
+            'antecedentes' => 'nullable|string'
         ]);
 
         $medicoId = $request->input('usuariomedicoid');
         $pacienteId = $request->input('pacienteid');
 
         // Obtener el concepto de la consulta
-        $conceptoConsulta = Concepto::where('medico_id', $medicoId)
-            ->where(function($query) {
-                $query->whereRaw('LOWER(concepto) LIKE ?', ['%consulta%'])
-                    ->orWhereRaw('LOWER(concepto) LIKE ?', ['%consultas%']);
-            })
-            ->first();
+        $conceptos = DB::select(
+            'SELECT * FROM conceptos WHERE medico_id = ? AND (LOWER(concepto) LIKE ? OR LOWER(concepto) LIKE ?) LIMIT 1',
+            [$medicoId, '%consulta%', '%consultas%']
+        );
+
+        $conceptoConsulta = count($conceptos) > 0 ? $conceptos[0] : null;
 
         if (!$conceptoConsulta) {
             return back()->withErrors(['message' => 'No hay un concepto de consulta definido. Por favor, configure uno antes de continuar.']);
@@ -143,143 +189,186 @@ class ConsultaController extends Controller
         }
 
         // Generar el 'id' de la consulta manualmente basado en las consultas previas del médico y paciente
-        $ultimoId = Consultas::where('usuariomedicoid', $medicoId)
-                             ->where('pacienteid', $pacienteId)
-                             ->max('id');
+        $result = DB::select(
+            'SELECT MAX(id) as max_id FROM consultas WHERE usuariomedicoid = ? AND pacienteid = ?',
+            [$medicoId, $pacienteId]
+        );
 
+        $ultimoId = $result[0]->max_id ?? null;
         $nuevoId = $ultimoId ? $ultimoId + 1 : 1;
 
-        // Creación de la consulta
-        $consultaData = $request->except('antecedentes'); // Excluimos los antecedentes de la consulta
-        $consultaData = $request->except('recetas'); 
-        $consultaData['talla'] = $request->hidden_talla;
-        $consultaData['temperatura'] = $request->hidden_temperatura;
-        $consultaData['saturacion_oxigeno'] = $request->hidden_saturacion_oxigeno;
-        $consultaData['frecuencia_cardiaca'] = $request->hidden_frecuencia_cardiaca;
-        $consultaData['peso'] = $request->hidden_peso;
-        $consultaData['tension_arterial'] = $request->hidden_tension_arterial;
-        $consultaData['circunferencia_cabeza'] = $request->circunferencia_cabeza;
-        $consultaData['status'] = 'Finalizada'; 
-        $consultaData['id'] = $nuevoId; 
-        $consultaData['años'] = $request->años;
-        $consultaData['meses'] = $request->meses;
-        $consultaData['dias'] = $request->dias;
-        $consulta = Consultas::create($consultaData);
+        // Preparar los datos de la consulta
+        $consultaData = [
+            'id' => $nuevoId,
+            'pacienteid' => $pacienteId,
+            'usuariomedicoid' => $medicoId,
+            'status' => 'Finalizada',
+            'motivoConsulta' => $request->input('motivoConsulta'),
+            'diagnostico' => $request->input('diagnostico'),
+            'talla' => $request->input('hidden_talla'),
+            'temperatura' => $request->input('hidden_temperatura'),
+            'saturacion_oxigeno' => $request->input('hidden_saturacion_oxigeno'),
+            'frecuencia_cardiaca' => $request->input('hidden_frecuencia_cardiaca'),
+            'peso' => $request->input('hidden_peso'),
+            'tension_arterial' => $request->input('hidden_tension_arterial'),
+            'circunferencia_cabeza' => $request->input('circunferencia_cabeza'),
+            'años' => $request->input('años'),
+            'meses' => $request->input('meses'),
+            'dias' => $request->input('dias'),
+            'created_at' => now(), // Agregar el campo created_at
+            'updated_at' => now(), // Agregar el campo updated_at
+        ];
 
-        // Obtener el correo y la CURP del paciente
-        $paciente = Paciente::find($pacienteId);
-        $email = $paciente->email;
+        // Insertar la consulta en la base de datos
+        DB::table('consultas')->insert($consultaData);
+
+        // Obtener el paciente filtrado por medico_id y no_exp
+        $pacientes = DB::select(
+            'SELECT * FROM pacientes WHERE no_exp = ? AND medico_id = ?',
+            [$pacienteId, $medicoId]
+        );
+
+        $paciente = count($pacientes) > 0 ? $pacientes[0] : null;
+
+        if (!$paciente) {
+            return back()->withErrors(['message' => 'Paciente no encontrado.']);
+        }
+
+        $email = $paciente->correo;
         $curp = $paciente->curp;
 
-        // Actualizamos los antecedentes en la tabla pacientes
-        $paciente = Paciente::where('no_exp', $request->input('pacienteid'))->first();
-        if ($paciente) {
-            $paciente->antecedentes = $request->input('antecedentes');
-            $paciente->save(); // Guardamos los cambios en la tabla `pacientes`
-        }
-
-        $paciente = Paciente::where('no_exp', $pacienteId)
-                            ->where('medico_id', $medicoId)
-                            ->first();
+        // Actualizar los antecedentes en la tabla pacientes
+        DB::table('pacientes')
+            ->where('no_exp', $pacienteId)
+            ->where('medico_id', $medicoId)
+            ->update(['antecedentes' => $request->input('antecedentes')]);
 
         // Actualizar el estado de la cita
-        $cita = Citas::where('no_exp', $pacienteId)
-                     ->where('medicoid', $medicoId)
-                     ->where('status', '!=', 'Finalizada')
-                     ->first();
+        $citas = DB::select(
+            'SELECT * FROM citas WHERE no_exp = ? AND medicoid = ? AND status != ?',
+            [$pacienteId, $medicoId, 'Finalizada']
+        );
 
-        if ($cita) {
-            $cita->status = 'Finalizada';
-            $cita->save();
+        if (count($citas) > 0) {
+            $cita = $citas[0];
+            DB::table('citas')
+                ->where('id', $cita->id)
+                ->update(['status' => 'Finalizada']);
         }
 
+        // Manejar las recetas
         if ($request->has('recetas')) {
             foreach ($request->recetas as $recetaData) {
-                // Obtener el siguiente valor de 'id' basado en la cantidad de recetas previas
-                $recetaId = ConsultaReceta::where('id_medico', $request->input('usuariomedicoid'))
-                    ->where('no_exp', $request->input('pacienteid'))
-                    ->where('consulta_id', $consulta->id)
-                    ->max('id');
+                // Obtener el siguiente valor de 'id' basado en las recetas previas
+                $result = DB::select(
+                    'SELECT MAX(id) as max_id FROM consulta_recetas WHERE id_medico = ? AND no_exp = ? AND consulta_id = ?',
+                    [$medicoId, $pacienteId, $nuevoId]
+                );
 
-                // Si no hay resultados, empieza con 1, si hay, incrementa en 1.
+                $recetaId = $result[0]->max_id ?? null;
                 $recetaId = $recetaId ? $recetaId + 1 : 1;
 
-        
-                ConsultaReceta::create([
-                    'consulta_id' => $consulta->id,
-                    'id_medico' => $request->input('usuariomedicoid'),
-                    'no_exp' => $request->input('pacienteid'),
+                // Insertar la receta en la base de datos
+                DB::table('consulta_recetas')->insert([
+                    'consulta_id' => $nuevoId,
+                    'id_medico' => $medicoId,
+                    'no_exp' => $pacienteId,
                     'id_tiporeceta' => $recetaData['tipo_de_receta'],
                     'receta' => $recetaData['receta'],
-                    'id' => $recetaId, // Asignar el nuevo ID único
+                    'id' => $recetaId,
+                    'created_at' => now(), // Agregar el campo created_at si existe en la tabla
+                    'updated_at' => now(), // Agregar el campo updated_at si existe en la tabla
                 ]);
             }
         }
-        
+
         // Verificar si la opción de 'mostrar_caja' está activada para el usuario autenticado
         $userSetting = Auth::user()->userSetting;
         if ($userSetting && $userSetting->mostrar_caja) {
-            Venta::create([
-                'consulta_id' => $consulta->id,
+            DB::table('ventas')->insert([
+                'consulta_id' => $nuevoId,
                 'precio_consulta' => $precioConsulta,
                 'iva' => $impuesto,
                 'total' => $totalPagar,
                 'no_exp' => $paciente->no_exp,
                 'medico_id' => $paciente->medico_id,
                 'status' => 'Por pagar',
+                'created_at' => now(), 
+                'updated_at' => now(), 
             ]);
         }
-        
-    
+
         return redirect()->route('vistaInicio')->with('success', 'Consulta guardada exitosamente.');
     }
+
     
     public function index(Request $request)
     {
         $currentUser = Auth::user();
         $medicoId = $currentUser->medico_id ? $currentUser->medico_id : $currentUser->id;
-    
-        // Get today's date
+
+        // Obtener la fecha de hoy
         $today = Carbon::today();
-    
-        // Retrieve the start and end date from the request, defaulting to today's date
-        $startDate = $request->input('start_date', $today->format('Y-m-d'));
-        $endDate = $request->input('end_date', $today->format('Y-m-d'));
-    
-        // Retrieve consultations with appointments (citas)
-        $consultasConCita = Citas::where('medicoid', $medicoId)
-            ->where('activo', 'si')
-            ->where('status', '!=', 'Finalizada')
-            ->whereBetween('fecha', [$startDate, $endDate])
-            ->with('paciente')  // Include the patient data
-            ->get()
-            ->map(function($cita) {
-                $cita->isCita = true; // Mark as a consultation with an appointment
-                return $cita;
-            });
-    
-        // Retrieve consultations without appointments
-        $consultasSinCita = Consultas::where('usuariomedicoid', $medicoId)
-            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->get()
-            ->map(function($consulta) {
-                $consulta->isCita = false; // Mark as a consultation without an appointment
-                return $consulta;
-            });
-    
-        // Combine both types of consultations
+
+        // Obtener las fechas de inicio y fin del request, por defecto la fecha de hoy
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : $today;
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : $today;
+
+        // Asegurarse de que las fechas estén en el formato correcto
+        $startDateFormatted = $startDate->format('Y-m-d');
+        $endDateFormatted = $endDate->format('Y-m-d');
+
+        // Consultas con cita
+        $consultasConCita = collect(DB::select(
+            'SELECT citas.*, citas.created_at AS created_at, pacientes.nombres, pacientes.apepat, pacientes.apemat
+            FROM citas
+            JOIN pacientes ON pacientes.no_exp = citas.no_exp AND pacientes.medico_id = citas.medicoid
+            WHERE citas.medicoid = ?
+            AND citas.activo = ?
+            AND citas.status != ?
+            AND citas.fecha BETWEEN ? AND ?',
+            [$medicoId, 'si', 'Finalizada', $startDateFormatted, $endDateFormatted]
+        ))->map(function($cita) {
+            $cita->isCita = true; // Marcar como consulta con cita
+            $cita->paciente = (object)[
+                'nombres' => $cita->nombres,
+                'apepat' => $cita->apepat,
+                'apemat' => $cita->apemat,
+            ];
+            return $cita;
+        });
+
+        // Consultas sin cita
+        $consultasSinCita = collect(DB::select(
+            'SELECT consultas.*, consultas.created_at AS created_at, pacientes.nombres, pacientes.apepat, pacientes.apemat
+            FROM consultas
+            JOIN pacientes ON pacientes.no_exp = consultas.pacienteid AND pacientes.medico_id = consultas.usuariomedicoid
+            WHERE consultas.usuariomedicoid = ?
+            AND DATE(consultas.created_at) BETWEEN ? AND ?',
+            [$medicoId, $startDateFormatted, $endDateFormatted]
+        ))->map(function($consulta) {
+            $consulta->isCita = false; // Marcar como consulta sin cita
+            $consulta->paciente = (object)[
+                'nombres' => $consulta->nombres,
+                'apepat' => $consulta->apepat,
+                'apemat' => $consulta->apemat,
+            ];
+            return $consulta;
+        });
+
+        // Combinar ambas consultas
         $consultas = $consultasConCita->concat($consultasSinCita);
-    
+
         // Cantidad de ventas "Por pagar"
-        $ventasPorPagar = Venta::where('status', 'Por pagar')->count();
-    
+        $ventasPorPagar = DB::table('ventas')->where('status', 'Por pagar')->count();
+
         return view('medico.consultas.consultas', [
-            'consultas' => $consultas, // No paginar, se maneja en DataTables
-            'ventasPorPagar' => $ventasPorPagar, // Enviamos el conteo de ventas por pagar
+            'consultas' => $consultas,
+            'ventasPorPagar' => $ventasPorPagar,
+            'startDate' => $startDateFormatted,
+            'endDate' => $endDateFormatted,
         ]);
     }
-    
-
 
     public function verificarPaciente(Request $request, $citaId)
     {

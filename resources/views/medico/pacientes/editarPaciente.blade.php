@@ -449,6 +449,17 @@
         </div>
     </div>
 
+    @if(session('curp_error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "{{ session('curp_error') }}",
+            });
+        </script>
+    @endif
+
+
     <!-- Ensure jQuery is included -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

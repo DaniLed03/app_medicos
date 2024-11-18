@@ -244,16 +244,16 @@
                         <tbody id="historialConsultas">
                             @foreach ($consultasPasadas as $consulta)
                             <tr class="border-b">
-                                <td class="py-3 px-6">{{ $consulta->fechaHora->format('d/m/Y') }}</td>
+                                <td class="py-3 px-6">
+                                    {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d/m/Y') }}
+                                </td>
                                 <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
                                 <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
                                 <td class="text-left py-3 px-4">
-                                    {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
-                                    {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
+                                    {{ $consulta->total_recetas }} {{ Str::plural('Receta', $consulta->total_recetas) }}
                                 </td>
                                 <td class="py-3 px-6">
-                                    <!-- Pasa el id de la consulta, el no_exp y el medico_id al hacer clic -->
-                                    <button class="bg-blue-500 text-white px-4 py-2 rounded" 
+                                    <button class="bg-blue-500 text-white px-4 py-2 rounded"
                                         onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
                                         Ver
                                     </button>
@@ -261,6 +261,7 @@
                             </tr>
                             @endforeach
                         </tbody>
+                        
                     </table>
 
                     <!-- Modal -->

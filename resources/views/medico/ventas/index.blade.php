@@ -89,12 +89,12 @@
                                         <td>{{ $venta->id }}</td>
                                         <td>{{ \Carbon\Carbon::parse($venta->created_at)->translatedFormat('j M Y h:i A') }}</td>
                                         <td>
-                                            {{ $venta->paciente ? $venta->paciente->nombres . ' ' . $venta->paciente->apepat . ' ' . $venta->paciente->apemat : 'No disponible' }}
+                                            {{ $venta->nombres }} {{ $venta->apepat }} {{ $venta->apemat }}
                                         </td>
                                         <td>{{ number_format($venta->precio_consulta, 2) }}</td>
                                         <td>{{ number_format($venta->iva, 2) }}%</td>
                                         <td>${{ number_format($venta->total, 2) }}</td>
-                                        <td>{{ $venta->status == 'Pagado' ? \Carbon\Carbon::parse($venta->updated_at)->translatedFormat('j M Y h:i A') : '-' }}</td>
+                                        <td>{{ $venta->status == 'Pagado' ? \Carbon\Carbon::parse($venta->fecha_pago)->translatedFormat('j M Y h:i A') : '-' }}</td>
                                         <td class="px-6 py-4">
                                             <span class="status-label {{ $venta->status == 'Pagado' ? 'bg-green-200 text-green-800' : 'bg-blue-200 text-blue-800' }} px-2 py-1 rounded-full">
                                                 {{ ucfirst($venta->status) }}
@@ -114,7 +114,7 @@
                                         </td>                                        
                                     </tr>
                                 @endforeach
-                            </tbody>
+                            </tbody>                            
                         </table>                        
                     </div>
                     

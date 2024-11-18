@@ -6,8 +6,8 @@
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
 
                         @php
-                            $startDate = request('start_date');
-                            $endDate = request('end_date');
+                            $startDate = isset($startDate) ? $startDate : \Carbon\Carbon::today()->format('Y-m-d');
+                            $endDate = isset($endDate) ? $endDate : \Carbon\Carbon::today()->format('Y-m-d');
                             $today = \Carbon\Carbon::today()->format('d/m/Y');
                         @endphp
 
@@ -69,7 +69,7 @@
                                             <span class="status-label bg-blue-200 text-blue-800 px-2 py-1 rounded-full">{{ $consulta->status }}</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            @if($consulta->status === 'Por comenzar')
+                                            @if($consulta->status === 'Por comenzar' || $consulta->status === 'en curso')
                                                 <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $consulta->id }}">Iniciar consulta</a>
                                             @elseif($consulta->status === 'En proceso')
                                                 <a href="#" class="text-blue-500 hover:text-blue-700 iniciar-consulta" data-id="{{ $consulta->id }}">Continuar consulta</a>
