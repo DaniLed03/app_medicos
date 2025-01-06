@@ -27,19 +27,25 @@
             page-break-inside: avoid; /* Evita que el contenido se divida en páginas */
         }
 
-
         .encabezado {
             text-align: center;
             margin-bottom: 10px;
         }
 
-        /* Dr. Vicente con 34px */
-        .encabezado .nombre-doctor {
+        /* Clase para el nombre en el encabezado con capitalización normal */
+        .nombre-encabezado {
             font-size: 34px;
+            text-transform: none; /* Mantiene la capitalización original */
+        }
+
+        /* Clase para el nombre en contenido y firma con mayúsculas */
+        .nombre-contenido {
+            text-transform: uppercase; /* Convierte el texto a mayúsculas */
+            font-weight: bold; /* Opcional: resaltar el nombre en mayúsculas */
         }
 
         /* Fuente más pequeña para estas líneas */
-        .encabezado .linea-pequena {
+        .linea-pequena {
             font-size: 14px;
         }
 
@@ -79,10 +85,11 @@
 <body>
     <div class="marco">
         {{-- ENCABEZADO --}}
-        {{-- ENCABEZADO --}}
         <div class="encabezado" style="line-height: 1; margin-bottom: 3px;">
-            <!-- Nombre del Doctor, grande, dinámico -->
-            <strong class="nombre-doctor">{{ $doctorName }}</strong><br>
+            <!-- Nombre del Doctor, grande, con capitalización normal -->
+            <strong class="nombre-encabezado">
+                {{ ucwords(strtolower($doctorName)) }}
+            </strong><br>
 
             <!-- Resto de líneas con fuente más pequeña -->
             <span class="linea-pequena" style="display: block;">ESPECIALISTA EN PEDIATRÍA</span>
@@ -92,17 +99,12 @@
             <span class="linea-pequena" style="display: block;">
                 CONSULTORIO: {{ $calle }}
             </span>
+            <div style="text-align: center; font-size: 11px; text-transform: uppercase;">
+                TELEFONO CELULAR: {{ $telefonoPersonalMedico }}. TELEFONO CONSULTORIO: {{ $consultorio->telefono }}
+            </div>
         </div>
 
-
-
-        <!-- Dos espacios y línea de teléfonos (centrada, mayúsculas y letra pequeña) -->
-        <br>
-        <div style="text-align: center; font-size: 11px; text-transform: uppercase;">
-            TELEFONO CELULAR: {{ $telefonoPersonalMedico }}. TELEFONO CONSULTORIO: {{ $consultorio->telefono }}
-        </div>
-
-        <!-- DOS SALTOS DE LÍNEA y luego el título + subtítulo a la derecha con line-height 1.5 -->
+        <!-- Espacios adicionales -->
         <br><br>
         <div style="text-align: right; line-height: 1.5;">
             <div class="titulo" style="text-align: right;">
@@ -121,10 +123,10 @@
             <p><strong>A QUIEN CORRESPONDA:</strong></p>
             <p>
                 El que suscribe, médico pediatra 
-                <strong>{{ $doctorName }}</strong>, legalmente autorizado para ejercer mi profesión
+                <strong class="nombre-contenido">{{ strtoupper($doctorName) }}</strong>, legalmente autorizado para ejercer mi profesión
                 tal como se desprende de mi cédula profesional número:
                 <strong>{{ $cedula }}</strong>, de la cual adjunto al presente una copia simple,
-                <strong>HAGO CONSTAR QUE</strong>: el (la) menor 
+                HAGO CONSTAR QUE: el (la) menor 
                 <strong>{{ $menor->nombres }} {{ $menor->apepat }} {{ $menor->apemat }}</strong>, 
                 cuya fotografía aparece al margen, es hijo(a) de 
                 <strong>{{ $menor->padre }}</strong> y 
@@ -138,7 +140,7 @@
         {{-- FIRMA --}}
         <div class="firma">
             <span>ATENTAMENTE</span>
-            <span><strong>{{ $doctorName }}</strong></span>
+            <span><strong class="nombre-contenido">{{ strtoupper($doctorName) }}</strong></span>
         </div>
     </div>
 </body>
