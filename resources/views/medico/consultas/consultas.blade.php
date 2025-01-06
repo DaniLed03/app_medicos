@@ -4,7 +4,7 @@
         <div class="loader"></div>
     </div>
     
-    <div class="py-12">
+    <div class="py-12" style="display: none;"> <!-- Oculto inicialmente -->
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-2xl sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -44,9 +44,9 @@
                             </div>
                         </form>
 
-                        <!-- Table -->
+                        <!-- Tabla -->
                         <table id="consultasTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden display nowrap text-center">
-                            <!-- Table head -->
+                            <!-- Encabezado de la tabla -->
                             <thead class="uppercase tracking-wider border-b-2 bg-table-header-color text-white">
                                 <tr>
                                     <th scope="col" class="px-6 py-4 font-bold">Fecha y Hora</th>
@@ -56,12 +56,12 @@
                                 </tr>
                             </thead>
 
-                            <!-- Table body -->
+                            <!-- Cuerpo de la tabla -->
                             <tbody>
                                 @forelse($consultas as $consulta)
                                     <tr>
                                         <td class="px-6 py-4">
-                                            {{ \Carbon\Carbon::parse($consulta->created_at)->format('d/m/Y h:i A') }}
+                                            {{ \Carbon\Carbon::parse($consulta->created_at)->format('d/m/Y H:i') }}
                                         </td>
                                         <td class="px-6 py-4">
                                             @if($consulta->paciente)
@@ -99,6 +99,7 @@
     </div>
 </x-app-layout>
 
+<!-- Librerías de DataTables y Font Awesome -->
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
@@ -183,10 +184,12 @@
             "info": true,
             "scrollX": false,
             "autoWidth": true,
-            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]]
+            "lengthMenu": [[5, 10, 15, -1], [5, 10, 15, "Todos"]],
+            "order": [[0, "asc"]] // Ordena por la primera columna de manera ascendente
         });
     });
 
+    // Funcionalidad del botón "Reiniciar"
     document.getElementById('resetButton').addEventListener('click', function() {
         const today = new Date();
         const offset = today.getTimezoneOffset();
@@ -198,6 +201,7 @@
         document.getElementById('filterForm').submit();
     });
 
+    // Funcionalidad para iniciar o continuar consultas
     const iniciarConsultaButtons = document.querySelectorAll('.iniciar-consulta');
 
     iniciarConsultaButtons.forEach(button => {
@@ -240,18 +244,18 @@
         });
     });
 
+    // Control de la pantalla de carga
     document.addEventListener('DOMContentLoaded', function () {
-            // Mostrar el loader
-            document.getElementById('loader').style.display = 'flex';
+        // Mostrar el loader
+        document.getElementById('loader').style.display = 'flex';
 
-            window.onload = function() {
-                // Ocultar el loader una vez que todo el contenido se haya cargado
-                document.getElementById('loader').style.display = 'none';
-                // Mostrar el contenido
-                document.querySelector('.py-12').style.display = 'block';
-            };
-        });
-
+        window.onload = function() {
+            // Ocultar el loader una vez que todo el contenido se haya cargado
+            document.getElementById('loader').style.display = 'none';
+            // Mostrar el contenido
+            document.querySelector('.py-12').style.display = 'block';
+        };
+    });
 </script>
 
 <style>
@@ -309,5 +313,10 @@
     }
     .shadow-2xl {
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>

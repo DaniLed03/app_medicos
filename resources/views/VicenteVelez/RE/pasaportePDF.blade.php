@@ -21,8 +21,12 @@
         .marco {
             border: 1px solid #000;
             padding: 30px;
-            page-break-inside: avoid;
+            margin: 0 auto; /* Centrar horizontalmente */
+            height: 800px; /* Altura fija para tamaño carta, ajusta según sea necesario */
+            box-sizing: border-box; /* Asegura que el borde y el padding no aumenten la altura */
+            page-break-inside: avoid; /* Evita que el contenido se divida en páginas */
         }
+
 
         .encabezado {
             text-align: center;
@@ -75,22 +79,25 @@
 <body>
     <div class="marco">
         {{-- ENCABEZADO --}}
-        <div class="encabezado">
+        {{-- ENCABEZADO --}}
+        <div class="encabezado" style="line-height: 1; margin-bottom: 3px;">
             <!-- Nombre del Doctor, grande, dinámico -->
             <strong class="nombre-doctor">{{ $doctorName }}</strong><br>
 
             <!-- Resto de líneas con fuente más pequeña -->
-            <span class="linea-pequena">ESPECIALISTA EN PEDIATRÍA</span><br>
-            <span class="linea-pequena">
+            <span class="linea-pequena" style="display: block;">ESPECIALISTA EN PEDIATRÍA</span>
+            <span class="linea-pequena" style="display: block;">
                 CÉDULA PROFESIONAL: {{ $cedula }} REG. S.S.A. 92703
-            </span><br>
-            <span class="linea-pequena">
+            </span>
+            <span class="linea-pequena" style="display: block;">
                 CONSULTORIO: {{ $calle }}
-            </span><br>
+            </span>
         </div>
 
+
+
         <!-- Dos espacios y línea de teléfonos (centrada, mayúsculas y letra pequeña) -->
-        <br><br>
+        <br>
         <div style="text-align: center; font-size: 11px; text-transform: uppercase;">
             TELEFONO CELULAR: {{ $telefonoPersonalMedico }}. TELEFONO CONSULTORIO: {{ $consultorio->telefono }}
         </div>
