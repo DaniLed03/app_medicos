@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
     <div class="py-12" x-data="{ isModalOpen: false, isPacienteModalOpen: false }" x-init="
         @if (session('paciente_id'))
             isModalOpen = true;
@@ -77,6 +82,29 @@
 </x-app-layout> 
 
 <style>
+    /* Pantalla de carga centrada */
+    .loader-container {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
     .bg-primary {
         background-color: #2D7498;
     }
@@ -343,4 +371,16 @@
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+            // Mostrar el loader
+            document.getElementById('loader').style.display = 'flex';
+
+            window.onload = function() {
+                // Ocultar el loader una vez que todo el contenido se haya cargado
+                document.getElementById('loader').style.display = 'none';
+                // Mostrar el contenido
+                document.querySelector('.py-12').style.display = 'block';
+            };
+        });
 </script>

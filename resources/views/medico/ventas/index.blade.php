@@ -69,7 +69,7 @@
 
                     <!-- Tabla de ventas -->
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <table id="ventasTable" class="display nowrap" style="width:100%">
+                        <table id="ventasTable" class="display nowrap shadow-md rounded-lg overflow-hidden" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>ID</th>

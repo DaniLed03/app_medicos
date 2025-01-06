@@ -1,5 +1,10 @@
 <x-app-layout>
-    <div class="bg-gray-100 min-h-screen flex justify-center items-center">
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
+    <div class="bg-gray-100 flex justify-center items-start p-4" style="min-height: 100vh; width: 100%;">
         <div class="bg-white shadow-lg rounded-lg p-8 mx-4 my-8 w-full" style="max-width: 100%;">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center">
@@ -33,6 +38,11 @@
                     <li class="mr-1">
                         <a class="tab-link" href="#historialTab" onclick="openTab(event, 'historialTab')">Historial</a>
                     </li>
+                    <li class="mr-1">
+                        <a class="tab-link" href="#generarDocumentosTab" onclick="openTab(event, 'generarDocumentosTab')">
+                            Generar documentos
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="flex items-center space-x-2">
@@ -51,7 +61,7 @@
             </div>
 
 
-            <div id="tab-content-wrapper" style="min-height: 400px; max-height: 600px;">
+            <div id="tab-content-wrapper" class="w-full">
                 <div id="consultaTab" class="tab-pane active">
                     <form action="{{ route('consultas.storeWithoutCita') }}" method="POST" id="consultasForm">
                         @csrf
@@ -86,10 +96,6 @@
                                 <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
                                 <div class="grid grid-cols-7 gap-2">
                                     <div>
-                                        <label for="hidden_talla" class="block text-xs font-medium text-gray-700">Talla</label>
-                                        <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="m" value="{{ old('hidden_talla') }}">
-                                    </div>
-                                    <div>
                                         <label for="hidden_temperatura" class="block text-xs font-medium text-gray-700">Temperatura</label>
                                         <input type="text" id="hidden_temperatura" name="hidden_temperatura" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="°C" value="{{ old('hidden_temperatura') }}">
                                     </div>
@@ -98,8 +104,8 @@
                                         <input type="text" id="hidden_frecuencia_cardiaca" name="hidden_frecuencia_cardiaca" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="bpm" value="{{ old('hidden_frecuencia_cardiaca') }}">
                                     </div>
                                     <div>
-                                        <label for="hidden_peso" class="block text-xs font-medium text-gray-700">Peso</label>
-                                        <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="kg" value="{{ old('hidden_peso') }}">
+                                        <label for="hidden_saturacion_oxigeno" class="block text-xs font-medium text-gray-700">Saturación de Oxígeno</label>
+                                        <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
                                     </div>
                                     <div>
                                         <label for="hidden_tension_arterial" class="block text-xs font-medium text-gray-700">Tensión Arterial</label>
@@ -110,8 +116,12 @@
                                         <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="cm" value="{{ old('circunferencia_cabeza') }}">
                                     </div>
                                     <div>
-                                        <label for="hidden_saturacion_oxigeno" class="block text-xs font-medium text-gray-700">Saturación de Oxígeno</label>
-                                        <input type="text" id="hidden_saturacion_oxigeno" name="hidden_saturacion_oxigeno" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="%" value="{{ old('hidden_saturacion_oxigeno') }}">
+                                        <label for="hidden_talla" class="block text-xs font-medium text-gray-700">Talla</label>
+                                        <input type="text" id="hidden_talla" name="hidden_talla" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="m" value="{{ old('hidden_talla') }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_peso" class="block text-xs font-medium text-gray-700">Peso</label>
+                                        <input type="text" id="hidden_peso" name="hidden_peso" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="kg" value="{{ old('hidden_peso') }}">
                                     </div>
                                 </div>
                             </div>
@@ -230,39 +240,41 @@
                 </div> 
                 
                 <div id="historialTab" class="tab-pane hidden">
-                    <h3 class="text-lg font-medium mb-4">Historial de Consultas</h3>
-                    <table id="historialConsultasTable" class="min-w-full bg-white border rounded-lg">
-                        <thead>
-                            <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
-                                <th class="py-3 px-6 text-left">Fecha</th>
-                                <th class="py-3 px-6 text-left">Motivo</th>
-                                <th class="py-3 px-6 text-left">Diagnóstico</th>
-                                <th class="py-3 px-6 text-left">Recetas</th>
-                                <th class="py-3 px-6 text-left">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historialConsultas">
-                            @foreach ($consultasPasadas as $consulta)
-                            <tr class="border-b">
-                                <td class="py-3 px-6">
-                                    {{ \Carbon\Carbon::parse($consulta->fechaHora)->format('d/m/Y') }}
-                                </td>
-                                <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
-                                <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
-                                <td class="text-left py-3 px-4">
-                                    {{ $consulta->total_recetas }} {{ Str::plural('Receta', $consulta->total_recetas) }}
-                                </td>
-                                <td class="py-3 px-6">
-                                    <button class="bg-blue-500 text-white px-4 py-2 rounded"
-                                        onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
-                                        Ver
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                        
-                    </table>
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
+                        <h3 class="text-lg font-medium mb-4">Historial de Consultas</h3>
+                        <table id="historialConsultasTable" class="min-w-full bg-white border shadow-md rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">Fecha y Hora</th>
+                                    <th class="py-3 px-6 text-left">Motivo</th>
+                                    <th class="py-3 px-6 text-left">Diagnóstico</th>
+                                    <th class="py-3 px-6 text-left">Recetas</th>
+                                    <th class="py-3 px-6 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historialConsultas">
+                                @foreach ($consultasPasadas as $consulta)
+                                <tr class="border-b">
+                                    <td class="py-3 px-6">
+                                        {{ mb_strtoupper(\Carbon\Carbon::parse($consulta->created_at ?? $consulta->fechaHora)->format('d/m/Y h:i A')) }}
+                                    </td>
+                                    <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
+                                    <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
+                                    <td class="text-left py-3 px-4">
+                                        {{ $consulta->total_recetas }} {{ Str::plural('Receta', $consulta->total_recetas) }}
+                                    </td>
+                                    <td class="py-3 px-6">
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded"
+                                            onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
+                                            Ver
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            
+                        </table>
+                    </div>
 
                     <!-- Modal -->
                     <div id="modalConsulta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden z-50">
@@ -345,6 +357,205 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="generarDocumentosTab" class="tab-pane hidden">
+                    <!-- Contenedor de Documentos -->
+                    <div id="documentosContainer" class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
+                        <h3 class="text-lg font-medium mb-4">Documentos</h3>
+                        <button 
+                            id="mostrarPasaporteWizard" 
+                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        >
+                            Constancia de Relaciones Exteriores
+                        </button>
+                    </div>
+                
+                    <!-- Wizard de 2 pasos -->
+                    <div id="pasaporteWizard" class="hidden w-full">
+                
+                        <!-- Barra de pasos -->
+                        <div class="flex justify-around items-center mb-2">
+                            <!-- Paso 1: Datos del Doctor -->
+                            <div class="flex flex-col items-center" id="paso1Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-green-600 text-white font-bold mb-1">1</div>
+                                <p class="text-xs font-medium">Datos del Doctor</p>
+                            </div>
+                            <!-- Línea divisoria -->
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <!-- Paso 2: Datos del Consultorio -->
+                            <div class="flex flex-col items-center" id="paso2Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">2</div>
+                                <p class="text-xs font-medium text-gray-400">Datos del Consultorio</p>
+                            </div>
+                            <!-- Línea divisoria -->
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <!-- Paso 3: Datos del Paciente -->
+                            <div class="flex flex-col items-center" id="paso3Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">3</div>
+                                <p class="text-xs font-medium text-gray-400">Datos del Paciente</p>
+                            </div>
+                            <!-- Línea divisoria -->
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <!-- Paso 4: Generar PDF -->
+                            <div class="flex flex-col items-center" id="paso4Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">4</div>
+                                <p class="text-xs font-medium text-gray-400">Generar PDF</p>
+                            </div>
+                        </div>
+
+                
+                        <!-- Contenedor de cada paso -->
+                        <!-- Paso 1: Datos del Doctor -->
+                        <div id="paso1Contenido" class="bg-white p-4 rounded shadow-md">
+                            <h4 class="text-lg font-semibold mb-4">Paso 1: Datos del Doctor</h4>
+                            <form id="formPaso1">
+                                <div class="mb-4">
+                                    <label for="doctorName" class="block text-sm font-medium text-gray-700">Nombre del Doctor</label>
+                                    <input 
+                                        type="text"
+                                        id="doctorName"
+                                        name="doctorName"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('doctorName', 'Dr. ' . $medico->nombres . ' ' . $medico->apepat . ' ' . $medico->apemat) }}"
+                                        placeholder="Ej: Dr. Juan Pérez" 
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="cedula" class="block text-sm font-medium text-gray-700">Cédula Profesional</label>
+                                    <input 
+                                        type="text"
+                                        id="cedula"
+                                        name="cedula"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('cedula', $cedulaProfesional) }}"
+                                        placeholder="Ej: 12345678"
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="telefonoPersonalMedico" class="block text-sm font-medium text-gray-700">Teléfono Celular Personal del Médico</label>
+                                    <input
+                                        type="text"
+                                        id="telefonoPersonalMedico"
+                                        name="telefonoPersonalMedico"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('telefonoPersonalMedico', $telefonoPersonalMedico) }}"
+                                        placeholder="Ej: 8343011758"
+                                        required
+                                    >
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backToDocuments" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextPaso1" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Datos del Consultorio -->
+                        <div id="paso2Contenido" class="hidden bg-white p-4 rounded shadow-md">
+                            <h4 class="text-lg font-semibold mb-4">Paso 2: Datos del Consultorio</h4>
+                            <form id="formPaso2">
+                                <div class="mb-4">
+                                    <label for="calle" class="block text-sm font-medium text-gray-700">Calle del Consultorio</label>
+                                    <input 
+                                        type="text" 
+                                        id="calle"
+                                        name="calle"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('calle', $calle) }}"
+                                        placeholder="Ej: Av. Principal #123"
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="telefonoConsultorio" class="block text-sm font-medium text-gray-700">Teléfono del Consultorio</label>
+                                    <input
+                                        type="text"
+                                        id="telefonoConsultorio"
+                                        name="telefonoConsultorio"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('telefonoConsultorio', $telefonoConsultorio) }}"
+                                        placeholder="Ej: 8343011758"
+                                        required
+                                    >
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backPaso2" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextPaso2" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 3: Datos del Paciente -->
+                        <div id="paso3Contenido" class="hidden bg-white p-4 rounded shadow-md">
+                            <h4 class="text-lg font-semibold mb-4">Paso 3: Datos del Paciente</h4>
+                            <form id="formPaso3">
+                                <div class="mb-4">
+                                    <label for="pacienteNombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                    <input
+                                        type="text"
+                                        id="pacienteNombre"
+                                        name="pacienteNombre"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('pacienteNombre', $paciente->nombres . ' ' . $paciente->apepat . ' ' . $paciente->apemat) }}"
+                                        placeholder="Nombre completo"
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="padre" class="block text-sm font-medium text-gray-700">Padre</label>
+                                    <input
+                                        type="text"
+                                        id="padre"
+                                        name="padre"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('padre', $paciente->padre ?? '') }}"
+                                        placeholder="Nombre del padre"
+                                        required
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="madre" class="block text-sm font-medium text-gray-700">Madre</label>
+                                    <input
+                                        type="text"
+                                        id="madre"
+                                        name="madre"
+                                        class="w-full mt-1 border rounded p-2"
+                                        value="{{ old('madre', $paciente->madre ?? '') }}"
+                                        placeholder="Nombre de la madre"
+                                        required
+                                    >
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backPaso3" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextPaso3" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 4: Generar PDF -->
+                        <div id="paso4Contenido" class="hidden bg-white p-4 rounded shadow-md">
+                            <h4 class="text-lg font-semibold mb-4">Paso 4: Generar PDF</h4>
+                            <p>Haz clic en el botón para generar el PDF de la Constancia de Relaciones Exteriores.</p>
+                            
+                            <!-- Botones de navegación -->
+                            <div class="flex justify-between mt-4">
+                                <button id="backPaso4" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="generarPDFWizard" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Generar PDF</button>
+                            </div>
+                            
+                            <!-- Iframe para la vista previa del PDF -->
+                            <div id="pdfPreviewContainer" class="mt-6 hidden w-full h-auto">
+                                <iframe id="pdfPreviewFrameWizard" src="" frameborder="0" class="w-full h-full"></iframe>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                
                 
             </div>
 
@@ -404,16 +615,6 @@
                 </script>
             @endif
 
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -422,6 +623,227 @@
             <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
             <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
             
+            <style>
+                /* Asegúrate de que los nuevos indicadores de pasos sigan el mismo estilo */
+                .paso-indicator {
+                    flex: 1;
+                    text-align: center;
+                }
+
+                /* Asegura que el wizard no sobrepase los bordes del tab */
+                #pasaporteWizard {
+                    max-width: 100%;
+                    overflow-x: hidden;
+                }
+
+                /* Asegura que el wizard no sobrepase los bordes del tab */
+                #pasaporteWizard {
+                    max-width: 100%;
+                    overflow-x: hidden;
+                }
+
+                /* Ajustar el iframe para que sea responsivo */
+                #pdfPreviewFrameWizard {
+                    width: 100%;
+                    height: 600px;
+                    border: none;
+                }
+
+                /* Opcional: Ajustar el contenedor de la vista previa para una mejor presentación */
+                #pdfPreviewContainer {
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 20px;
+                }
+
+            </style>
+            <script>
+                // Si existen errores de validación (en $errors), muéstralos con un SweetAlert:
+                @if ($errors->any())
+                    let errorsHtml = `
+                        <ul style="list-style:none; padding:0; margin:0;">
+                            @foreach($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Errores de validación',
+                        html: errorsHtml,
+                        confirmButtonText: 'Aceptar'
+                    });
+                @endif
+            </script>
+            
+            <script>
+                // Manejo de navegación entre pasos del wizard
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Botones Paso 1
+                    document.getElementById('nextPaso1').addEventListener('click', function() {
+                        // Validar formulario Paso 1
+                        if (document.getElementById('formPaso1').checkValidity()) {
+                            avanzarPaso(1);
+                        } else {
+                            document.getElementById('formPaso1').reportValidity();
+                        }
+                    });
+            
+                    // Botones Paso 2
+                    document.getElementById('nextPaso2').addEventListener('click', function() {
+                        // Validar formulario Paso 2
+                        if (document.getElementById('formPaso2').checkValidity()) {
+                            avanzarPaso(2);
+                        } else {
+                            document.getElementById('formPaso2').reportValidity();
+                        }
+                    });
+            
+                    // Botones Paso 3
+                    document.getElementById('nextPaso3').addEventListener('click', function() {
+                        // Validar formulario Paso 3
+                        if (document.getElementById('formPaso3').checkValidity()) {
+                            avanzarPaso(3);
+                        } else {
+                            document.getElementById('formPaso3').reportValidity();
+                        }
+                    });
+            
+                    // Botones Regresar
+                    document.getElementById('backPaso2').addEventListener('click', function() {
+                        regresarPaso(2);
+                    });
+                    document.getElementById('backPaso3').addEventListener('click', function() {
+                        regresarPaso(3);
+                    });
+                    document.getElementById('backPaso4').addEventListener('click', function() {
+                        regresarPaso(4);
+                    });
+            
+                    // Botón Generar PDF en el Paso 4
+                    // Manejo del botón "Generar PDF" en el Wizard
+                    document.getElementById('generarPDFWizard').addEventListener('click', function() {
+                        // Obtener los datos de los formularios de los pasos anteriores
+                        const formPaso1 = document.getElementById('formPaso1');
+                        const formPaso2 = document.getElementById('formPaso2');
+                        const formPaso3 = document.getElementById('formPaso3');
+
+                        // Crear un objeto FormData y agregar los datos de los formularios
+                        let formData = new FormData();
+
+                        // Paso 1
+                        formData.append('doctorName', formPaso1.doctorName.value);
+                        formData.append('cedula', formPaso1.cedula.value);
+                        formData.append('telefonoPersonalMedico', formPaso1.telefonoPersonalMedico.value);
+
+                        // Paso 2
+                        formData.append('calle', formPaso2.calle.value);
+                        formData.append('telefonoConsultorio', formPaso2.telefonoConsultorio.value);
+
+                        // Paso 3
+                        formData.append('pacienteNombre', formPaso3.pacienteNombre.value);
+                        formData.append('padre', formPaso3.padre.value);
+                        formData.append('madre', formPaso3.madre.value);
+
+                        // Enviar la solicitud AJAX al controlador para generar el PDF
+                        fetch('{{ route('documento.generarPasaporteDesdeFormulario') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => { throw err; });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if(data.pdfBase64){
+                                // Mostrar la vista previa en el iframe
+                                document.getElementById('pdfPreviewFrameWizard').src = 'data:application/pdf;base64,' + data.pdfBase64;
+                                document.getElementById('pdfPreviewContainer').classList.remove('hidden');
+
+                                // Actualizar indicadores de paso
+                                document.getElementById('paso4Indicator').querySelector('.h-8').classList.remove('bg-green-600');
+                                document.getElementById('paso4Indicator').querySelector('.h-8').classList.add('bg-blue-600');
+                                // Puedes añadir más lógica para indicar que el PDF fue generado
+                            } else {
+                                alert('Error al generar el PDF.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            if (error.errors) {
+                                let mensajes = '';
+                                for (const [campo, msgs] of Object.entries(error.errors)) {
+                                    mensajes += `${campo}: ${msgs.join(', ')}\n`;
+                                }
+                                alert(`Errores de validación:\n${mensajes}`);
+                            } else if (error.message) {
+                                alert(`Error: ${error.message}`);
+                            } else {
+                                alert('Ocurrió un error al generar el PDF.');
+                            }
+                        });
+                    });
+                        
+                    // Función para avanzar al siguiente paso
+                    function avanzarPaso(pasoActual) {
+                        // Ocultar contenido del paso actual
+                        document.getElementById(`paso${pasoActual}Contenido`).classList.add('hidden');
+            
+                        // Mostrar contenido del siguiente paso
+                        document.getElementById(`paso${pasoActual + 1}Contenido`).classList.remove('hidden');
+            
+                        // Actualizar indicadores de paso
+                        document.getElementById(`paso${pasoActual}Indicator`).querySelector('.h-8').classList.remove('bg-green-600');
+                        document.getElementById(`paso${pasoActual}Indicator`).querySelector('.h-8').classList.add('bg-gray-300');
+                        document.getElementById(`paso${pasoActual + 1}Indicator`).querySelector('.h-8').classList.remove('bg-gray-300');
+                        document.getElementById(`paso${pasoActual + 1}Indicator`).querySelector('.h-8').classList.add('bg-green-600');
+                    }
+            
+                    // Función para regresar al paso anterior
+                    function regresarPaso(pasoActual) {
+                        // Ocultar contenido del paso actual
+                        document.getElementById(`paso${pasoActual}Contenido`).classList.add('hidden');
+            
+                        // Mostrar contenido del paso anterior
+                        document.getElementById(`paso${pasoActual - 1}Contenido`).classList.remove('hidden');
+            
+                        // Actualizar indicadores de paso
+                        document.getElementById(`paso${pasoActual}Indicator`).querySelector('.h-8').classList.remove('bg-green-600');
+                        document.getElementById(`paso${pasoActual}Indicator`).querySelector('.h-8').classList.add('bg-gray-300');
+                        document.getElementById(`paso${pasoActual - 1}Indicator`).querySelector('.h-8').classList.remove('bg-gray-300');
+                        document.getElementById(`paso${pasoActual - 1}Indicator`).querySelector('.h-8').classList.add('bg-green-600');
+                    }
+            
+                    // Mostrar el Wizard y ocultar el contenedor de Documentos
+                    document.getElementById('mostrarPasaporteWizard').addEventListener('click', function () {
+                        // Ocultar el contenedor de Documentos
+                        const documentosDiv = document.getElementById('documentosContainer');
+                        documentosDiv.classList.add('hidden'); // Usa la clase hidden para ocultar
+
+                        // Mostrar el Wizard
+                        const wizardDiv = document.getElementById('pasaporteWizard');
+                        wizardDiv.classList.remove('hidden'); // Quita la clase hidden para mostrar
+                    });
+
+                    // Regresar al contenedor de Documentos y ocultar el Wizard
+                    document.getElementById('backToDocuments').addEventListener('click', function () {
+                        // Mostrar el contenedor de Documentos
+                        const documentosDiv = document.getElementById('documentosContainer');
+                        documentosDiv.classList.remove('hidden'); // Quita la clase hidden para mostrar
+
+                        // Ocultar el Wizard
+                        const wizardDiv = document.getElementById('pasaporteWizard');
+                        wizardDiv.classList.add('hidden'); // Usa la clase hidden para ocultar
+                    });
+
+            
+                });
+            </script>
             <script>
                 // Función para actualizar los signos vitales dentro del modal
                 function updateModalVitalSigns() {
@@ -508,19 +930,23 @@
 
 
                 function verConsulta(consultaId, pacienteId, medicoId) {
-                    const url = `/consultas/${consultaId}/${pacienteId}/${medicoId}`;
+                    const url = `/consultas/${consultaId}/detalles/${pacienteId}/${medicoId}`;
 
                     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(response => response.json())
                         .then(data => {
-                            // Asignar la fecha de la consulta al título del modal
+                            // Convierte la fecha a objeto Date
                             const fechaConsulta = new Date(data.fechaHora);
-                            const dia = ('0' + fechaConsulta.getDate()).slice(-2); // Asegura dos dígitos en el día
-                            const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-                            const mes = meses[fechaConsulta.getMonth()]; // Obtiene el mes en mayúsculas
-                            const año = fechaConsulta.getFullYear();
-                            const fechaFormateada = `${dia} ${mes} ${año}`; // Formato "10 ABR 2024"
 
+                            // Extrae día, mes (numérico) y año, asegurándote de agregar ceros a la izquierda
+                            const dia = String(fechaConsulta.getDate()).padStart(2, '0'); 
+                            const mes = String(fechaConsulta.getMonth() + 1).padStart(2, '0');
+                            const año = fechaConsulta.getFullYear();
+
+                            // Formato: dd/mm/yyyy
+                            const fechaFormateada = `${dia}/${mes}/${año}`;
+
+                            // Ahora se asigna "19/12/2024" en lugar de "19 DIC 2024"
                             document.getElementById('fechaConsultaTitulo').innerText = fechaFormateada;
 
                             // Asignar otros datos al modal
@@ -880,12 +1306,23 @@
                 };
 
                 for (const [fieldId, unit] of Object.entries(vitalSignsFields)) {
-                    document.getElementById(fieldId).addEventListener('blur', function () {
+                    const field = document.getElementById(fieldId);
+
+                    // Al hacer focus: quitar unidad si está al final
+                    field.addEventListener('focus', function () {
+                        if (this.value.endsWith(unit)) {
+                            this.value = this.value.slice(0, -unit.length).trim();
+                        }
+                    });
+
+                    // Al perder el foco (blur): agregar unidad si no existe y el campo no está vacío
+                    field.addEventListener('blur', function () {
                         if (this.value && !this.value.endsWith(unit)) {
                             this.value += ` ${unit}`;
                         }
                     });
                 }
+
 
                 document.addEventListener('DOMContentLoaded', function() {
                     let showAlert = @json($showAlert); // Pasamos la variable desde el backend
@@ -918,9 +1355,36 @@
                     });
                 });
 
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Mostrar el loader
+                    document.getElementById('loader').style.display = 'flex';
+
+                    window.onload = function() {
+                        // Ocultar el loader una vez que todo el contenido se haya cargado
+                        document.getElementById('loader').style.display = 'none';
+                        // Mostrar el contenido
+                        document.querySelector('.py-12').style.display = 'block';
+                    };
+                });
+
             </script>
 
             <style>
+                .dataTables_filter input[type="search"] {
+                    width: 500px !important; /* Ajusta el tamaño a tu preferencia */
+                    padding: 6px 12px; /* Ajuste de padding */
+                    font-size: 16px;
+                    border-radius: 4px;
+                    border: 1px solid #ccc;
+                    box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+                }
+
+                .dataTables_filter input[type="search"]:focus {
+                    border-color: #007bff; /* Color del borde azul */
+                    outline: none; /* Elimina el outline por defecto */
+                    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+                }
+                
                 #recetaModalContent ul,
                 #recetaModalContent ol {
                     list-style-type: disc; /* Puntos para listas no ordenadas */
@@ -985,6 +1449,29 @@
                 #tabs {
                     border-bottom: 1px solid #e2e8f0; /* Mantén la línea en los tabs */
                     margin-top: 0; /* Elimina el margen superior para que las pestañas estén pegadas al nombre */
+                }
+
+                /* Pantalla de carga centrada */
+                .loader-container {
+                    position: fixed;
+                    z-index: 9999;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .loader {
+                    border: 16px solid #f3f3f3;
+                    border-top: 16px solid #3498db;
+                    border-radius: 50%;
+                    width: 120px;
+                    height: 120px;
+                    animation: spin 2s linear infinite;
                 }
             </style>
         </div>

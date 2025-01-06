@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+    
     <div class="py-12 flex items-center justify-center">
         <div class="bg-white shadow-lg rounded-lg p-6 text-center w-full max-w-7xl flex flex-col md:flex-row justify-between">
             <!-- Contenedor Vertical (Datos Profesionales) -->
@@ -45,11 +50,46 @@
             </div>            
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // El loader ya está visible por defecto gracias a CSS, no es necesario mostrarlo aquí.
+
+            window.onload = function() {
+                // Ocultar el loader una vez que todo el contenido se haya cargado
+                document.getElementById('loader').style.display = 'none';
+                // No es necesario modificar la visualización del contenido principal
+            };
+        });
+    </script>
 </x-app-layout>
 
 
 <!-- Estilos adicionales -->
 <style>
+    /* Pantalla de carga centrada */
+    .loader-container {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
     .shadow-lg {
         box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
     }
@@ -76,5 +116,11 @@
     }
     .text-center {
         text-align: center; /* Alineación del texto al centro */
+    }
+
+    /* Animación del loader */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>

@@ -63,7 +63,7 @@
                             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Buscar</button>
                         </form>
                         
-                        <table id="pacientesTable" class="display nowrap" style="width:100%">
+                        <table id="pacientesTable" class="display nowrap shadow-md rounded-lg overflow-hidden" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>No. Exp</th>
@@ -81,7 +81,7 @@
                                             <tr>
                                                 <td>{{ $paciente->no_exp }}</td>
                                                 <td>{{ $paciente->apepat }} {{ $paciente->apemat }} {{ $paciente->nombres }}</td>
-                                                <td>{{ strtoupper(\Carbon\Carbon::parse($paciente->fechanac)->locale('es')->isoFormat('DD MMM YYYY')) }}</td>
+                                                <td>{{ strtoupper(\Carbon\Carbon::parse($paciente->fechanac)->format('d/m/Y')) }}</td>                                                
                                                 <td>{{ $paciente->sexo }}</td>
                                                 <td>{{ $paciente->telefono }}</td>
                                                 <td>

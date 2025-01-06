@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('apemat');
             $table->date('fechanac')->nullable();
             $table->time('hora')->nullable();
-            $table->decimal('peso', 5, 2)->nullable();
-            $table->integer('talla')->nullable();
+            $table->string('peso')->nullable();
+            $table->string('talla')->nullable();
             $table->string('lugar_naci')->nullable();
             $table->string('hospital')->nullable();
             $table->string('tipoparto')->nullable();

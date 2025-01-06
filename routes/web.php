@@ -14,6 +14,7 @@ use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\ConceptoController;
 use App\Http\Controllers\ColoniaController;
 use App\Http\Controllers\ActualizarConsultaSinCitaController;
+use App\Http\Controllers\DocumentoController;
 
 // Ruta de la página de bienvenida
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -115,8 +116,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/medico/storeDesdeModal', [MedicoController::class, 'storeDesdeModal'])->name('medico.storeDesdeModal');
     Route::get('/search-pacientes', [MedicoController::class, 'searchPacientes'])->name('pacientes.search');
     route::post('/consultas/navigate', [ConsultaController::class, 'navigate'])->name('consultas.navigate');    
+
+    Route::get(
+        '/consultas/{id}/detalles/{pacienteId}/{medicoId}',
+        [ConsultaController::class, 'getConsultaDetails']
+    )->name('consultas.getConsultaDetails');
+    
+    Route::get(
+        '/consultas/{id}/{no_exp}/{medico_id}',
+        [ConsultaController::class, 'show']
+    )->name('consultas.show');
+    
+
     Route::get('/consultas/{id}/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails']);
-    Route::get('consultas/{id}/detalles/{pacienteId}/{medicoId}', [ConsultaController::class, 'getConsultaDetails'])->name('consultas.getConsultaDetails');
     Route::get('/consultas/{pacienteId}/{medicoId}/{consultaId}/editar', [ActualizarConsultaSinCitaController::class, 'editWithoutCita'])
     ->name('consultas.editWithoutCita');
     Route::put('consultas/{pacienteId}/{medicoId}/{consultaId}/actualizar', [ActualizarConsultaSinCitaController::class, 'updateWithoutCita'])->name('consultas.updateWithoutCita');
@@ -165,5 +177,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/medico/catalogos/configuracion/configSistema', [MedicoController::class, 'mostrarConfiguracion'])->name('configuracion.mostrar');
     Route::post('/medico/catalogos/configuracion/guardar', [MedicoController::class, 'guardarConfiguracion'])->name('configuracion.guardar');
+
+    // Rutas de DocumentoController
+    Route::get('/pacientes/{pacienteId}/pdf-pasaporte', [DocumentoController::class, 'generarPasaportePDF'])
+     ->name('documentos.pasaporte');
+     // routes/web.php
+    Route::post('/documentos/pasaporte-preview/{pacienteId}', [DocumentoController::class, 'generarPasaportePreview'])
+    ->name('documentos.pasaporte.preview');
+
+    Route::post('/documento/generar-pasaporte', [DocumentoController::class, 'generarPasaporteDesdeFormulario'])
+        ->name('documento.generarPasaporteDesdeFormulario');
 
 });

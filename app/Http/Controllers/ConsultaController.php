@@ -18,16 +18,17 @@ use Illuminate\Support\Collection;
 
 class ConsultaController extends Controller
 {
-    public function createWithoutCita($pacienteId)
+     public function createWithoutCita($pacienteId)
     {
         $medicoId = Auth::id(); 
 
         // Obtener datos del paciente y filtrar también por médico, incluyendo los antecedentes
         $paciente = DB::select("
-            SELECT no_exp, nombres, apepat, apemat, fechanac, antecedentes 
+            SELECT no_exp, nombres, apepat, apemat, fechanac, antecedentes, 
+                   padre, madre, telefono
             FROM pacientes 
             WHERE no_exp = ? 
-            AND medico_id = ? 
+              AND medico_id = ? 
             LIMIT 1
         ", [$pacienteId, $medicoId]);
 
@@ -35,9 +36,24 @@ class ConsultaController extends Controller
             abort(404, 'Paciente no encontrado para este médico');
         }
 
+        // Obtener datos del consultorio asociado al médico
+        $consultorio = DB::selectOne("
+            SELECT calle, telefono, cedula_profesional
+            FROM consultorios
+            WHERE user_id = ?
+            LIMIT 1
+        ", [$medicoId]);
+
+        // Asignar valores con fallback en caso de que no existan
+        $calle = $consultorio->calle ?? '';
+        $telefonoConsultorio = $consultorio->telefono ?? '';
+        $cedulaProfesional = $consultorio->cedula_profesional ?? '';
+
         $paciente = $paciente[0];
 
         $medico = Auth::user();
+        // Obtener el teléfono celular personal del médico
+        $telefonoPersonalMedico = $medico->telefono ?? '';
 
         // Obtener tipos de receta
         $tiposDeReceta = DB::select("SELECT * FROM tipo_de_receta");
@@ -88,7 +104,11 @@ class ConsultaController extends Controller
             'showAlert', 
             'tiposDeReceta', 
             'recetas', 
-            'consultasPasadas'
+            'consultasPasadas',
+            'calle',
+            'telefonoConsultorio',
+            'cedulaProfesional',
+            'telefonoPersonalMedico'
         ));
     }
 
@@ -403,29 +423,70 @@ class ConsultaController extends Controller
 
     public function show($id, $no_exp, $medico_id)
     {
-        // Encuentra la consulta y las recetas asociadas, filtrando por consulta, paciente y médico
-        $consulta = Consultas::with(['recetas' => function ($query) use ($id, $no_exp) {
-            $query->where('consulta_recetas.consulta_id', $id) // Filtrar por la consulta específica
-                ->where('consulta_recetas.no_exp', $no_exp); // Filtrar por paciente
-        }])
-        ->where('id', $id)  // Filtrar por el ID de la consulta
-        ->where('pacienteid', $no_exp)  // Filtrar por el paciente
-        ->where('usuariomedicoid', $medico_id)  // Filtrar por el médico
-        ->firstOrFail();
+        // Verificar que el médico logueado coincida con el que se está pasando
+        if (Auth::id() != $medico_id) {
+            abort(403, 'No autorizado para ver esta consulta');
+        }
 
-        // Obtener la información del paciente
-        $paciente = Paciente::where('no_exp', $no_exp)->firstOrFail();
+        // 1) Obtener la consulta filtrando por la llave compuesta
+        $consultaData = DB::select("
+            SELECT *
+            FROM consultas
+            WHERE id = ?
+            AND pacienteid = ?
+            AND usuariomedicoid = ?
+            LIMIT 1
+        ", [$id, $no_exp, $medico_id]);
 
-        // Calcular la edad del paciente
-        $fechaNacimiento = \Carbon\Carbon::parse($paciente->fechanac);
-        $edad = $fechaNacimiento->diff(\Carbon\Carbon::now());
+        if (empty($consultaData)) {
+            abort(404, 'Consulta no encontrada.');
+        }
 
-        // Formatear la fecha de la consulta
-        $fechaConsulta = \Carbon\Carbon::parse($consulta->fechaHora)->format('d-m-Y');
+        // DB::select() devuelve un array de stdClass; tomamos la primera posición
+        $consulta = $consultaData[0];
 
-        // Retornar la vista con los datos de la consulta y paciente
-        return view('medico.consultas.verConsulta', compact('consulta', 'paciente', 'fechaConsulta', 'edad'));
+        // 2) Obtener sus recetas
+        $recetas = DB::select("
+            SELECT cr.*, tdr.nombre AS tipo_receta_nombre
+            FROM consulta_recetas cr
+            JOIN tipo_de_receta tdr ON cr.id_tiporeceta = tdr.id
+            WHERE cr.consulta_id = ?
+            AND cr.no_exp = ?
+            AND cr.id_medico = ?
+        ", [$id, $no_exp, $medico_id]);
+
+        // Convertir $recetas a una colección para poder usar métodos como ->pluck()
+        $consulta->recetas = collect($recetas);
+
+        // 3) Obtener al paciente, asegurándonos de que sea del mismo médico
+        $pacienteData = DB::select("
+            SELECT *
+            FROM pacientes
+            WHERE no_exp = ?
+            AND medico_id = ?
+            LIMIT 1
+        ", [$no_exp, $medico_id]);
+
+        if (empty($pacienteData)) {
+            abort(404, 'Paciente no encontrado o no pertenece a este médico.');
+        }
+
+        $paciente = $pacienteData[0];
+
+        // 4) Calcular la edad y formatear la fecha de la consulta
+        $fechaNacimiento = Carbon::parse($paciente->fechanac);
+        $edad = $fechaNacimiento->diff(Carbon::now());
+        $fechaConsulta = Carbon::parse($consulta->fechaHora)->format('d-m-Y');
+
+        // 5) Retornar la vista con los datos necesarios
+        return view('medico.consultas.verConsulta', [
+            'consulta'      => $consulta,
+            'paciente'      => $paciente,
+            'fechaConsulta' => $fechaConsulta,
+            'edad'          => $edad,
+        ]);
     }
+
 
     public function terminate($id)
     {

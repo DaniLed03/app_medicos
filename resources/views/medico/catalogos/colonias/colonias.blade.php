@@ -1,4 +1,9 @@
     <x-app-layout>
+        <!-- Pantalla de carga -->
+        <div id="loader" class="loader-container">
+            <div class="loader"></div>
+        </div>
+
         <div class="py-12">
             <div class="max-w-full mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
@@ -42,7 +47,7 @@
 
                         <!-- Tabla de colonias -->
                         <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                            <table id="coloniasTable" class="display nowrap w-full" style="width:100%">
+                            <table id="coloniasTable" class="display nowrap w-full shadow-md rounded-lg overflow-hidden" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>Código Postal</th>
@@ -440,6 +445,18 @@
                 // Lógica para consultar la colonia
                 alert(`Consultando información de la colonia con ID: ${id}`);
             }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Mostrar el loader
+                document.getElementById('loader').style.display = 'flex';
+
+                window.onload = function() {
+                    // Ocultar el loader una vez que todo el contenido se haya cargado
+                    document.getElementById('loader').style.display = 'none';
+                    // Mostrar el contenido
+                    document.querySelector('.py-12').style.display = 'block';
+                };
+            });
         </script>
         
         <!-- Importa jQuery antes de cualquier otra librería -->
@@ -462,6 +479,44 @@
     </x-app-layout>
 
     <style>
+        /* Pantalla de carga centrada */
+        .loader-container {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        .dataTables_filter input[type="search"] {
+            width: 500px !important; /* Ajusta el tamaño a tu preferencia */
+            padding: 6px 12px; /* Ajuste de padding */
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+        }
+
+        .dataTables_filter input[type="search"]:focus {
+            border-color: #007bff; /* Color del borde azul */
+            outline: none; /* Elimina el outline por defecto */
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+        }
+
         #addColoniaModal {
             display: none;
         }

@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
     <div class="py-12">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
@@ -131,24 +136,51 @@
 
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                        <!-- Peso (kg) -->
+                                        <!-- Peso -->
                                         <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="pesoEditar" :value="__('Peso (kg)')" />
-                                            <x-text-input id="pesoEditar" class="block mt-1 w-full" type="number" step="0.01" name="peso" value="{{ $paciente->peso ?? '' }}" />
+                                            <x-input-label for="pesoEditar" :value="__('Peso')" />
+                                            <!-- Input de texto -->
+                                            <x-text-input
+                                                id="pesoEditar"
+                                                class="block mt-1 w-full"
+                                                type="text"
+                                                name="peso"
+                                                value="{{ $paciente->peso ?? '' }}"
+                                                onfocus="removeUnit('pesoEditar', ' kg')"
+                                                onblur="addUnit('pesoEditar', ' kg')"
+                                            />
                                             <x-input-error :messages="$errors->get('peso')" class="mt-2" />
                                         </div>
 
-                                        <!-- Talla (cm) -->
+                                        <!-- Talla -->
                                         <div class="mt-4 md:col-span-1">
-                                            <x-input-label for="tallaEditar" :value="__('Talla (cm)')" />
-                                            <x-text-input id="tallaEditar" class="block mt-1 w-full" type="number" name="talla" value="{{ $paciente->talla ?? '' }}" />
+                                            <x-input-label for="tallaEditar" :value="__('Talla')" />
+                                            <!-- Input de texto -->
+                                            <x-text-input
+                                                id="tallaEditar"
+                                                class="block mt-1 w-full"
+                                                type="text"
+                                                name="talla"
+                                                value="{{ $paciente->talla ?? '' }}"
+                                                onfocus="removeUnit('tallaEditar', ' cm')"
+                                                onblur="addUnit('tallaEditar', ' cm')"
+                                            />
                                             <x-input-error :messages="$errors->get('talla')" class="mt-2" />
                                         </div>
+
 
                                         <!-- Tipo de Parto -->
                                         <div class="mt-4 md:col-span-1">
                                             <x-input-label for="tipopartoEditar" :value="__('Tipo de Parto')" />
-                                            <x-text-input id="tipopartoEditar" class="block mt-1 w-full" type="text" name="tipoparto" value="{{ $paciente->tipoparto ?? '' }}" />
+                                            <!-- Se fuerza a mayúsculas al escribir -->
+                                            <x-text-input 
+                                                id="tipopartoEditar" 
+                                                class="block mt-1 w-full" 
+                                                type="text" 
+                                                name="tipoparto" 
+                                                value="{{ $paciente->tipoparto ?? '' }}" 
+                                                oninput="this.value = this.value.toUpperCase()" 
+                                            />
                                             <x-input-error :messages="$errors->get('tipoparto')" class="mt-2" />
                                         </div>
 
@@ -396,7 +428,7 @@
                                 <table id="historialTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden display nowrap">
                                     <thead class="bg-[#2D7498] text-white">
                                         <tr>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha y Hora</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Motivo</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Diagnóstico</th>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Recetas</th>
@@ -408,7 +440,7 @@
                                             @foreach($consultas as $consulta)
                                                 <tr>
                                                     <td class="text-left py-3 px-4">
-                                                        {{ mb_strtoupper(\Carbon\Carbon::parse($consulta->created_at ?? $consulta->fechaHora)->locale('es')->isoFormat('DD MMM YYYY hh:mm A')) }}
+                                                        {{ mb_strtoupper(\Carbon\Carbon::parse($consulta->created_at ?? $consulta->fechaHora)->format('d/m/Y h:i A')) }}
                                                     </td>
                                                     <td class="text-left py-3 px-4" style="max-width: 200px; word-wrap: break-word; overflow-wrap: break-word;">
                                                         {!! $consulta->motivoConsulta !!}
@@ -421,17 +453,24 @@
                                                         {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
                                                     </td>
                                                     <td class="text-left py-3 px-4">
-                                                        <a href="{{ route('consultas.show', ['id' => $consulta->id, 'no_exp' => $paciente->no_exp, 'medico_id' => $consulta->usuariomedicoid]) }}" 
-                                                           class="text-blue-500 hover:text-blue-700 ">
-                                                           Visualizar Historial
+                                                        <a href="{{ route('consultas.show', [
+                                                                'id'        => $consulta->id,
+                                                                'no_exp'    => $paciente->no_exp,
+                                                                'medico_id' => $consulta->usuariomedicoid
+                                                            ]) }}" class="text-blue-500 hover:text-blue-700">
+                                                                Visualizar Historial
+                                                            </a>
+
+                                                    
+                                                        <a href="{{ route('consultas.editWithoutCita', [
+                                                                 'pacienteId' => $paciente->no_exp,
+                                                                 'medicoId'   => $consulta->usuariomedicoid,
+                                                                 'consultaId' => $consulta->id
+                                                             ]) }}"
+                                                           class="text-green-500 hover:text-green-700 ml-4">
+                                                           Editar
                                                         </a>
-                                                    
-                                                        <a href="{{ route('consultas.editWithoutCita', ['pacienteId' => $paciente->no_exp, 'medicoId' => $consulta->usuariomedicoid, 'consultaId' => $consulta->id]) }}" 
-                                                            class="text-green-500 hover:text-green-700 ml-4">
-                                                            Editar
-                                                        </a>                                                             
-                                                    </td>
-                                                    
+                                                    </td>                                                    
                                                 </tr>
                                             @endforeach
                                         @else
@@ -589,9 +628,66 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* Pantalla de carga centrada */
+        .loader-container {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
     </style>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mostrar el loader
+            document.getElementById('loader').style.display = 'flex';
+
+            window.onload = function() {
+                // Ocultar el loader una vez que todo el contenido se haya cargado
+                document.getElementById('loader').style.display = 'none';
+                // Mostrar el contenido
+                document.querySelector('.py-12').style.display = 'block';
+            };
+        });
+
+        /**
+         * Agrega la unidad de medida si no existe y si hay contenido en el input
+         */
+        function addUnit(inputId, unit) {
+            const input = document.getElementById(inputId);
+            // Verificamos si ya contiene la unidad y si el valor no está vacío
+            if (input.value && !input.value.endsWith(unit)) {
+                input.value += unit;
+            }
+        }
+
+        /**
+         * Remueve la unidad de medida si existe para que el usuario 
+         * pueda editar solo el valor numérico
+         */
+        function removeUnit(inputId, unit) {
+            const input = document.getElementById(inputId);
+            if (input.value.endsWith(unit)) {
+                input.value = input.value.slice(0, -unit.length).trim();
+            }
+        }
+
         function submitForm(formId) {
             const buttonId = formId + '-update'; // Obtén el ID del botón de enviar
             const submitButton = document.getElementById(buttonId);

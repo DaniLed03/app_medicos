@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
     <div class="bg-gray-100 min-h-screen flex justify-center items-center">
         <div class="bg-white shadow-lg rounded-lg p-8 mx-4 my-8 w-full" style="max-width: 100%;">
             <div class="flex justify-between items-center mb-6">
@@ -96,10 +101,6 @@
                                 <h3 class="text-lg font-medium mb-4">Signos Vitales</h3>
                                 <div class="grid grid-cols-7 gap-2">
                                     <div>
-                                        <label for="hidden_talla" class="block text-xs font-medium text-gray-700">Talla</label>
-                                        <input type="text" id="hidden_talla" name="talla" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="m" value="{{ $consulta->talla }}">
-                                    </div>
-                                    <div>
                                         <label for="hidden_temperatura" class="block text-xs font-medium text-gray-700">Temperatura</label>
                                         <input type="text" id="hidden_temperatura" name="temperatura" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="°C" value="{{ $consulta->temperatura }}">
                                     </div>
@@ -108,8 +109,8 @@
                                         <input type="text" id="hidden_frecuencia_cardiaca" name="frecuencia_cardiaca" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="bpm" value="{{ $consulta->frecuencia_cardiaca }}">
                                     </div>
                                     <div>
-                                        <label for="hidden_peso" class="block text-xs font-medium text-gray-700">Peso</label>
-                                        <input type="text" id="hidden_peso" name="peso" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="kg" value="{{ $consulta->peso }}">
+                                        <label for="hidden_saturacion_oxigeno" class="block text-xs font-medium text-gray-700">Saturación de Oxígeno</label>
+                                        <input type="text" id="hidden_saturacion_oxigeno" name="saturacion_oxigeno" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="%" value="{{ $consulta->saturacion_oxigeno }}">
                                     </div>
                                     <div>
                                         <label for="hidden_tension_arterial" class="block text-xs font-medium text-gray-700">Tensión Arterial</label>
@@ -120,8 +121,12 @@
                                         <input type="text" id="circunferencia_cabeza" name="circunferencia_cabeza" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="cm" value="{{ $consulta->circunferencia_cabeza }}">
                                     </div>
                                     <div>
-                                        <label for="hidden_saturacion_oxigeno" class="block text-xs font-medium text-gray-700">Saturación de Oxígeno</label>
-                                        <input type="text" id="hidden_saturacion_oxigeno" name="saturacion_oxigeno" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="%" value="{{ $consulta->saturacion_oxigeno }}">
+                                        <label for="hidden_talla" class="block text-xs font-medium text-gray-700">Talla</label>
+                                        <input type="text" id="hidden_talla" name="talla" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="m" value="{{ $consulta->talla }}">
+                                    </div>
+                                    <div>
+                                        <label for="hidden_peso" class="block text-xs font-medium text-gray-700">Peso</label>
+                                        <input type="text" id="hidden_peso" name="peso" class="mt-1 p-1 w-full border rounded-md text-xs" placeholder="kg" value="{{ $consulta->peso }}">
                                     </div>
                                 </div>
                             </div>
@@ -255,38 +260,40 @@
 
                 <!-- Historial de consultas -->
                 <div id="historialTab" class="tab-pane hidden">
-                    <h3 class="text-lg font-medium mb-4">Historial de Consultas</h3>
-                    <table id="historialConsultasTable" class="min-w-full bg-white border rounded-lg">
-                        <thead>
-                            <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
-                                <th class="py-3 px-6 text-left">Fecha</th>
-                                <th class="py-3 px-6 text-left">Motivo</th>
-                                <th class="py-3 px-6 text-left">Diagnóstico</th>
-                                <th class="py-3 px-6 text-left">Recetas</th>
-                                <th class="py-3 px-6 text-left">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historialConsultas">
-                            @foreach ($consultasPasadas as $consulta)
-                            <tr class="border-b">
-                                <td class="py-3 px-6">{{ $consulta->fechaHora->format('d/m/Y') }}</td>
-                                <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
-                                <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
-                                <td class="text-left py-3 px-4">
-                                    {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
-                                    {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
-                                </td>
-                                <td class="py-3 px-6">
-                                    <!-- Pasa el id de la consulta, el no_exp y el medico_id al hacer clic -->
-                                    <button class="bg-blue-500 text-white px-4 py-2 rounded" 
-                                        onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
-                                        Ver
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-6">
+                        <h3 class="text-lg font-medium mb-4">Historial de Consultas</h3>
+                        <table id="historialConsultasTable" class="min-w-full bg-white border shadow-md rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="bg-[#2D7498] text-white uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">Fecha</th>
+                                    <th class="py-3 px-6 text-left">Motivo</th>
+                                    <th class="py-3 px-6 text-left">Diagnóstico</th>
+                                    <th class="py-3 px-6 text-left">Recetas</th>
+                                    <th class="py-3 px-6 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historialConsultas">
+                                @foreach ($consultasPasadas as $consulta)
+                                <tr class="border-b">
+                                    <td class="py-3 px-6">{{ mb_strtoupper(\Carbon\Carbon::parse($consulta->created_at ?? $consulta->fechaHora)->format('d/m/Y h:i A')) }}</td>
+                                    <td class="py-3 px-6">{!! $consulta->motivoConsulta !!}</td>
+                                    <td class="py-3 px-6">{!! $consulta->diagnostico !!}</td>
+                                    <td class="text-left py-3 px-4">
+                                        {{ $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count() }} 
+                                        {{ Str::plural('Receta', $consulta->recetasPorPaciente($paciente->no_exp)->where('id_medico', $consulta->usuariomedicoid)->count()) }}
+                                    </td>
+                                    <td class="py-3 px-6">
+                                        <!-- Pasa el id de la consulta, el no_exp y el medico_id al hacer clic -->
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded" 
+                                            onclick="verConsulta({{ $consulta->id }}, {{ $consulta->pacienteid }}, {{ $consulta->usuariomedicoid }})">
+                                            Ver
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!-- Modal para mostrar detalles de la consulta -->
                     <div id="modalConsulta" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden z-50">
@@ -432,19 +439,23 @@
 
 
                 function verConsulta(consultaId, pacienteId, medicoId) {
-                    const url = `/consultas/${consultaId}/${pacienteId}/${medicoId}`;
+                    const url = `/consultas/${consultaId}/detalles/${pacienteId}/${medicoId}`;
 
                     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(response => response.json())
                         .then(data => {
-                            // Asignar la fecha de la consulta al título del modal
+                            // Convierte la fecha a objeto Date
                             const fechaConsulta = new Date(data.fechaHora);
-                            const dia = ('0' + fechaConsulta.getDate()).slice(-2); // Asegura dos dígitos en el día
-                            const meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-                            const mes = meses[fechaConsulta.getMonth()]; // Obtiene el mes en mayúsculas
-                            const año = fechaConsulta.getFullYear();
-                            const fechaFormateada = `${dia} ${mes} ${año}`; // Formato "10 ABR 2024"
 
+                            // Extrae día, mes (numérico) y año, asegurándote de agregar ceros a la izquierda
+                            const dia = String(fechaConsulta.getDate()).padStart(2, '0'); 
+                            const mes = String(fechaConsulta.getMonth() + 1).padStart(2, '0');
+                            const año = fechaConsulta.getFullYear();
+
+                            // Formato: dd/mm/yyyy
+                            const fechaFormateada = `${dia}/${mes}/${año}`;
+
+                            // Ahora se asigna "19/12/2024" en lugar de "19 DIC 2024"
                             document.getElementById('fechaConsultaTitulo').innerText = fechaFormateada;
 
                             // Asignar otros datos al modal
@@ -956,12 +967,23 @@
                 };
 
                 for (const [fieldId, unit] of Object.entries(vitalSignsFields)) {
-                    document.getElementById(fieldId).addEventListener('blur', function () {
+                    const field = document.getElementById(fieldId);
+
+                    // Al hacer focus: quitar unidad si está al final
+                    field.addEventListener('focus', function () {
+                        if (this.value.endsWith(unit)) {
+                            this.value = this.value.slice(0, -unit.length).trim();
+                        }
+                    });
+
+                    // Al perder el foco (blur): agregar unidad si no existe y el campo no está vacío
+                    field.addEventListener('blur', function () {
                         if (this.value && !this.value.endsWith(unit)) {
                             this.value += ` ${unit}`;
                         }
                     });
                 }
+
 
                 document.addEventListener('DOMContentLoaded', function() {
                     let showAlert = @json($showAlert); // Pasamos la variable desde el backend
@@ -994,9 +1016,59 @@
                     });
                 });
 
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Mostrar el loader
+                    document.getElementById('loader').style.display = 'flex';
+
+                    window.onload = function() {
+                        // Ocultar el loader una vez que todo el contenido se haya cargado
+                        document.getElementById('loader').style.display = 'none';
+                        // Mostrar el contenido
+                        document.querySelector('.py-12').style.display = 'block';
+                    };
+                });
+
             </script>
 
             <style>
+                /* Pantalla de carga centrada */
+                .loader-container {
+                    position: fixed;
+                    z-index: 9999;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .loader {
+                    border: 16px solid #f3f3f3;
+                    border-top: 16px solid #3498db;
+                    border-radius: 50%;
+                    width: 120px;
+                    height: 120px;
+                    animation: spin 2s linear infinite;
+                }
+
+                .dataTables_filter input[type="search"] {
+                    width: 500px !important; /* Ajusta el tamaño a tu preferencia */
+                    padding: 6px 12px; /* Ajuste de padding */
+                    font-size: 16px;
+                    border-radius: 4px;
+                    border: 1px solid #ccc;
+                    box-sizing: border-box; /* Asegura que el padding y el border estén incluidos en el tamaño total del elemento */
+                }
+
+                .dataTables_filter input[type="search"]:focus {
+                    border-color: #007bff; /* Color del borde azul */
+                    outline: none; /* Elimina el outline por defecto */
+                    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Añade un efecto de sombra azul alrededor del borde */
+                }
+                
                 #recetaModalContent ul,
                 #recetaModalContent ol {
                     list-style-type: disc; /* Puntos para listas no ordenadas */

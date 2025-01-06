@@ -1,4 +1,9 @@
 <x-app-layout>
+    <!-- Pantalla de carga -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
     <div class="py-12">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
@@ -28,7 +33,7 @@
 
                     <!-- Tabla de conceptos -->
                     <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                        <table id="conceptosTable" class="display nowrap w-full" style="width:100%">
+                        <table id="conceptosTable" class="display nowrap w-full shadow-md rounded-lg overflow-hidden" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Tipo de Concepto</th>
@@ -304,9 +309,44 @@
             submitButton.innerText = 'Guardando...';  // Cambia el texto del botón mientras se guarda
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+            // Mostrar el loader
+            document.getElementById('loader').style.display = 'flex';
+
+            window.onload = function() {
+                // Ocultar el loader una vez que todo el contenido se haya cargado
+                document.getElementById('loader').style.display = 'none';
+                // Mostrar el contenido
+                document.querySelector('.py-12').style.display = 'block';
+            };
+        });
 </script>
 
 <style>
+    /* Pantalla de carga centrada */
+    .loader-container {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
     .dt-buttons {
         margin-bottom: 10px;
     }
