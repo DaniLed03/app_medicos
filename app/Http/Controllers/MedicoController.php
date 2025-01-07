@@ -149,43 +149,40 @@ class MedicoController extends Controller
         $porcentajeMujeres = $totalPacientes > 0 ? ($totalMujeres / $totalPacientes) * 100 : 0;
         $porcentajeHombres = $totalPacientes > 0 ? ($totalHombres / $totalPacientes) * 100 : 0;
 
-        // Búsqueda de pacientes
-        $pacientes = collect(); // Inicia vacío
-        if ($request->has('name') && $request->name != '') {
-            $searchTerm = $request->name;
-            $wildcardTerm = "%{$searchTerm}%";
+        // Inicializar colección vacía para pacientes
+        $pacientes = collect();
 
-            // Consulta SQL para buscar pacientes
-            $query = "
+        if ($request->has('name') && trim($request->name) != '') {
+            // Convertir el término de búsqueda a mayúsculas y separarlo en palabras
+            $input = mb_strtoupper(trim($request->name), 'UTF-8');
+            $palabras = preg_split('/\s+/', $input);
+
+            // Construir la consulta SQL inicial
+            $sql = "
                 SELECT *
                 FROM pacientes
                 WHERE activo = 'si'
                 AND medico_id = ?
-                AND (
-                    no_exp LIKE ?
-                    OR nombres LIKE ?
-                    OR apepat LIKE ?
-                    OR apemat LIKE ?
-                    OR CONCAT(nombres, ' ', apepat, ' ', apemat) LIKE ?
-                    OR CONCAT(apepat, ' ', apemat, ' ', nombres) LIKE ?
-                    OR telefono LIKE ?
-                )
             ";
 
-            // Valores de los parámetros
-            $bindings = [
-                $medicoId,
-                $wildcardTerm,
-                $wildcardTerm,
-                $wildcardTerm,
-                $wildcardTerm,
-                $wildcardTerm,
-                $wildcardTerm,
-                $wildcardTerm,
-            ];
+            $bindings = [$medicoId];
 
-            // Convertir el resultado en una colección
-            $pacientes = collect(DB::select($query, $bindings));
+            // Por cada palabra, agregar una cláusula AND que verifique si la palabra aparece en alguno de los campos
+            foreach ($palabras as $palabra) {
+                $sql .= " AND (
+                            UPPER(nombres) LIKE ? 
+                        OR UPPER(apepat) LIKE ?
+                        OR UPPER(apemat) LIKE ?
+                        )";
+                $wildcard = "%{$palabra}%";
+                $bindings[] = $wildcard;
+                $bindings[] = $wildcard;
+                $bindings[] = $wildcard;
+            }
+
+            // Ejecutar la consulta y convertir el resultado en una colección
+            $result = DB::select($sql, $bindings);
+            $pacientes = collect($result);
         }
 
         return view('medico.dashboard', compact('pacientes', 'totalPacientes', 'porcentajeMujeres', 'porcentajeHombres'));
