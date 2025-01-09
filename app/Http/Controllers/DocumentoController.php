@@ -7,26 +7,10 @@ use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log; // <--- Importamos Log
+use NumberToWords\NumberToWords;
 
 class DocumentoController extends Controller
 {
-    public function generarPasaportePDF($pacienteId)
-    {
-        $menor = DB::selectOne("
-            SELECT *
-            FROM pacientes
-            WHERE no_exp = ?
-            LIMIT 1
-        ", [$pacienteId]);
-
-        if (!$menor) {
-            abort(404, "Paciente no encontrado");
-        }
-
-        $pdf = PDF::loadView('VicenteVelez.RE.pasaportePDF', compact('menor'));
-        return $pdf->stream('ConstanciaPasaporte.pdf');
-    }
-
     public function generarPasaporteDesdeFormulario(Request $request)
     {
         // Validar los datos del formulario
@@ -111,5 +95,72 @@ class DocumentoController extends Controller
             'pdfBase64' => $base64Pdf,
         ]);
     }
+
+    public function generarFacturaDesdeFormulario(Request $request)
+    {
+        // Validación de campos requeridos
+        $validatedData = $request->validate([
+            'doctorName' => 'required|string|max:255',
+            'cedula' => 'required|string|max:50',
+            'telefonoPersonalMedico' => 'required|string|max:20',
+            'calle' => 'required|string|max:255',
+            'telefonoConsultorio' => 'required|string|max:20',
+            'quienRecibe' => 'required|string|max:255',
+            'cantidad' => 'required|numeric',
+            'concepto' => 'required|string',
+        ]);
+
+        // Obtener el correo del médico autenticado
+        $medico = Auth::user();
+        $emailMedico = $medico->email;
+
+        // Asignar variables desde la solicitud validada
+        $quienRecibe = $validatedData['quienRecibe'];
+        $cantidad = $validatedData['cantidad'];
+
+        // Convertir cantidad a letras y formatear los decimales
+        $numberToWords = new NumberToWords();
+        $numberTransformer = $numberToWords->getNumberTransformer('es');
+
+        // Parte entera de la cantidad
+        $parteEntera = floor($cantidad);
+        // Parte decimal multiplicada por 100 y redondeada
+        $decimales = round(($cantidad - $parteEntera) * 100);
+
+        // Convertir la parte entera a letras
+        $cantidad_letra = ucfirst($numberTransformer->toWords($parteEntera)) . ' pesos';
+
+        // Agregar la parte decimal en formato XX/100 M.N.
+        if ($decimales > 0) {
+            // Si hay decimales diferentes de .00
+            $cantidad_letra .= " {$decimales}/100 M.N.";
+        } else {
+            // Si la parte decimal es .00
+            $cantidad_letra .= " 00/100 M.N.";
+        }
+
+        // Generar el PDF pasando todas las variables necesarias a la vista
+        $pdf = PDF::loadView('VicenteVelez.Factu.factura', [
+            'doctorName' => $validatedData['doctorName'],
+            'cedula' => $validatedData['cedula'],
+            'telefonoPersonalMedico' => $validatedData['telefonoPersonalMedico'],
+            'calle' => $validatedData['calle'],
+            'telefonoConsultorio' => $validatedData['telefonoConsultorio'],
+            'quienRecibe' => $quienRecibe,
+            'cantidad' => $cantidad,
+            'cantidad_letra' => $cantidad_letra,
+            'concepto' => $validatedData['concepto'],
+            'emailMedico' => $emailMedico,
+        ])->setPaper('A5', 'portrait'); // Establece el tamaño de papel a A5 y orientación vertical
+
+        $pdfContent = $pdf->output();
+        $base64Pdf = base64_encode($pdfContent);
+
+        return response()->json([
+            'pdfBase64' => $base64Pdf,
+        ]);
+    }
+
+
 
 }

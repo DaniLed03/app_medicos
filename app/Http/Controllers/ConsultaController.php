@@ -21,6 +21,9 @@ class ConsultaController extends Controller
      public function createWithoutCita($pacienteId)
     {
         $medicoId = Auth::id(); 
+        // Obtener datos del médico autenticado
+        $medico = Auth::user();
+        $emailMedico = $medico->email; // Extraer el email del médico
 
         // Obtener datos del paciente y filtrar también por médico, incluyendo los antecedentes
         $paciente = DB::select("
@@ -108,7 +111,8 @@ class ConsultaController extends Controller
             'calle',
             'telefonoConsultorio',
             'cedulaProfesional',
-            'telefonoPersonalMedico'
+            'telefonoPersonalMedico',
+            'emailMedico'
         ));
     }
 

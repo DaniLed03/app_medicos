@@ -368,6 +368,13 @@
                         >
                             Constancia de Relaciones Exteriores
                         </button>
+                        <!-- Nuevo botón para Generar factura -->
+                            <button 
+                            id="mostrarFacturaWizard" 
+                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        >
+                            Generar Recibo de Honorarios
+                        </button>
                     </div>
                 
                     <!-- Wizard de 2 pasos -->
@@ -409,41 +416,43 @@
                         <div id="paso1Contenido" class="bg-white p-4 rounded shadow-md">
                             <h4 class="text-lg font-semibold mb-4">Paso 1: Datos del Doctor</h4>
                             <form id="formPaso1">
-                                <div class="mb-4">
-                                    <label for="doctorName" class="block text-sm font-medium text-gray-700">Nombre del Doctor</label>
-                                    <input 
-                                        type="text"
-                                        id="doctorName"
-                                        name="doctorName"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('doctorName', 'Dr. ' . $medico->nombres . ' ' . $medico->apepat . ' ' . $medico->apemat) }}"
-                                        placeholder="Ej: Dr. Juan Pérez" 
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="cedula" class="block text-sm font-medium text-gray-700">Cédula Profesional</label>
-                                    <input 
-                                        type="text"
-                                        id="cedula"
-                                        name="cedula"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('cedula', $cedulaProfesional) }}"
-                                        placeholder="Ej: 12345678"
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="telefonoPersonalMedico" class="block text-sm font-medium text-gray-700">Teléfono Celular Personal del Médico</label>
-                                    <input
-                                        type="text"
-                                        id="telefonoPersonalMedico"
-                                        name="telefonoPersonalMedico"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('telefonoPersonalMedico', $telefonoPersonalMedico) }}"
-                                        placeholder="Ej: 8343011758"
-                                        required
-                                    >
+                                <div class="mb-4 flex items-center space-x-4">
+                                    <div class="flex-1">
+                                        <label for="doctorName" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <input 
+                                            type="text"
+                                            id="doctorName"
+                                            name="doctorName"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('doctorName', 'DR. ' . $medico->nombres . ' ' . $medico->apepat . ' ' . $medico->apemat) }}"
+                                            placeholder="Ej: Dr. Juan Pérez" 
+                                            required
+                                        >
+                                    </div>
+                                    <div class="flex-1">
+                                        <label for="cedula" class="block text-sm font-medium text-gray-700">Cédula Profesional</label>
+                                        <input 
+                                            type="text"
+                                            id="cedula"
+                                            name="cedula"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('cedula', $cedulaProfesional) }}"
+                                            placeholder="Ej: 12345678"
+                                            required
+                                        >
+                                    </div>
+                                    <div class="flex-1">
+                                        <label for="telefonoPersonalMedico" class="block text-sm font-medium text-gray-700">Teléfono Celular</label>
+                                        <input
+                                            type="text"
+                                            id="telefonoPersonalMedico"
+                                            name="telefonoPersonalMedico"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('telefonoPersonalMedico', $telefonoPersonalMedico) }}"
+                                            placeholder="Ej: 8343011758"
+                                            required
+                                        >
+                                    </div>   
                                 </div>
                             </form>
                             <div class="flex justify-between">
@@ -456,29 +465,33 @@
                         <div id="paso2Contenido" class="hidden bg-white p-4 rounded shadow-md">
                             <h4 class="text-lg font-semibold mb-4">Paso 2: Datos del Consultorio</h4>
                             <form id="formPaso2">
-                                <div class="mb-4">
-                                    <label for="calle" class="block text-sm font-medium text-gray-700">Calle del Consultorio</label>
-                                    <input 
-                                        type="text" 
-                                        id="calle"
-                                        name="calle"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('calle', $calle) }}"
-                                        placeholder="Ej: Av. Principal #123"
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="telefonoConsultorio" class="block text-sm font-medium text-gray-700">Teléfono del Consultorio</label>
-                                    <input
-                                        type="text"
-                                        id="telefonoConsultorio"
-                                        name="telefonoConsultorio"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('telefonoConsultorio', $telefonoConsultorio) }}"
-                                        placeholder="Ej: 8343011758"
-                                        required
-                                    >
+                                <div class="mb-4 flex space-x-4">
+                                    <!-- Campo de Calle con mayor ancho -->
+                                    <div class="flex-grow">
+                                        <label for="calle" class="block text-sm font-medium text-gray-700">Calle del Consultorio</label>
+                                        <input 
+                                            type="text" 
+                                            id="calle"
+                                            name="calle"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('calle', $calle) }}"
+                                            placeholder="Ej: Av. Principal #123"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Campo de Teléfono con menor ancho -->
+                                    <div class="w-1/3">
+                                        <label for="telefonoConsultorio" class="block text-sm font-medium text-gray-700">Teléfono del Consultorio</label>
+                                        <input
+                                            type="text"
+                                            id="telefonoConsultorio"
+                                            name="telefonoConsultorio"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('telefonoConsultorio', $telefonoConsultorio) }}"
+                                            placeholder="Ej: 8343011758"
+                                            required
+                                        >
+                                    </div>
                                 </div>
                             </form>
                             <div class="flex justify-between">
@@ -491,41 +504,46 @@
                         <div id="paso3Contenido" class="hidden bg-white p-4 rounded shadow-md">
                             <h4 class="text-lg font-semibold mb-4">Paso 3: Datos del Paciente</h4>
                             <form id="formPaso3">
-                                <div class="mb-4">
-                                    <label for="pacienteNombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-                                    <input
-                                        type="text"
-                                        id="pacienteNombre"
-                                        name="pacienteNombre"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('pacienteNombre', $paciente->nombres . ' ' . $paciente->apepat . ' ' . $paciente->apemat) }}"
-                                        placeholder="Nombre completo"
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="padre" class="block text-sm font-medium text-gray-700">Padre</label>
-                                    <input
-                                        type="text"
-                                        id="padre"
-                                        name="padre"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('padre', $paciente->padre ?? '') }}"
-                                        placeholder="Nombre del padre"
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="madre" class="block text-sm font-medium text-gray-700">Madre</label>
-                                    <input
-                                        type="text"
-                                        id="madre"
-                                        name="madre"
-                                        class="w-full mt-1 border rounded p-2"
-                                        value="{{ old('madre', $paciente->madre ?? '') }}"
-                                        placeholder="Nombre de la madre"
-                                        required
-                                    >
+                                <div class="mb-4 flex space-x-4">
+                                    <!-- Campo Nombre -->
+                                    <div class="flex-1">
+                                        <label for="pacienteNombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <input
+                                            type="text"
+                                            id="pacienteNombre"
+                                            name="pacienteNombre"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('pacienteNombre', $paciente->nombres . ' ' . $paciente->apepat . ' ' . $paciente->apemat) }}"
+                                            placeholder="Nombre completo"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Campo Padre -->
+                                    <div class="flex-1">
+                                        <label for="padre" class="block text-sm font-medium text-gray-700">Padre</label>
+                                        <input
+                                            type="text"
+                                            id="padre"
+                                            name="padre"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('padre', $paciente->padre ?? '') }}"
+                                            placeholder="Nombre del padre"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Campo Madre -->
+                                    <div class="flex-1">
+                                        <label for="madre" class="block text-sm font-medium text-gray-700">Madre</label>
+                                        <input
+                                            type="text"
+                                            id="madre"
+                                            name="madre"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('madre', $paciente->madre ?? '') }}"
+                                            placeholder="Nombre de la madre"
+                                            required
+                                        >
+                                    </div>
                                 </div>
                             </form>
                             <div class="flex justify-between">
@@ -533,6 +551,7 @@
                                 <button id="nextPaso3" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
                             </div>
                         </div>
+
 
                         <!-- Paso 4: Generar PDF -->
                         <div id="paso4Contenido" class="hidden bg-white p-4 rounded shadow-md">
@@ -549,14 +568,238 @@
                             <div id="pdfPreviewContainer" class="mt-6 hidden w-full h-auto">
                                 <iframe id="pdfPreviewFrameWizard" src="" frameborder="0" class="w-full h-full"></iframe>
                             </div>
-                            
-                            
                         </div>
                     </div>
+
+                    <!-- Wizard para la factura -->
+                    <div id="facturaWizard" class="hidden w-full">
+                        <!-- Barra de pasos - similar a la existente, ajusta títulos según corresponda -->
+                        <div class="flex justify-around items-center mb-2">
+                            <!-- Reutilizamos los mismos pasos para datos del médico, consultorio y paciente -->
+                            <div class="flex flex-col items-center" id="factPaso1Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-green-600 text-white font-bold mb-1">1</div>
+                                <p class="text-xs font-medium">Datos del Doctor</p>
+                            </div>
+                            <!-- Se repiten los mismos pasos 2, 3 y 4 para mantener la consistencia -->
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <div class="flex flex-col items-center" id="factPaso2Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">2</div>
+                                <p class="text-xs font-medium text-gray-400">Datos del Consultorio</p>
+                            </div>
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <div class="flex flex-col items-center" id="factPaso3Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">3</div>
+                                <p class="text-xs font-medium text-gray-400">Solicitante</p>
+                            </div>
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <div class="flex flex-col items-center" id="factPaso4Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">4</div>
+                                <p class="text-xs font-medium text-gray-400">Datos del Recibo</p>
+                            </div>
+                            <div class="border-t-2 border-gray-300 flex-grow mx-2" style="margin-top: 0.5rem;"></div>
+                            <div class="flex flex-col items-center" id="factPaso5Indicator">
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center bg-gray-300 text-white font-bold mb-1">5</div>
+                                <p class="text-xs font-medium text-gray-400">Generar PDF</p>
+                            </div>
+                        </div>
+
+                        <!-- Contenido de cada paso para la factura -->
+                        <!-- Paso 1: Datos del Doctor -->
+                        <div id="factPaso1Contenido" class="bg-white p-4 rounded">
+                            <h4 class="text-lg font-semibold mb-4">Paso 1: Datos del Doctor</h4>
+                            <form id="formFactPaso1">
+                                
+                                <div class="mb-4 flex items-center space-x-4">
+                                    <!-- Nombre del Doctor -->
+                                    <div class="flex-1">
+                                        <label for="factDoctorName" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <input 
+                                            type="text"
+                                            id="factDoctorName"
+                                            name="doctorName"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('doctorName', 'DR. ' . $medico->nombres . ' ' . $medico->apepat . ' ' . $medico->apemat) }}"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Correo Electrónico -->
+                                    <div class="flex-1">
+                                        <label for="factDoctorEmail" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                                        <input 
+                                            type="email" 
+                                            id="factDoctorEmail" 
+                                            name="doctorEmail" 
+                                            class="w-full mt-1 border rounded p-2" 
+                                            value="{{ old('doctorEmail', $emailMedico) }}" 
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Cédula Profesional -->
+                                    <div class="flex-1">
+                                        <label for="factCedula" class="block text-sm font-medium text-gray-700">Cédula Profesional</label>
+                                        <input 
+                                            type="text"
+                                            id="factCedula"
+                                            name="cedula"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('cedula', $cedulaProfesional) }}"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Teléfono Celular Personal del Médico -->
+                                    <div class="flex-1">
+                                        <label for="factTelefonoPersonalMedico" class="block text-sm font-medium text-gray-700">Teléfono Celular</label>
+                                        <input
+                                            type="text"
+                                            id="factTelefonoPersonalMedico"
+                                            name="telefonoPersonalMedico"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('telefonoPersonalMedico', $telefonoPersonalMedico) }}"
+                                            required
+                                        >
+                                    </div>
+                                </div>                                
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="factBackToDocuments" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextFactPaso1" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <div id="factPaso2Contenido" class="hidden bg-white p-4 rounded">
+                            <h4 class="text-lg font-semibold mb-4">Paso 2: Datos del Consultorio</h4>
+                            <form id="formFactPaso2">
+                                <div class="mb-4 flex items-center space-x-4">
+                                    <!-- Calle del Consultorio -->
+                                    <div class="flex-1">
+                                        <label for="factCalle" class="block text-sm font-medium text-gray-700">Calle del Consultorio</label>
+                                        <input 
+                                            type="text" 
+                                            id="factCalle"
+                                            name="calle"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('calle', $calle) }}"
+                                            required
+                                        >
+                                    </div>
+                                    <!-- Teléfono del Consultorio -->
+                                    <div class="flex-3">
+                                        <label for="factTelefonoConsultorio" class="block text-sm font-medium text-gray-700">Teléfono del Consultorio</label>
+                                        <input
+                                            type="text"
+                                            id="factTelefonoConsultorio"
+                                            name="telefonoConsultorio"
+                                            class="w-full mt-1 border rounded p-2"
+                                            value="{{ old('telefonoConsultorio', $telefonoConsultorio) }}"
+                                            required
+                                        >
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backFactPaso2" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextFactPaso2" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Paso 3: Datos de quien recibe -->
+                        <div id="factPaso3Contenido" class="hidden bg-white p-4 rounded ">
+                            <h4 class="text-lg font-semibold mb-4">Paso 3: Datos del Solicitante</h4>
+                            <form id="formFactPaso3">
+                                <div class="mb-4">
+                                    <span class="block text-sm font-medium text-gray-700 mb-2">Seleccione una opcion:</span>
+                                    <div class="flex flex-col space-y-2">
+                                        <!-- Opción Padre -->
+                                        <div class="flex items-center space-x-2 w-full">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="quienRecibe" value="padre" class="form-radio" required>
+                                                <span class="ml-2">Padre</span>
+                                            </label>
+                                            <input type="text" id="inputPadre" name="padre" 
+                                                class="mt-1 p-2 border rounded-md opacity-50 cursor-not-allowed flex-grow" 
+                                                placeholder="Nombre del Padre" disabled
+                                                value="{{ $paciente->padre ?? '' }}">
+                                        </div>
+                                        <!-- Opción Madre -->
+                                        <div class="flex items-center space-x-2 w-full">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="quienRecibe" value="madre" class="form-radio" required>
+                                                <span class="ml-2">Madre</span>
+                                            </label>
+                                            <input type="text" id="inputMadre" name="madre" 
+                                                class="mt-1 p-2 border rounded-md opacity-50 cursor-not-allowed flex-grow" 
+                                                placeholder="Nombre de la Madre" disabled
+                                                value="{{ $paciente->madre ?? '' }}">
+                                        </div>
+                                        <!-- Opción Otro -->
+                                        <div class="flex items-center space-x-2 w-full">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="quienRecibe" value="otro" class="form-radio" required>
+                                                <span class="ml-2">Otro</span>
+                                            </label>
+                                            <input type="text" id="inputOtro" name="otro" 
+                                                class="mt-1 p-2 border rounded-md opacity-50 cursor-not-allowed flex-grow" 
+                                                placeholder="Otro" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backFactPaso3" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextFactPaso3" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 4: Datos de Factura -->
+                        <div id="factPaso4Contenido" class="hidden bg-white p-4">
+                            <h4 class="text-lg font-semibold mb-4">Paso 4: Datos de Factura</h4>
+                            <form id="formFactPaso4">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">CANTIDAD:</label>
+                                    <input 
+                                        type="number" 
+                                        name="cantidad" 
+                                        class="w-1/4 mt-1 border rounded p-2" 
+                                        placeholder="Cantidad" 
+                                        required
+                                        step="any"
+                                    >
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">CONCEPTO:</label>
+                                    <textarea 
+                                        name="concepto" 
+                                        class="w-full mt-1 border rounded p-2" 
+                                        rows="3" 
+                                        placeholder="Descripción del concepto" 
+                                        required
+                                    ></textarea>
+                                </div>
+                            </form>
+                            <div class="flex justify-between">
+                                <button id="backFactPaso4" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="nextFactPaso4" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Siguiente</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 5: Generar PDF -->
+                        <div id="factPaso5Contenido" class="hidden bg-white p-4 rounded">
+                            <h4 class="text-lg font-semibold mb-4">Paso 5: Generar PDF</h4>
+                            <p>Haz clic en el botón para generar la factura.</p>
+                            
+                            <div class="flex justify-between mt-4">
+                                <button id="backFactPaso5" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Regresar</button>
+                                <button id="generarPDFFactura" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Generar PDF</button>
+                            </div>
+                            
+                            <!-- Iframe para vista previa del PDF -->
+                            <div id="pdfPreviewContainerFactura" class="mt-6 hidden w-full h-auto">
+                                <iframe id="pdfPreviewFrameFactura" src="" frameborder="0" class="w-full h-full"></iframe>
+                            </div>                            
+                        </div>
+                    </div>
+
                 </div>
-                
-                
-                
             </div>
 
             @if (old('recetas'))
@@ -651,6 +894,19 @@
 
                 /* Opcional: Ajustar el contenedor de la vista previa para una mejor presentación */
                 #pdfPreviewContainer {
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 20px;
+                }
+
+                /* Ajustar el iframe para que sea responsivo */
+                #pdfPreviewFrameFactura {
+                    width: 100%;
+                    height: 600px;
+                    border: none;
+                }
+
+                /* Opcional: Ajustar el contenedor de la vista previa para una mejor presentación */
+                #pdfPreviewContainerFactura {
                     border-top: 1px solid #e2e8f0;
                     padding-top: 20px;
                 }
@@ -844,6 +1100,213 @@
             
                 });
             </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Mostrar el wizard de factura y ocultar otros elementos
+                    document.getElementById('mostrarFacturaWizard').addEventListener('click', function () {
+                        document.getElementById('documentosContainer').classList.add('hidden');
+                        document.getElementById('facturaWizard').classList.remove('hidden');
+                    });
+                
+                    // Regresar al contenedor de Documentos desde el wizard de factura
+                    document.getElementById('factBackToDocuments').addEventListener('click', function () {
+                        document.getElementById('facturaWizard').classList.add('hidden');
+                        document.getElementById('documentosContainer').classList.remove('hidden');
+                    });
+                
+                    // Funciones para avanzar y regresar entre pasos en el wizard de factura
+                    function avanzarFactPaso(pasoActual) {
+                        // Ocultar el contenido del paso actual
+                        document.getElementById(`factPaso${pasoActual}Contenido`).classList.add('hidden');
+                
+                        // Mostrar contenido del siguiente paso
+                        document.getElementById(`factPaso${pasoActual + 1}Contenido`).classList.remove('hidden');
+                
+                        // Actualizar indicadores de paso
+                        document.getElementById(`factPaso${pasoActual}Indicator`).querySelector('.h-8').classList.remove('bg-green-600');
+                        document.getElementById(`factPaso${pasoActual}Indicator`).querySelector('.h-8').classList.add('bg-gray-300');
+                        document.getElementById(`factPaso${pasoActual + 1}Indicator`).querySelector('.h-8').classList.remove('bg-gray-300');
+                        document.getElementById(`factPaso${pasoActual + 1}Indicator`).querySelector('.h-8').classList.add('bg-green-600');
+                    }
+                
+                    function regresarFactPaso(pasoActual) {
+                        // Ocultar el contenido del paso actual
+                        document.getElementById(`factPaso${pasoActual}Contenido`).classList.add('hidden');
+                
+                        // Mostrar contenido del paso anterior
+                        document.getElementById(`factPaso${pasoActual - 1}Contenido`).classList.remove('hidden');
+                
+                        // Actualizar indicadores de paso
+                        document.getElementById(`factPaso${pasoActual}Indicator`).querySelector('.h-8').classList.remove('bg-green-600');
+                        document.getElementById(`factPaso${pasoActual}Indicator`).querySelector('.h-8').classList.add('bg-gray-300');
+                        document.getElementById(`factPaso${pasoActual - 1}Indicator`).querySelector('.h-8').classList.remove('bg-gray-300');
+                        document.getElementById(`factPaso${pasoActual - 1}Indicator`).querySelector('.h-8').classList.add('bg-green-600');
+                    }
+                
+                    // Ejemplo de asignación de eventos para navegación en el wizard de factura
+                    document.getElementById('nextFactPaso1').addEventListener('click', function() {
+                        if(document.getElementById('formFactPaso1').checkValidity()) {
+                            avanzarFactPaso(1);
+                        } else {
+                            document.getElementById('formFactPaso1').reportValidity();
+                        }
+                    });
+                
+                    document.getElementById('nextFactPaso2').addEventListener('click', function() {
+                        if(document.getElementById('formFactPaso2').checkValidity()) {
+                            avanzarFactPaso(2);
+                        } else {
+                            document.getElementById('formFactPaso2').reportValidity();
+                        }
+                    });
+                
+                    document.getElementById('nextFactPaso3').addEventListener('click', function() {
+                        // Validar que al menos un radio esté seleccionado y que el input correspondiente no esté vacío
+                        const selectedRadio = document.querySelector('input[name="quienRecibe"]:checked');
+                        let isValid = false;
+                        if(selectedRadio) {
+                            if(selectedRadio.value === 'padre' && document.getElementById('inputPadre').value.trim() !== '') {
+                                isValid = true;
+                            } else if(selectedRadio.value === 'madre' && document.getElementById('inputMadre').value.trim() !== '') {
+                                isValid = true;
+                            } else if(selectedRadio.value === 'otro' && document.getElementById('inputOtro').value.trim() !== '') {
+                                isValid = true;
+                            }
+                        }
+                        
+                        if(isValid) {
+                            avanzarFactPaso(3);
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Seleccione el solicitante',
+                                text: 'Por favor, complete el campo correspondiente a la opción seleccionada.'
+                            });
+                        }
+                    });
+
+
+                
+                    document.getElementById('nextFactPaso4').addEventListener('click', function() {
+                        if(document.getElementById('formFactPaso4').checkValidity()) {
+                            avanzarFactPaso(4);
+                        } else {
+                            document.getElementById('formFactPaso4').reportValidity();
+                        }
+                    });
+                
+                    document.getElementById('backFactPaso2').addEventListener('click', function() {
+                        regresarFactPaso(2);
+                    });
+                
+                    document.getElementById('backFactPaso3').addEventListener('click', function() {
+                        regresarFactPaso(3);
+                    });
+                
+                    document.getElementById('backFactPaso4').addEventListener('click', function() {
+                        regresarFactPaso(4);
+                    });
+                
+                    document.getElementById('backFactPaso5').addEventListener('click', function() {
+                        regresarFactPaso(5);
+                    });
+                
+                    document.getElementById('generarPDFFactura').addEventListener('click', function() {
+                        // Recopilar datos de todos los formularios del wizard de factura
+                        let formFact1 = document.getElementById('formFactPaso1');
+                        let formFact2 = document.getElementById('formFactPaso2');
+                        let formFact4 = document.getElementById('formFactPaso4');
+                        
+                        let formData = new FormData();
+                        
+                        // Paso 1 y 2
+                        formData.append('doctorName', formFact1.doctorName.value);
+                        formData.append('cedula', formFact1.cedula.value);
+                        formData.append('telefonoPersonalMedico', formFact1.telefonoPersonalMedico.value);
+                        formData.append('doctorEmail', formFact1.doctorEmail.value); // Añadir el correo
+                        formData.append('calle', formFact2.calle.value);
+                        formData.append('telefonoConsultorio', formFact2.telefonoConsultorio.value);
+                        
+                        // Paso 3: Datos de quien recibe
+                        const selectedRadio = document.querySelector('input[name="quienRecibe"]:checked');
+                        let quienRecibe = '';
+                        if(selectedRadio) {
+                            if(selectedRadio.value === 'padre') {
+                                quienRecibe = document.getElementById('inputPadre').value;
+                            } else if(selectedRadio.value === 'madre') {
+                                quienRecibe = document.getElementById('inputMadre').value;
+                            } else if(selectedRadio.value === 'otro') {
+                                quienRecibe = document.getElementById('inputOtro').value;
+                            }
+                        }
+                        formData.append('quienRecibe', quienRecibe);
+                        
+                        // Paso 4: Cantidad y Concepto
+                        formData.append('cantidad', formFact4.cantidad.value);
+                        formData.append('concepto', formFact4.concepto.value);
+                        
+                        // Enviar la solicitud AJAX para generar el PDF de la factura
+                        fetch('{{ route('ruta.generarFacturaDesdeFormulario') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data); // Verificar la respuesta en la consola
+                            if(data.pdfBase64){
+                                document.getElementById('pdfPreviewFrameFactura').src = 'data:application/pdf;base64,' + data.pdfBase64;
+                                document.getElementById('pdfPreviewContainerFactura').classList.remove('hidden');
+                            } else {
+                                alert('Error al generar la factura.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Ocurrió un error al generar el PDF de la factura.');
+                        });
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const radios = document.querySelectorAll('input[name="quienRecibe"]');
+                    const inputPadre = document.getElementById('inputPadre');
+                    const inputMadre = document.getElementById('inputMadre');
+                    const inputOtro = document.getElementById('inputOtro');
+                
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            // Deshabilitar todos los inputs inicialmente
+                            inputPadre.disabled = true;
+                            inputMadre.disabled = true;
+                            inputOtro.disabled = true;
+                            inputPadre.classList.add('opacity-50','cursor-not-allowed');
+                            inputMadre.classList.add('opacity-50','cursor-not-allowed');
+                            inputOtro.classList.add('opacity-50','cursor-not-allowed');
+                
+                            // Habilitar el input correspondiente a la opción seleccionada
+                            if(this.value === 'padre') {
+                                inputPadre.disabled = false;
+                                inputPadre.classList.remove('opacity-50','cursor-not-allowed');
+                            } else if(this.value === 'madre') {
+                                inputMadre.disabled = false;
+                                inputMadre.classList.remove('opacity-50','cursor-not-allowed');
+                            } else if(this.value === 'otro') {
+                                inputOtro.disabled = false;
+                                inputOtro.classList.remove('opacity-50','cursor-not-allowed');
+                            }
+                        });
+                    });
+                });
+            </script>
+    
+    
             <script>
                 // Función para actualizar los signos vitales dentro del modal
                 function updateModalVitalSigns() {

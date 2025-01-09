@@ -188,4 +188,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/documento/generar-pasaporte', [DocumentoController::class, 'generarPasaporteDesdeFormulario'])
         ->name('documento.generarPasaporteDesdeFormulario');
 
+    Route::post('/documento/generar-factura', [DocumentoController::class, 'generarFacturaDesdeFormulario'])
+    ->name('ruta.generarFacturaDesdeFormulario');
+
+
 });

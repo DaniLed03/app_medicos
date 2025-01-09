@@ -8,6 +8,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
         "ckeditor/ckeditor": "^4.24",
+        "kwn/number-to-words": "^2.11",
         "laravel/fortify": "*",
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.15",
